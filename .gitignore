@@ -1,0 +1,18 @@
+# Laravel
+apps/api/.env
+apps/api/vendor/
+apps/api/storage/logs/*.log
+
+# Python
+apps/worker/.env
+apps/worker/**/__pycache__/
+apps/worker/**/*.pyc
+
+# Node
+apps/web/.env
+apps/web/node_modules/
+apps/web/dist/
+
+# OS
+.DS_Store
+*.env.local
