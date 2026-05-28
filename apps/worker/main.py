@@ -28,5 +28,5 @@ async def health():
 
 @app.post("/jobs/sync-trending")
 async def trigger_sync():
-    await sync_trending_job()
-    return {"triggered": "sync_trending"}
+    synced = await sync_trending_job()
+    return {"triggered": "sync_trending", "synced": synced}

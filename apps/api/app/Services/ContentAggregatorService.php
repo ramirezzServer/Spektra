@@ -2,67 +2,215 @@
 
 namespace App\Services;
 
+use App\Models\ContentItem;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ContentAggregatorService
 {
-    public function searchFilms(string $query, int $page): array
+    private const CACHE_TTL_HOURS = 24;
+
+    public function searchFilms(string $query, int $page = 1): array
     {
-        return Cache::remember("tmdb:multi:$query:$page", now()->addDay(), fn () => Http::get(config('services.tmdb.url').'/search/multi', [
-            'api_key' => config('services.tmdb.key'),
-            'query' => $query,
-            'page' => $page,
-        ])->json('results', []));
+        return $this->tmdbSearch('/search/movie', $query, $page, 'film');
     }
 
-    public function searchGames(string $query, int $page): array
+    public function searchSeries(string $query, int $page = 1): array
     {
-        return Cache::remember("rawg:games:$query:$page", now()->addDay(), fn () => Http::get(config('services.rawg.url').'/games', [
-            'key' => config('services.rawg.key'),
-            'search' => $query,
-            'page' => $page,
-        ])->json('results', []));
+        return $this->tmdbSearch('/search/tv', $query, $page, 'series');
     }
 
-    public function searchBooks(string $query, int $page): array
+    public function searchGames(string $query, int $page = 1): array
     {
-        return Cache::remember("openlibrary:books:$query:$page", now()->addDay(), fn () => Http::get(config('services.openlibrary.url').'/search.json', [
-            'q' => $query,
-            'page' => $page,
-        ])->json('docs', []));
+        if (! config('services.rawg.key')) {
+            return ['results' => [], 'total' => 0];
+        }
+
+        return Cache::remember($this->cacheKey('rawg', 'games', $query, $page), now()->addHours(self::CACHE_TTL_HOURS), function () use ($query, $page) {
+            try {
+                $response = Http::timeout(10)->get(config('services.rawg.base_url').'/games', [
+                    'key' => config('services.rawg.key'),
+                    'search' => $query,
+                    'page' => $page,
+                    'page_size' => 20,
+                ])->throw()->json();
+
+                return [
+                    'results' => collect($response['results'] ?? [])->map(fn (array $item) => $this->normalizeRawg($item))->all(),
+                    'total' => (int) ($response['count'] ?? 0),
+                ];
+            } catch (Throwable $exception) {
+                Log::warning('RAWG search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+
+                return ['results' => [], 'total' => 0];
+            }
+        });
     }
 
-    public function normalizeToContentItem(array $raw, string $type): array
+    public function searchBooks(string $query, int $page = 1): array
     {
-        return match ($type) {
-            'game' => [
-                'external_id' => (string) $raw['id'],
-                'type' => 'game',
-                'title' => $raw['name'] ?? 'Untitled game',
-                'poster_url' => $raw['background_image'] ?? null,
-                'release_year' => isset($raw['released']) ? (int) substr($raw['released'], 0, 4) : null,
-                'genres' => collect($raw['genres'] ?? [])->pluck('name')->all(),
-                'metadata' => $raw,
+        return Cache::remember($this->cacheKey('openlibrary', 'books', $query, $page), now()->addHours(self::CACHE_TTL_HOURS), function () use ($query, $page) {
+            try {
+                $response = Http::timeout(10)->get(config('services.openlibrary.base_url').'/search.json', [
+                    'q' => $query,
+                    'page' => $page,
+                    'limit' => 20,
+                ])->throw()->json();
+
+                return [
+                    'results' => collect($response['docs'] ?? [])->map(fn (array $item) => $this->normalizeOpenLibrary($item))->all(),
+                    'total' => (int) ($response['numFound'] ?? 0),
+                ];
+            } catch (Throwable $exception) {
+                Log::warning('OpenLibrary search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+
+                return ['results' => [], 'total' => 0];
+            }
+        });
+    }
+
+    public function getTrendingFilmsAndSeries(): array
+    {
+        if (! config('services.tmdb.key')) {
+            return [];
+        }
+
+        return Cache::remember('tmdb:trending:week', now()->addHours(self::CACHE_TTL_HOURS), function () {
+            try {
+                $response = Http::timeout(10)->get(config('services.tmdb.base_url').'/trending/all/week', [
+                    'api_key' => config('services.tmdb.key'),
+                ])->throw()->json();
+
+                return collect($response['results'] ?? [])
+                    ->filter(fn (array $item) => in_array($item['media_type'] ?? null, ['movie', 'tv'], true))
+                    ->map(fn (array $item) => $this->normalizeTmdb($item, ($item['media_type'] ?? '') === 'tv' ? 'series' : 'film'))
+                    ->values()
+                    ->all();
+            } catch (Throwable $exception) {
+                Log::warning('TMDB trending failed', ['error' => $exception->getMessage()]);
+
+                return [];
+            }
+        });
+    }
+
+    public function normalizeTmdb(array $item, string $type): array
+    {
+        $releaseDate = $type === 'series' ? ($item['first_air_date'] ?? null) : ($item['release_date'] ?? null);
+        $posterPath = $item['poster_path'] ?? null;
+
+        return [
+            'external_id' => (string) ($item['id'] ?? uniqid('tmdb_', true)),
+            'type' => $type,
+            'title' => $item['title'] ?? $item['name'] ?? 'Untitled',
+            'poster_url' => $posterPath ? 'https://image.tmdb.org/t/p/w500'.$posterPath : null,
+            'release_year' => $this->yearFromDate($releaseDate),
+            'genres' => [],
+            'metadata' => [
+                'source' => 'tmdb',
+                'overview' => $item['overview'] ?? null,
+                'voteAverage' => $item['vote_average'] ?? null,
+                'voteCount' => $item['vote_count'] ?? null,
+                'popularity' => $item['popularity'] ?? null,
+                'originalLanguage' => $item['original_language'] ?? null,
             ],
-            'book' => [
-                'external_id' => $raw['key'] ?? ($raw['cover_edition_key'] ?? md5(json_encode($raw))),
-                'type' => 'book',
-                'title' => $raw['title'] ?? 'Untitled book',
-                'poster_url' => isset($raw['cover_i']) ? 'https://covers.openlibrary.org/b/id/'.$raw['cover_i'].'-L.jpg' : null,
-                'release_year' => $raw['first_publish_year'] ?? null,
-                'genres' => array_slice($raw['subject'] ?? [], 0, 6),
-                'metadata' => $raw,
+        ];
+    }
+
+    public function normalizeRawg(array $item): array
+    {
+        return [
+            'external_id' => (string) ($item['id'] ?? uniqid('rawg_', true)),
+            'type' => 'game',
+            'title' => $item['name'] ?? 'Untitled game',
+            'poster_url' => $item['background_image'] ?? null,
+            'release_year' => $this->yearFromDate($item['released'] ?? null),
+            'genres' => collect($item['genres'] ?? [])->pluck('name')->filter()->values()->all(),
+            'metadata' => [
+                'source' => 'rawg',
+                'metacritic' => $item['metacritic'] ?? null,
+                'rating' => $item['rating'] ?? null,
+                'ratingsCount' => $item['ratings_count'] ?? null,
+                'platforms' => collect($item['platforms'] ?? [])->pluck('platform.name')->filter()->values()->all(),
             ],
-            default => [
-                'external_id' => (string) $raw['id'],
-                'type' => ($raw['media_type'] ?? 'movie') === 'tv' ? 'series' : 'film',
-                'title' => $raw['title'] ?? $raw['name'] ?? 'Untitled',
-                'poster_url' => isset($raw['poster_path']) ? 'https://image.tmdb.org/t/p/w500'.$raw['poster_path'] : null,
-                'release_year' => (int) substr($raw['release_date'] ?? $raw['first_air_date'] ?? '0', 0, 4) ?: null,
-                'genres' => [],
-                'metadata' => $raw,
+        ];
+    }
+
+    public function normalizeOpenLibrary(array $item): array
+    {
+        $key = $item['key'] ?? uniqid('ol_', true);
+        $externalId = str_starts_with($key, '/works/') ? substr($key, strlen('/works/')) : $key;
+
+        return [
+            'external_id' => (string) $externalId,
+            'type' => 'book',
+            'title' => $item['title'] ?? 'Untitled book',
+            'poster_url' => isset($item['cover_i']) ? 'https://covers.openlibrary.org/b/id/'.$item['cover_i'].'-L.jpg' : null,
+            'release_year' => isset($item['first_publish_year']) ? (int) $item['first_publish_year'] : null,
+            'genres' => array_values(array_slice($item['subject'] ?? [], 0, 8)),
+            'metadata' => [
+                'source' => 'openlibrary',
+                'overview' => null,
+                'authors' => array_values(array_slice($item['author_name'] ?? [], 0, 6)),
+                'editionCount' => $item['edition_count'] ?? null,
+                'firstPublishYear' => $item['first_publish_year'] ?? null,
+                'openLibraryKey' => $key,
             ],
-        };
+        ];
+    }
+
+    public function upsertContentItem(array $normalized): ContentItem
+    {
+        return ContentItem::updateOrCreate(
+            [
+                'external_id' => $normalized['external_id'],
+                'type' => $normalized['type'],
+            ],
+            [
+                'title' => $normalized['title'],
+                'poster_url' => $normalized['poster_url'] ?? null,
+                'release_year' => $normalized['release_year'] ?? null,
+                'genres' => $normalized['genres'] ?? [],
+                'metadata' => $normalized['metadata'] ?? [],
+            ],
+        );
+    }
+
+    private function tmdbSearch(string $path, string $query, int $page, string $type): array
+    {
+        if (! config('services.tmdb.key')) {
+            return ['results' => [], 'total' => 0];
+        }
+
+        return Cache::remember($this->cacheKey('tmdb', $type, $query, $page), now()->addHours(self::CACHE_TTL_HOURS), function () use ($path, $query, $page, $type) {
+            try {
+                $response = Http::timeout(10)->get(config('services.tmdb.base_url').$path, [
+                    'api_key' => config('services.tmdb.key'),
+                    'query' => $query,
+                    'page' => $page,
+                ])->throw()->json();
+
+                return [
+                    'results' => collect($response['results'] ?? [])->map(fn (array $item) => $this->normalizeTmdb($item, $type))->all(),
+                    'total' => (int) ($response['total_results'] ?? 0),
+                ];
+            } catch (Throwable $exception) {
+                Log::warning('TMDB search failed', ['type' => $type, 'query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+
+                return ['results' => [], 'total' => 0];
+            }
+        });
+    }
+
+    private function cacheKey(string $provider, string $type, string $query, int $page): string
+    {
+        return sprintf('%s:%s:%s:%d', $provider, $type, md5(mb_strtolower(trim($query))), $page);
+    }
+
+    private function yearFromDate(?string $date): ?int
+    {
+        return $date && preg_match('/^\d{4}/', $date) ? (int) substr($date, 0, 4) : null;
     }
 }

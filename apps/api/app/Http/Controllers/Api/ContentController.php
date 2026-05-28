@@ -13,34 +13,101 @@ class ContentController extends Controller
 {
     use JsonEnvelope;
 
+    private const TYPES = ['film', 'series', 'game', 'book'];
+
+    public function __construct(private ContentAggregatorService $aggregator) {}
+
     public function index(Request $request)
     {
-        $query = ContentItem::query()->when($request->q, fn ($builder, $q) => $builder->where('title', 'ilike', "%$q%"))->byType($request->type)->orderBy('title');
-        return $this->paginated($query->paginate(20), ContentItemResource::class);
+        $query = trim((string) $request->query('q', ''));
+        $type = $this->validType($request->query('type'));
+        $page = max(1, (int) $request->integer('page', 1));
+        $perPage = 20;
+
+        if (mb_strlen($query) < 2) {
+            $items = ContentItem::query()
+                ->byType($type)
+                ->trending()
+                ->paginate($perPage, ['*'], 'page', $page);
+
+            return $this->paginated($items, ContentItemResource::class);
+        }
+
+        $searches = $this->searchProviders($query, $type, $page);
+        $normalized = collect($searches)->flatMap(fn (array $search) => $search['results'] ?? []);
+        $items = $normalized
+            ->map(fn (array $item) => $this->aggregator->upsertContentItem($item))
+            ->unique(fn (ContentItem $item) => $item->type.':'.$item->external_id)
+            ->sort(function (ContentItem $a, ContentItem $b) use ($query) {
+                $needle = mb_strtolower($query);
+                $aStarts = str_starts_with(mb_strtolower($a->title), $needle);
+                $bStarts = str_starts_with(mb_strtolower($b->title), $needle);
+
+                return [$bStarts, $a->title] <=> [$aStarts, $b->title];
+            })
+            ->values();
+
+        return $this->ok(ContentItemResource::collection($items), [
+            'page' => $page,
+            'per_page' => $perPage,
+            'total' => $items->count(),
+            'query' => $query,
+        ]);
     }
 
     public function trending(Request $request)
     {
-        $items = ContentItem::query()->byType($request->type)->trending()->limit((int) $request->integer('limit', 20))->get();
-        return $this->ok(ContentItemResource::collection($items));
+        $type = $this->validType($request->query('type'));
+        $limit = min(40, max(5, (int) $request->integer('limit', 20)));
+        $source = 'db';
+
+        $items = ContentItem::query()->byType($type)->trending()->limit($limit)->get();
+
+        if ($items->count() < $limit) {
+            collect($this->aggregator->getTrendingFilmsAndSeries())
+                ->when($type, fn ($collection) => $collection->where('type', $type))
+                ->each(fn (array $item) => $this->aggregator->upsertContentItem($item));
+
+            $items = ContentItem::query()->byType($type)->trending()->limit($limit)->get();
+            $source = 'api';
+        }
+
+        return $this->ok(ContentItemResource::collection($items), ['source' => $source]);
     }
 
-    public function show(string $type, string $id)
+    public function show(string $type, string $externalId)
     {
-        $item = ContentItem::where('type', $type)->where(fn ($query) => $query->where('id', $id)->orWhere('external_id', $id))->firstOrFail();
+        if (! in_array($type, self::TYPES, true)) {
+            return response()->json(['message' => 'Content not found'], 404);
+        }
+
+        $item = ContentItem::where('type', $type)->where('external_id', $externalId)->first();
+
+        if (! $item) {
+            return response()->json(['message' => 'Content not found'], 404);
+        }
+
         return $this->ok(new ContentItemResource($item));
     }
 
-    public function externalSearch(Request $request, ContentAggregatorService $service)
+    private function searchProviders(string $query, ?string $type, int $page): array
     {
-        $request->validate(['q' => ['required', 'string'], 'type' => ['required', 'in:film,series,game,book']]);
-        $page = (int) $request->integer('page', 1);
-        $raw = match ($request->type) {
-            'game' => $service->searchGames($request->q, $page),
-            'book' => $service->searchBooks($request->q, $page),
-            default => $service->searchFilms($request->q, $page),
+        return match ($type) {
+            'film' => [$this->aggregator->searchFilms($query, $page)],
+            'series' => [$this->aggregator->searchSeries($query, $page)],
+            'game' => [$this->aggregator->searchGames($query, $page)],
+            'book' => [$this->aggregator->searchBooks($query, $page)],
+            default => [
+                $this->aggregator->searchFilms($query, $page),
+                $this->aggregator->searchSeries($query, $page),
+                $this->aggregator->searchGames($query, $page),
+                $this->aggregator->searchBooks($query, $page),
+            ],
         };
+    }
 
-        return $this->ok(collect($raw)->map(fn ($item) => $service->normalizeToContentItem($item, $request->type))->values());
+    private function validType(mixed $type): ?string
+    {
+        return is_string($type) && in_array($type, self::TYPES, true) ? $type : null;
     }
 }

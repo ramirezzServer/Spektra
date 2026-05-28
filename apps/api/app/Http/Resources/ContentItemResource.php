@@ -18,8 +18,8 @@ class ContentItemResource extends JsonResource
             'releaseYear' => $this->release_year,
             'genres' => $this->genres ?? [],
             'metadata' => $this->metadata ?? [],
-            'avgRating' => $this->avg_rating,
-            'ratingsCount' => $this->ratings_count,
+            'avgRating' => $this->avg_rating ? round((float) $this->avg_rating, 1) : null,
+            'ratingsCount' => $this->ratings_count ?? 0,
         ];
     }
 }

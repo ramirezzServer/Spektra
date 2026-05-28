@@ -32,17 +32,17 @@ return [
     ],
 
     'tmdb' => [
-        'key' => env('TMDB_API_KEY'),
-        'url' => env('TMDB_BASE_URL', 'https://api.themoviedb.org/3'),
+        'key' => env('TMDB_API_KEY', ''),
+        'base_url' => env('TMDB_BASE_URL', 'https://api.themoviedb.org/3'),
     ],
 
     'rawg' => [
-        'key' => env('RAWG_API_KEY'),
-        'url' => env('RAWG_BASE_URL', 'https://api.rawg.io/api'),
+        'key' => env('RAWG_API_KEY', ''),
+        'base_url' => env('RAWG_BASE_URL', 'https://api.rawg.io/api'),
     ],
 
     'openlibrary' => [
-        'url' => env('OPENLIBRARY_BASE_URL', 'https://openlibrary.org'),
+        'base_url' => env('OPENLIBRARY_BASE_URL', 'https://openlibrary.org'),
     ],
 
 ];

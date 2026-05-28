@@ -2,27 +2,61 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 import type { ContentItem, ContentType, PaginatedResponse } from '@/types';
 
-export function useTrending(type?: ContentType | 'all') {
+type ContentResponse = PaginatedResponse<ContentItem> & {
+  meta: PaginatedResponse<ContentItem>['meta'] & {
+    per_page?: number;
+    query?: string;
+  };
+};
+
+export function useSearch(query: string, type?: ContentType | 'all', page = 1) {
   return useQuery({
-    queryKey: ['content', 'trending', type],
+    queryKey: ['content', 'search', query, type, page],
+    queryFn: async () => {
+      const response = await api.get<ContentResponse>('/content', {
+        params: {
+          q: query,
+          type: type && type !== 'all' ? type : undefined,
+          page,
+        },
+      });
+
+      return {
+        ...response.data,
+        meta: {
+          ...response.data.meta,
+          perPage: response.data.meta.perPage ?? response.data.meta.per_page ?? 20,
+        },
+      };
+    },
+    enabled: query.trim().length >= 2,
+  });
+}
+
+export function useTrending(type?: ContentType | 'all', limit = 20) {
+  return useQuery({
+    queryKey: ['content', 'trending', type, limit],
     queryFn: async () => {
       const response = await api.get<{ data: ContentItem[] }>('/content/trending', {
-        params: type && type !== 'all' ? { type } : {},
+        params: {
+          type: type && type !== 'all' ? type : undefined,
+          limit,
+        },
       });
       return response.data.data;
     },
   });
 }
 
-export function useSearchContent(query: string, type?: ContentType | 'all') {
+export function useContentItem(type: string, externalId: string) {
   return useQuery({
-    queryKey: ['content', 'search', query, type],
+    queryKey: ['content', 'item', type, externalId],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<ContentItem>>('/content', {
-        params: { q: query, type: type === 'all' ? undefined : type },
-      });
+      const response = await api.get<{ data: ContentItem }>(`/content/${type}/${externalId}`);
       return response.data.data;
     },
-    enabled: query.trim().length > 1,
+    enabled: Boolean(type && externalId),
   });
 }
+
+export const useSearchContent = useSearch;

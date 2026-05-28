@@ -12,6 +12,10 @@ class UserEntry extends Model
 
     protected $fillable = ['user_id', 'content_id', 'status', 'rating', 'review'];
 
+    protected $casts = [
+        'rating' => 'integer',
+    ];
+
     protected static function booted(): void
     {
         static::created(fn (UserEntry $entry) => ActivityFeedJob::dispatch($entry));
