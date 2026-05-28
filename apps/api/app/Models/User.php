@@ -69,4 +69,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')->withPivot('created_at');
     }
+
+    public function getAvatarUrlAttribute($value): string
+    {
+        return $value ?: "https://api.dicebear.com/8.x/initials/svg?seed={$this->username}";
+    }
 }

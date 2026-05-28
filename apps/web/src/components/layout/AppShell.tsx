@@ -1,18 +1,22 @@
 import { Outlet } from 'react-router-dom';
-import { BottomNav } from './BottomNav';
-import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
+import { Navbar } from './Navbar';
+import { BottomNav } from './BottomNav';
 
 export function AppShell() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-app-bg text-app-text">
-      <Sidebar />
-      <div className="md:pl-60">
+    <div className="min-h-screen bg-bg-secondary">
+      <aside className="hidden md:flex fixed left-0 top-0 h-full w-60 flex-col bg-surface border-r border-border z-30 overflow-y-auto">
+        <Sidebar />
+      </aside>
+
+      <main className="md:ml-60 min-h-screen flex flex-col">
         <Navbar />
-        <main className="mx-auto w-full max-w-[1200px] px-4 pb-28 pt-5 md:px-8 md:pb-10 md:pt-8">
+        <div className="flex-1 px-4 md:px-8 py-6 pb-24 md:pb-8 max-w-screen-xl mx-auto w-full">
           <Outlet />
-        </main>
-      </div>
+        </div>
+      </main>
+
       <BottomNav />
     </div>
   );

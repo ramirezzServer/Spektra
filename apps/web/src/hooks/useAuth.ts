@@ -1,34 +1,58 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/axios';
+import { useNavigate } from 'react-router-dom';
+import type { User } from '@spektra/shared-types';
+import api from '@/lib/axios';
 import { useAuthStore } from '@/stores/authStore';
-import type { User } from '@/types';
-
-interface AuthResponse {
-  data: {
-    token: string;
-    user: User;
-  };
-}
 
 export function useAuth() {
-  const { token, user, setAuth, clearAuth } = useAuthStore();
-  const me = useQuery({
+  const { token, user, isAuthenticated, setAuth, clearAuth } = useAuthStore();
+  const navigate = useNavigate();
+
+  useQuery({
     queryKey: ['auth', 'me'],
-    queryFn: async () => (await api.get<{ data: User }>('/auth/me')).data.data,
+    queryFn: async () => {
+      const res = await api.get<{ data: User }>('/auth/me');
+      return res.data.data;
+    },
     enabled: Boolean(token),
   });
 
-  const login = useMutation({
-    mutationFn: async (payload: { email: string; password: string }) =>
-      (await api.post<AuthResponse>('/auth/login', payload)).data.data,
-    onSuccess: ({ token: nextToken, user: nextUser }) => setAuth(nextToken, nextUser),
+  const registerMutation = useMutation({
+    mutationFn: async (data: { name: string; username: string; email: string; password: string; password_confirmation: string }) => {
+      const res = await api.post('/auth/register', data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setAuth(data.token, data.data);
+      navigate('/');
+    },
   });
 
-  const register = useMutation({
-    mutationFn: async (payload: { username: string; email: string; password: string }) =>
-      (await api.post<AuthResponse>('/auth/register', payload)).data.data,
-    onSuccess: ({ token: nextToken, user: nextUser }) => setAuth(nextToken, nextUser),
+  const loginMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string }) => {
+      const res = await api.post('/auth/login', data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setAuth(data.token, data.data);
+      navigate('/');
+    },
   });
 
-  return { token, user: me.data ?? user, login, register, logout: clearAuth };
+  const logoutMutation = useMutation({
+    mutationFn: async () => api.post('/auth/logout'),
+    onSettled: () => {
+      clearAuth();
+      navigate('/login');
+    },
+  });
+
+  return {
+    user,
+    token,
+    isAuthenticated,
+    register: registerMutation,
+    login: loginMutation,
+    logout: logoutMutation,
+  };
 }

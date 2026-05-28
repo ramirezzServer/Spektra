@@ -1,30 +1,29 @@
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Avatar } from '@/components/ui/Avatar';
 import { useAuthStore } from '@/stores/authStore';
 
-export function Navbar({ desktop = false }: { desktop?: boolean }) {
-  const user = useAuthStore((state) => state.user);
-
-  if (desktop) {
-    return (
-      <div className="flex h-16 items-center justify-between border-b border-app-border px-4">
-        <Link to="/" className="text-lg font-bold tracking-normal text-app-text">Spektra</Link>
-        <Avatar src={user?.avatarUrl} alt={user?.username ?? 'Guest'} size="sm" />
-      </div>
-    );
-  }
+export function Navbar() {
+  const { user, isAuthenticated } = useAuthStore();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-app-border bg-app-bg/95 px-4 backdrop-blur md:hidden">
-      <Link to="/" className="text-lg font-bold text-app-text">Spektra</Link>
-      <div className="flex items-center gap-2">
-        <Link className="grid min-h-11 min-w-11 place-items-center rounded-md text-app-muted" to="/search" aria-label="Search">
-          <Search className="h-5 w-5" />
+    <header className="md:hidden sticky top-0 z-20 bg-surface border-b border-border">
+      <div className="flex items-center justify-between px-4 h-14">
+        <Link to="/" className="text-lg font-semibold tracking-tight text-content-primary">
+          spek<span className="text-accent">.</span>tra
         </Link>
-        <Link to={user ? `/profile/${user.username}` : '/login'} aria-label="Profile">
-          <Avatar src={user?.avatarUrl} alt={user?.username ?? 'Guest'} size="sm" />
-        </Link>
+
+        <div className="flex items-center gap-2">
+          <Link to="/search" className="p-2 rounded-md text-content-secondary hover:bg-bg-tertiary">
+            <Search size={19} />
+          </Link>
+          {isAuthenticated ? (
+            <Link to={`/profile/${user?.username}`}>
+              <img src={user?.avatarUrl ?? ''} className="w-7 h-7 rounded-full bg-accent-light" alt="" />
+            </Link>
+          ) : (
+            <Link to="/login" className="text-sm font-medium text-accent">Sign in</Link>
+          )}
+        </div>
       </div>
     </header>
   );
