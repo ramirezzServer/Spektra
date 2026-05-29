@@ -1,20 +1,31 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
-import type { ActivityFeedItem, PaginatedResponse } from '@/types';
+import { useAuthStore } from '@/stores/authStore';
+import type { ActivityFeedItem, CursorPaginatedResponse } from '@/types';
 
-export function useFeed(scope: 'following' | 'global') {
+export type FeedScope = 'following' | 'global';
+
+export function useActivityFeed(scope: FeedScope) {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return useInfiniteQuery({
     queryKey: ['feed', scope],
-    initialPageParam: 1,
+    initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {
-      const response = await api.get<PaginatedResponse<ActivityFeedItem>>('/feed', {
-        params: { page: pageParam, scope },
+      const response = await api.get<CursorPaginatedResponse<ActivityFeedItem>>('/feed', {
+        params: {
+          scope,
+          cursor: pageParam ?? undefined,
+          per_page: 20,
+        },
       });
       return response.data;
     },
-    getNextPageParam: (lastPage) => {
-      const next = lastPage.meta.page + 1;
-      return lastPage.data.length && next * lastPage.meta.perPage <= lastPage.meta.total + lastPage.meta.perPage ? next : undefined;
-    },
+    enabled: scope === 'global' || isAuthenticated,
+    getNextPageParam: (lastPage) => lastPage.meta.next_cursor ?? undefined,
+    staleTime: 1000 * 45,
+    gcTime: 1000 * 60 * 10,
   });
 }
+
+export const useFeed = useActivityFeed;

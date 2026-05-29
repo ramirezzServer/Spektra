@@ -20,4 +20,9 @@ class ActivityFeed extends Model
     {
         return $this->belongsTo(User::class, 'actor_id');
     }
+
+    public function content()
+    {
+        return $this->belongsTo(ContentItem::class, 'object_id');
+    }
 }

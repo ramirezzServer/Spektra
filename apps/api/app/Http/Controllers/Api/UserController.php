@@ -21,7 +21,17 @@ class UserController extends Controller
 
     public function show(Request $request, string $username)
     {
-        return $this->ok(new UserResource(User::where('username', $username)->firstOrFail()));
+        $user = User::withCount(['followers', 'following'])->where('username', $username)->firstOrFail();
+
+        $counts = Cache::remember("user:{$user->id}:social_counts", now()->addMinutes(5), fn () => [
+            'followersCount' => $user->followers_count,
+            'followingCount' => $user->following_count,
+        ]);
+
+        $user->followers_count = $counts['followersCount'];
+        $user->following_count = $counts['followingCount'];
+
+        return $this->ok(new UserResource($user));
     }
 
     public function stats(string $username)

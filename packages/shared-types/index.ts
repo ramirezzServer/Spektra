@@ -8,6 +8,8 @@ export interface User {
   email?: string;
   avatarUrl: string | null;
   bio: string | null;
+  followersCount?: number;
+  followingCount?: number;
   createdAt: string;
 }
 
@@ -50,6 +52,11 @@ export interface Follow {
   createdAt: string;
 }
 
+export interface FollowRelationship {
+  isSelf: boolean;
+  isFollowing: boolean;
+}
+
 export interface List {
   id: string;
   userId: string;
@@ -61,14 +68,24 @@ export interface List {
 }
 
 export interface ActivityFeedItem {
-  id: number;
+  id: number | string;
   actorId: string;
   actor?: User;
-  verb: 'rated' | 'reviewed' | 'added_to_list' | 'followed' | 'status_changed';
+  verb: 'rated' | 'reviewed' | 'added_to_library' | 'status_changed' | 'added_to_list' | 'followed';
   objectId: string;
   objectType: string;
+  content?: ContentItem;
   metadata: Record<string, unknown>;
   createdAt: string;
+}
+
+export interface CursorPaginatedResponse<T> {
+  data: T[];
+  meta: {
+    per_page: number;
+    next_cursor: string | null;
+    has_more: boolean;
+  };
 }
 
 export interface PaginatedResponse<T> {
@@ -78,7 +95,7 @@ export interface PaginatedResponse<T> {
     perPage: number;
     per_page?: number;
     total: number;
-    lastPage: number;
+    lastPage?: number;
     last_page?: number;
   };
 }

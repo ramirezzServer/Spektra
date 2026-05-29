@@ -16,6 +16,7 @@ class ActivityFeedResource extends JsonResource
             'verb' => $this->verb,
             'objectId' => $this->object_id,
             'objectType' => $this->object_type,
+            'content' => new ContentItemResource($this->whenLoaded('content')),
             'metadata' => $this->metadata ?? [],
             'createdAt' => optional($this->created_at)->toISOString(),
         ];

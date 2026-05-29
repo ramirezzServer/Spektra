@@ -1,11 +1,13 @@
-import { BookOpen, Clapperboard, Gamepad2, Library, MessageSquare, Star, Tv } from 'lucide-react';
+import { BookOpen, Clapperboard, Gamepad2, Library, MessageSquare, Star, Tv, UserCheck, UserPlus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { ContentGrid } from '@/components/content/ContentGrid';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useUserLibrary, useUserProfile, useUserStats } from '@/hooks/useLibrary';
+import { useFollowUser, useRelationship, useUnfollowUser } from '@/hooks/useSocial';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { useAuthStore } from '@/stores/authStore';
 import type { ContentItem, ContentType, EntryStatus } from '@/types';
 
@@ -36,6 +38,10 @@ export function Profile() {
   const [page, setPage] = useState(1);
   const profile = useUserProfile(username);
   const stats = useUserStats(username);
+  const relationship = useRelationship(username);
+  const followUser = useFollowUser();
+  const unfollowUser = useUnfollowUser();
+  const [followError, setFollowError] = useState<string | null>(null);
   const library = useUserLibrary(username, { status, type, page, perPage: 20, sort: 'updated_desc' });
   const entries = library.data?.data ?? [];
   const items = useMemo(() => entries.map((entry) => entry.content).filter((item): item is ContentItem => Boolean(item)), [entries]);
@@ -51,6 +57,20 @@ export function Profile() {
     setPage(1);
   }
 
+  async function toggleFollow() {
+    if (!username) return;
+    setFollowError(null);
+    try {
+      if (relationship.data?.isFollowing) {
+        await unfollowUser.mutateAsync(username);
+      } else {
+        await followUser.mutateAsync(username);
+      }
+    } catch (error) {
+      setFollowError(getApiErrorMessage(error, 'Unable to update follow status.'));
+    }
+  }
+
   if (profile.isError) {
     return (
       <div className="flex min-h-72 items-center justify-center rounded-lg border border-dashed border-border bg-surface px-6 text-center">
@@ -64,7 +84,7 @@ export function Profile() {
 
   return (
     <div className="space-y-8">
-      <section className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {profile.isLoading ? (
           <>
             <Skeleton className="h-20 w-20 rounded-full" />
@@ -82,15 +102,41 @@ export function Profile() {
                 {initials(username)}
               </div>
             )}
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h1 className="break-words text-2xl font-semibold text-content-primary">@{profile.data?.username}</h1>
               <p className="mt-1 max-w-2xl text-sm text-content-secondary">
                 {profile.data?.bio || (isOwnProfile ? 'Your library lives here.' : 'Member of Spektra')}
               </p>
+              <div className="mt-3 flex flex-wrap gap-3 text-sm text-content-secondary">
+                <Link to={`/profile/${username}/followers`} className="hover:text-accent" aria-label={`${profile.data?.followersCount ?? 0} followers`}>
+                  <span className="font-semibold text-content-primary">{profile.data?.followersCount ?? 0}</span> followers
+                </Link>
+                <Link to={`/profile/${username}/following`} className="hover:text-accent" aria-label={`${profile.data?.followingCount ?? 0} following`}>
+                  <span className="font-semibold text-content-primary">{profile.data?.followingCount ?? 0}</span> following
+                </Link>
+              </div>
               {profile.data?.createdAt && (
                 <p className="mt-2 text-xs text-content-tertiary">Joined {new Date(profile.data.createdAt).toLocaleDateString()}</p>
               )}
+              {followError && <p className="mt-2 text-sm text-danger-text" role="alert">{followError}</p>}
             </div>
+            {isOwnProfile ? (
+              <span className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-semibold text-content-secondary">This is you</span>
+            ) : currentUser ? (
+              <Button
+                type="button"
+                variant={relationship.data?.isFollowing ? 'secondary' : 'primary'}
+                disabled={relationship.isLoading || followUser.isPending || unfollowUser.isPending}
+                onClick={toggleFollow}
+              >
+                {relationship.data?.isFollowing ? <UserCheck className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+                {relationship.data?.isFollowing ? 'Unfollow' : 'Follow'}
+              </Button>
+            ) : (
+              <Link to="/login" className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-semibold text-accent hover:text-accent-hover">
+                Sign in to follow
+              </Link>
+            )}
           </>
         )}
       </section>

@@ -18,6 +18,7 @@ const LibraryPage = React.lazy(() => import('@/pages/Library').then((module) => 
 const Search = React.lazy(() => import('@/pages/Search').then((module) => ({ default: module.Search })));
 const Feed = React.lazy(() => import('@/pages/Feed').then((module) => ({ default: module.Feed })));
 const Lists = React.lazy(() => import('@/pages/Lists').then((module) => ({ default: module.Lists })));
+const UserConnections = React.lazy(() => import('@/pages/UserConnections').then((module) => ({ default: module.UserConnections })));
 
 function lazyPage(element: React.ReactNode) {
   return <React.Suspense fallback={<div className="py-16 text-sm text-content-tertiary">Loading...</div>}>{element}</React.Suspense>;
@@ -35,6 +36,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="/" element={<Home />} />
             <Route path="/search" element={lazyPage(<Search />)} />
             <Route path="/profile/:username" element={lazyPage(<Profile />)} />
+            <Route path="/profile/:username/followers" element={lazyPage(<UserConnections kind="followers" />)} />
+            <Route path="/profile/:username/following" element={lazyPage(<UserConnections kind="following" />)} />
             <Route path="/content/:type/:id" element={lazyPage(<ContentDetail />)} />
 
             <Route path="/feed" element={<RequireAuth>{lazyPage(<Feed />)}</RequireAuth>} />

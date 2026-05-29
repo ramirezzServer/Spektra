@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\FeedController;
+use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserEntryController;
 use Illuminate\Support\Facades\Route;
@@ -21,14 +23,20 @@ Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => '
 Route::get('/content', [ContentController::class, 'index']);
 Route::get('/content/trending', [ContentController::class, 'trending']);
 Route::get('/content/{type}/{externalId}', [ContentController::class, 'show']);
+Route::get('/feed', [FeedController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/entries', [UserEntryController::class, 'store']);
     Route::delete('/entries/{id}', [UserEntryController::class, 'destroy']);
     Route::get('/entries/by-content/{contentId}', [UserEntryController::class, 'showByContent']);
     Route::get('/library', [UserEntryController::class, 'library']);
+    Route::post('/follows/{username}', [FollowController::class, 'store']);
+    Route::delete('/follows/{username}', [FollowController::class, 'destroy']);
+    Route::get('/users/{username}/relationship', [FollowController::class, 'relationship']);
 });
 
-Route::get('/users/{username}', [UserController::class, 'show']);
 Route::get('/users/{username}/stats', [UserController::class, 'stats']);
 Route::get('/users/{username}/library', [UserController::class, 'library']);
+Route::get('/users/{username}/followers', [FollowController::class, 'followers']);
+Route::get('/users/{username}/following', [FollowController::class, 'following']);
+Route::get('/users/{username}', [UserController::class, 'show']);

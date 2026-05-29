@@ -16,6 +16,8 @@ class UserResource extends JsonResource
             'email'          => $this->when($request->user()?->id === $this->id, $this->email),
             'avatarUrl'      => $this->avatar_url,
             'bio'            => $this->bio,
+            'followersCount' => $this->when(isset($this->followers_count), (int) $this->followers_count),
+            'followingCount' => $this->when(isset($this->following_count), (int) $this->following_count),
             'createdAt'      => $this->created_at?->toISOString(),
         ];
     }
