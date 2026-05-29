@@ -8,12 +8,17 @@ use App\Http\Resources\UserEntryResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
     use JsonEnvelope;
 
-    public function show(string $username)
+    private const STATUSES = ['want', 'in_progress', 'done'];
+    private const TYPES = ['film', 'series', 'game', 'book'];
+    private const SORTS = ['updated_desc', 'title_asc', 'rating_desc'];
+
+    public function show(Request $request, string $username)
     {
         return $this->ok(new UserResource(User::where('username', $username)->firstOrFail()));
     }
@@ -21,22 +26,74 @@ class UserController extends Controller
     public function stats(string $username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        $counts = $user->entries()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
-        return $this->ok([
-            'watched' => $counts['done'] ?? 0,
-            'playing' => $counts['in_progress'] ?? 0,
-            'reading' => $user->entries()->whereHas('content', fn ($query) => $query->where('type', 'book'))->count(),
-            'want' => $counts['want'] ?? 0,
-        ]);
+
+        $stats = Cache::remember("user:{$user->id}:stats", now()->addMinutes(10), function () use ($user) {
+            $byStatus = $user->entries()
+                ->selectRaw('status, count(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status');
+
+            $byType = $user->entries()
+                ->join('content_items', 'content_items.id', '=', 'user_entries.content_id')
+                ->selectRaw('content_items.type, count(*) as total')
+                ->groupBy('content_items.type')
+                ->pluck('total', 'type');
+
+            return [
+                'total' => (int) $user->entries()->count(),
+                'byType' => [
+                    'film' => (int) ($byType['film'] ?? 0),
+                    'series' => (int) ($byType['series'] ?? 0),
+                    'game' => (int) ($byType['game'] ?? 0),
+                    'book' => (int) ($byType['book'] ?? 0),
+                ],
+                'byStatus' => [
+                    'want' => (int) ($byStatus['want'] ?? 0),
+                    'in_progress' => (int) ($byStatus['in_progress'] ?? 0),
+                    'done' => (int) ($byStatus['done'] ?? 0),
+                ],
+                'ratedCount' => (int) $user->entries()->whereNotNull('rating')->count(),
+                'reviewedCount' => (int) $user->entries()->whereNotNull('review')->where('review', '!=', '')->count(),
+            ];
+        });
+
+        return $this->ok($stats);
     }
 
     public function library(Request $request, string $username)
     {
         $user = User::where('username', $username)->firstOrFail();
-        $query = $user->entries()->with('content')
-            ->when($request->status, fn ($builder, $status) => $builder->where('status', $status))
-            ->when($request->type, fn ($builder, $type) => $builder->whereHas('content', fn ($content) => $content->where('type', $type)));
+        $status = $this->valid($request->query('status'), self::STATUSES);
+        $type = $this->valid($request->query('type'), self::TYPES);
+        $sort = $this->valid($request->query('sort'), self::SORTS) ?? 'updated_desc';
 
-        return $this->paginated($query->paginate(20), UserEntryResource::class);
+        $query = $user->entries()
+            ->with('content')
+            ->when($status, fn ($builder) => $builder->where('status', $status))
+            ->when($type, fn ($builder) => $builder->whereHas('content', fn ($content) => $content->where('type', $type)));
+
+        $query = match ($sort) {
+            'title_asc' => $query
+                ->join('content_items', 'content_items.id', '=', 'user_entries.content_id')
+                ->orderBy('content_items.title')
+                ->orderBy('user_entries.updated_at', 'desc'),
+            'rating_desc' => $query->orderByDesc('rating')->orderByDesc('updated_at'),
+            default => $query->orderByDesc('updated_at')->orderByDesc('id'),
+        };
+
+        return $this->paginated(
+            $query->paginate($this->perPage($request), ['user_entries.*'], 'page', max(1, (int) $request->integer('page', 1))),
+            UserEntryResource::class
+        );
+    }
+
+    private function perPage(Request $request): int
+    {
+        return min(50, max(1, (int) $request->integer('per_page', 20)));
+    }
+
+    private function valid(mixed $value, array $allowed): ?string
+    {
+        return is_string($value) && in_array($value, $allowed, true) ? $value : null;
     }
 }

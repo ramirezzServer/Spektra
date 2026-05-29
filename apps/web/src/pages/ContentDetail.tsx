@@ -1,12 +1,15 @@
-import { Calendar, Check, Clock, Gamepad2, Plus, Star, Users } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { Calendar, Check, Clock, Gamepad2, Plus, Star, Trash2, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { RatingStars } from '@/components/content/RatingStars';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useContentItem } from '@/hooks/useContent';
+import { libraryErrorMessage, useDeleteEntry, useEntryByContent, useUpsertEntry } from '@/hooks/useLibrary';
 import { cn } from '@/lib/utils';
-import type { ContentType } from '@/types';
+import { useAuthStore } from '@/stores/authStore';
+import type { ContentType, EntryStatus, UserEntry } from '@/types';
 
 const typeClass: Record<ContentType, string> = {
   film: 'border-film-light bg-film-light text-film-text',
@@ -25,11 +28,55 @@ function highlightValue(value: unknown): string | null {
   return null;
 }
 
+const statusOptions: Array<{ value: EntryStatus; label: string; icon: typeof Plus }> = [
+  { value: 'want', label: 'Want', icon: Plus },
+  { value: 'in_progress', label: 'In Progress', icon: Clock },
+  { value: 'done', label: 'Done', icon: Check },
+];
+
 export function ContentDetail() {
   const { type = '', id = '' } = useParams();
   const content = useContentItem(type, id);
   const item = content.data;
   const metadata = item?.metadata ?? {};
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const entry = useEntryByContent(item?.id);
+  const upsertEntry = useUpsertEntry();
+  const deleteEntry = useDeleteEntry();
+  const [review, setReview] = useState('');
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    setReview(entry.data?.review ?? '');
+  }, [entry.data?.review]);
+
+  async function saveEntry(next: Partial<Pick<UserEntry, 'status' | 'rating' | 'review'>>) {
+    if (!item) return;
+    setMessage(null);
+    try {
+      await upsertEntry.mutateAsync({
+        content_id: item.id,
+        status: next.status ?? entry.data?.status ?? 'done',
+        rating: next.rating ?? entry.data?.rating ?? null,
+        review: next.review ?? entry.data?.review ?? null,
+      });
+      setMessage('Saved.');
+    } catch (error) {
+      setMessage(libraryErrorMessage(error));
+    }
+  }
+
+  async function removeEntry() {
+    if (!entry.data || !item) return;
+    setMessage(null);
+    try {
+      await deleteEntry.mutateAsync({ id: entry.data.id, contentId: item.id });
+      setReview('');
+      setMessage('Removed from your library.');
+    } catch (error) {
+      setMessage(libraryErrorMessage(error));
+    }
+  }
 
   if (content.isLoading) {
     return (
@@ -71,7 +118,7 @@ export function ContentDetail() {
       <div className="w-full max-w-80">
         <div className="aspect-[2/3] overflow-hidden rounded-lg border border-border bg-surface shadow-card">
           {item.posterUrl ? (
-            <img src={item.posterUrl} alt={item.title} className="h-full w-full object-cover" />
+            <img src={item.posterUrl} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
           ) : (
             <div className="flex h-full items-center justify-center bg-bg-tertiary px-6 text-center text-sm font-semibold text-content-tertiary">
               No poster available
@@ -126,30 +173,65 @@ export function ContentDetail() {
         )}
 
         <div className="space-y-4 rounded-lg border border-border bg-surface p-4">
-          <p className="text-sm font-semibold text-content-primary">Tracking controls arrive in Phase 3.</p>
-          <div className="grid gap-2 sm:grid-cols-3">
-            <Button disabled variant="secondary">
-              <Plus className="h-4 w-4" />
-              Want
-            </Button>
-            <Button disabled variant="secondary">
-              <Clock className="h-4 w-4" />
-              In Progress
-            </Button>
-            <Button disabled variant="secondary">
-              <Check className="h-4 w-4" />
-              Done
-            </Button>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-content-primary">Your library</p>
+            {entry.isFetching && isAuthenticated && <span className="text-xs text-content-tertiary">Syncing...</span>}
           </div>
-          <div className="space-y-2">
-            <p className="text-sm font-semibold text-content-primary">Your rating</p>
-            <RatingStars value={null} disabled />
-          </div>
-          <textarea
-            disabled
-            className="min-h-28 w-full resize-none rounded-lg border border-border bg-bg-secondary p-3 text-sm text-content-secondary placeholder:text-content-tertiary"
-            placeholder="Review writing will be available in Phase 3."
-          />
+
+          {!isAuthenticated ? (
+            <div className="rounded-md border border-dashed border-border bg-bg-secondary p-4 text-sm text-content-secondary">
+              <Link to="/login" className="font-semibold text-accent hover:text-accent-hover">Sign in</Link> to track status, rating, and review.
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {statusOptions.map((option) => {
+                  const Icon = option.icon;
+                  const active = entry.data?.status === option.value;
+                  return (
+                    <Button
+                      key={option.value}
+                      disabled={upsertEntry.isPending || deleteEntry.isPending}
+                      variant={active ? 'primary' : 'secondary'}
+                      onClick={() => saveEntry({ status: option.value })}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {option.label}
+                    </Button>
+                  );
+                })}
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-content-primary">Your rating</p>
+                <RatingStars value={entry.data?.rating ?? null} disabled={upsertEntry.isPending} onChange={(rating) => saveEntry({ rating })} />
+              </div>
+              <div className="space-y-2">
+                <textarea
+                  maxLength={5000}
+                  value={review}
+                  onChange={(event) => setReview(event.target.value)}
+                  disabled={upsertEntry.isPending}
+                  className="min-h-28 w-full resize-none rounded-lg border border-border bg-bg-secondary p-3 text-sm text-content-secondary placeholder:text-content-tertiary"
+                  placeholder="Write your review..."
+                />
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs text-content-tertiary">{review.length}/5000</span>
+                  <div className="flex gap-2">
+                    {entry.data && (
+                      <Button variant="ghost" disabled={deleteEntry.isPending} onClick={removeEntry}>
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </Button>
+                    )}
+                    <Button disabled={upsertEntry.isPending} onClick={() => saveEntry({ review })}>
+                      Save review
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              {message && <p className="text-sm text-content-secondary">{message}</p>}
+            </>
+          )}
         </div>
 
         {item.type === 'game' && platforms.length > 0 && (

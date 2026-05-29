@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\ActivityFeed;
-use App\Models\UserEntry;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -11,24 +10,23 @@ class ActivityFeedJob implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private UserEntry $entry)
+    public function __construct(
+        private string $actorId,
+        private string $contentId,
+        private string $verb,
+        private array $metadata
+    )
     {
     }
 
     public function handle(): void
     {
-        $verb = $this->entry->wasChanged('review') && $this->entry->review ? 'reviewed' : ($this->entry->wasChanged('rating') && $this->entry->rating ? 'rated' : 'status_changed');
-
         ActivityFeed::create([
-            'actor_id' => $this->entry->user_id,
-            'verb' => $verb,
-            'object_id' => $this->entry->content_id,
+            'actor_id' => $this->actorId,
+            'verb' => $this->verb,
+            'object_id' => $this->contentId,
             'object_type' => 'content_item',
-            'metadata' => [
-                'status' => $this->entry->status,
-                'rating' => $this->entry->rating,
-                'review' => $this->entry->review,
-            ],
+            'metadata' => $this->metadata,
         ]);
     }
 }

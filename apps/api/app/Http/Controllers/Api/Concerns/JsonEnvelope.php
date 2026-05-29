@@ -16,7 +16,10 @@ trait JsonEnvelope
             'meta' => [
                 'page' => $paginator->currentPage(),
                 'per_page' => $paginator->perPage(),
+                'perPage' => $paginator->perPage(),
                 'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+                'lastPage' => $paginator->lastPage(),
             ],
         ]);
     }

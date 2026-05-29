@@ -1,4 +1,4 @@
-import { Activity, BookMarked, Home, LogOut, Search } from 'lucide-react';
+import { Activity, BookMarked, Home, Library, LogOut, Search } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -6,6 +6,7 @@ const navItems = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/search', label: 'Search', icon: Search },
   { to: '/feed', label: 'Feed', icon: Activity },
+  { to: '/library', label: 'Library', icon: Library },
   { to: '/lists', label: 'Lists', icon: BookMarked },
 ];
 

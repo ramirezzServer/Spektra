@@ -17,6 +17,7 @@ class UserEntryResource extends JsonResource
             'status' => $this->status,
             'rating' => $this->rating,
             'review' => $this->review,
+            'createdAt' => optional($this->created_at)->toISOString(),
             'updatedAt' => optional($this->updated_at)->toISOString(),
         ];
     }

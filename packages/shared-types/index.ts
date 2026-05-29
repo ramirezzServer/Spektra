@@ -3,8 +3,9 @@ export type EntryStatus = 'want' | 'in_progress' | 'done';
 
 export interface User {
   id: string;
+  name?: string | null;
   username: string;
-  email: string;
+  email?: string;
   avatarUrl: string | null;
   bio: string | null;
   createdAt: string;
@@ -31,7 +32,16 @@ export interface UserEntry {
   status: EntryStatus;
   rating: number | null;
   review: string | null;
+  createdAt: string;
   updatedAt: string;
+}
+
+export interface UserStats {
+  total: number;
+  byType: Record<ContentType, number>;
+  byStatus: Record<EntryStatus, number>;
+  ratedCount: number;
+  reviewedCount: number;
 }
 
 export interface Follow {
@@ -66,6 +76,9 @@ export interface PaginatedResponse<T> {
   meta: {
     page: number;
     perPage: number;
+    per_page?: number;
     total: number;
+    lastPage: number;
+    last_page?: number;
   };
 }

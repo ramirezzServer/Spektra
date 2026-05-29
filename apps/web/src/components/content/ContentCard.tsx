@@ -1,7 +1,7 @@
 import { BookOpen, Calendar, Gamepad2, Star, Tv, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
-import type { ContentItem, ContentType } from '@/types';
+import type { ContentItem, ContentType, EntryStatus } from '@/types';
 
 const iconByType: Record<ContentType, typeof Video> = {
   film: Video,
@@ -19,9 +19,17 @@ const badgeClass: Record<ContentType, string> = {
 
 export interface ContentCardProps {
   item: ContentItem;
+  userStatus?: EntryStatus;
+  userRating?: number | null;
 }
 
-export function ContentCard({ item }: ContentCardProps) {
+const statusLabel: Record<EntryStatus, string> = {
+  want: 'Want',
+  in_progress: 'In Progress',
+  done: 'Done',
+};
+
+export function ContentCard({ item, userStatus, userRating }: ContentCardProps) {
   const FallbackIcon = iconByType[item.type];
 
   return (
@@ -45,6 +53,12 @@ export function ContentCard({ item }: ContentCardProps) {
           <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-app-text/85 px-2 py-1 text-xs font-semibold text-white">
             <Star className="h-3 w-3 fill-white" />
             {item.avgRating.toFixed(1)}
+          </div>
+        )}
+        {(userStatus || userRating) && (
+          <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
+            {userStatus && <Badge className="border-white/20 bg-app-text/85 text-white">{statusLabel[userStatus]}</Badge>}
+            {userRating ? <Badge className="border-white/20 bg-app-text/85 text-white">{userRating}/10</Badge> : null}
           </div>
         )}
       </div>
