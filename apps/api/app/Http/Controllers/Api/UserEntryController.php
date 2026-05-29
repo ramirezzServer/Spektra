@@ -21,6 +21,10 @@ class UserEntryController extends Controller
 
     public function store(Request $request)
     {
+        if (config('auth.require_email_verification') && ! $request->user()->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Please verify your email before updating your library.'], 403);
+        }
+
         $data = $request->validate([
             'content_id' => ['required', 'uuid', 'exists:content_items,id'],
             'status' => ['required', 'in:want,in_progress,done'],

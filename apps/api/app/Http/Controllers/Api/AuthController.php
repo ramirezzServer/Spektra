@@ -20,6 +20,7 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($data);
+        $user->sendEmailVerificationNotification();
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\FeedController;
 use App\Http\Controllers\Api\FollowController;
 use App\Http\Controllers\Api\UserController;
@@ -17,6 +18,9 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->name('verification.verify');
+
 // Placeholder routes - will be filled in later phases
 Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'spektra-api']));
 
@@ -30,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/entries/{id}', [UserEntryController::class, 'destroy']);
     Route::get('/entries/by-content/{contentId}', [UserEntryController::class, 'showByContent']);
     Route::get('/library', [UserEntryController::class, 'library']);
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send']);
     Route::post('/follows/{username}', [FollowController::class, 'store']);
     Route::delete('/follows/{username}', [FollowController::class, 'destroy']);
     Route::get('/users/{username}/relationship', [FollowController::class, 'relationship']);

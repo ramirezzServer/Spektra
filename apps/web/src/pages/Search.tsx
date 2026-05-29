@@ -1,6 +1,7 @@
 import { Search as SearchIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { ContentGrid } from '@/components/content/ContentGrid';
+import { SEO } from '@/components/seo/SEO';
 import { useSearch } from '@/hooks/useContent';
 import { cn } from '@/lib/utils';
 import type { ContentType } from '@/types';
@@ -37,6 +38,7 @@ export function Search() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 overflow-x-hidden">
+      <SEO title="Search" description="Search films, series, games, and books on Spektra." canonicalPath="/search" />
       <div className="space-y-4">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-content-tertiary" />

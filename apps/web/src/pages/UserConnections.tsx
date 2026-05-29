@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { UserList } from '@/components/social/UserList';
 import { Pagination } from '@/components/ui/Pagination';
+import { SEO } from '@/components/seo/SEO';
 import { useFollowers, useFollowing } from '@/hooks/useSocial';
 
 export function UserConnections({ kind }: { kind: 'followers' | 'following' }) {
@@ -15,6 +16,7 @@ export function UserConnections({ kind }: { kind: 'followers' | 'following' }) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <SEO title={title} description={`View ${title} on Spektra.`} canonicalPath={username ? `/profile/${username}/${kind}` : undefined} />
       <h1 className="text-2xl font-semibold text-content-primary">{title}</h1>
       <UserList users={query.data?.data ?? []} isLoading={query.isLoading} isError={query.isError} emptyMessage={emptyMessage} />
       <Pagination page={page} lastPage={query.data?.meta.lastPage ?? 1} isFetching={query.isFetching} onPageChange={setPage} />

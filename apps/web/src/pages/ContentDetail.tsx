@@ -6,6 +6,7 @@ import { PosterImage } from '@/components/content/PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { SEO } from '@/components/seo/SEO';
 import { useContentItem } from '@/hooks/useContent';
 import { libraryErrorMessage, useDeleteEntry, useEntryByContent, useUpsertEntry } from '@/hooks/useLibrary';
 import { cn } from '@/lib/utils';
@@ -116,6 +117,13 @@ export function ContentDetail() {
 
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-8 overflow-x-hidden lg:grid-cols-[minmax(220px,320px)_1fr]">
+      <SEO
+        title={item.title}
+        description={typeof metadata.overview === 'string' && metadata.overview ? metadata.overview : `${item.title} on Spektra.`}
+        image={item.posterUrl ?? undefined}
+        type="article"
+        canonicalPath={`/content/${item.type}/${item.externalId}`}
+      />
       <div className="w-full max-w-80">
         <div className="aspect-[2/3] overflow-hidden rounded-lg border border-border bg-surface shadow-card">
           {item.posterUrl ? (

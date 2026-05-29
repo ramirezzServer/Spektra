@@ -5,6 +5,7 @@ import { ContentGrid } from '@/components/content/ContentGrid';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { SEO } from '@/components/seo/SEO';
 import { useUserLibrary, useUserProfile, useUserStats } from '@/hooks/useLibrary';
 import { useFollowUser, useRelationship, useUnfollowUser } from '@/hooks/useSocial';
 import { getApiErrorMessage } from '@/lib/apiError';
@@ -84,6 +85,13 @@ export function Profile() {
 
   return (
     <div className="space-y-8">
+      <SEO
+        title={profile.data?.username ? `@${profile.data.username}` : 'Profile'}
+        description={profile.data?.bio || 'Spektra profile, library, ratings, reviews, and activity.'}
+        image={profile.data?.avatarUrl ?? undefined}
+        type="profile"
+        canonicalPath={username ? `/profile/${username}` : undefined}
+      />
       <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {profile.isLoading ? (
           <>

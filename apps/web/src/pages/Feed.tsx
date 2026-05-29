@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ActivityList } from '@/components/feed/ActivityList';
 import { FeedTabs } from '@/components/feed/FeedTabs';
+import { SEO } from '@/components/seo/SEO';
 import { useActivityFeed, type FeedScope } from '@/hooks/useFeed';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -13,6 +14,7 @@ export function Feed() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
+      <SEO title="Activity Feed" description="Recent Spektra activity from followed users and the global community." canonicalPath="/feed" />
       <div className="space-y-3">
         <h1 className="text-2xl font-semibold text-content-primary">Activity Feed</h1>
         <FeedTabs active={scope} isAuthenticated={isAuthenticated} onChange={setScope} />

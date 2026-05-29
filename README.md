@@ -1,62 +1,77 @@
 # Spektra
 
-Spektra is a multi-content tracker for films, series, games, and books with social features: follow users, activity feeds, ratings, reviews, and custom lists.
+Spektra is a full-stack tracker for films, series, games, and books. It supports account auth, external content search, personal library tracking, ratings, reviews, profiles, following, and real activity feeds.
 
-## Stack Overview
+## Implemented Features
+
+- Email/password auth with optional email verification.
+- Content search and detail pages for TMDB, RAWG, and OpenLibrary-backed data.
+- User library tracking with Want, In Progress, and Done statuses.
+- Ratings, reviews, profile stats, and paginated library views.
+- Social graph: follow/unfollow, followers, following, relationship state.
+- Activity feed with Following and Global scopes.
+- Privacy/Terms pages, SPA SEO metadata, robots.txt, sitemap.xml.
+- Optional consent-gated analytics adapter and app error boundary.
+
+## Stack
 
 | App | Tech | Purpose |
 | --- | --- | --- |
-| `apps/web` | React 18, Vite, TypeScript, TailwindCSS, React Router, TanStack Query, Zustand | Mobile-ready user interface |
-| `apps/api` | Laravel 11, Sanctum, PostgreSQL, Redis | API, auth, social graph, library, lists |
-| `apps/worker` | Python 3.11, FastAPI, APScheduler, asyncpg | Scheduled sync jobs and rating refreshes |
-| `packages/shared-types` | TypeScript | Shared domain interfaces |
+| `apps/web` | React 18, Vite, TypeScript, TailwindCSS, React Router, TanStack Query, Zustand | SPA frontend |
+| `apps/api` | Laravel 11, Sanctum, PostgreSQL, Redis | API, auth, library, social graph, feed |
+| `apps/worker` | Python, FastAPI, APScheduler, asyncpg | Scheduled sync and rating refresh jobs |
+| `packages/shared-types` | TypeScript | Shared frontend domain types |
 
-## Prerequisites
-
-- Node 20+
-- PHP 8.3+
-- Python 3.11+
-- Docker
-- Composer
-
-## Quick Start
+## Local Setup
 
 ```bash
-git clone ...
-cd spektra
 cp .env.example .env
 docker compose up -d postgres redis
-cd apps/api && composer install && php artisan migrate
-cd ../web && npm install && npm run dev
-cd ../worker && pip install -r requirements.txt && uvicorn main:app --reload
+
+cd apps/api
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+
+cd ../web
+npm install
+npm run dev
+
+cd ../worker
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
-## Environment Variables
+## Environment
 
-| Variable | Used by | Description |
-| --- | --- | --- |
-| `DB_CONNECTION` | API | PostgreSQL connection driver, use `pgsql` |
-| `DB_HOST` / `DB_PORT` | API, Worker | PostgreSQL host and port |
-| `DB_DATABASE` | API, Worker | Database name |
-| `DB_USERNAME` / `DB_PASSWORD` | API, Worker | Database credentials |
-| `REDIS_HOST` / `REDIS_PORT` | API | Cache, queue, and session backend |
-| `VITE_API_URL` | Web | API base URL, usually `http://localhost:8000/api` |
-| `TMDB_API_KEY` | API, Worker | Film and series provider key |
-| `RAWG_API_KEY` | API, Worker | Game provider key |
-| `OPENLIBRARY_BASE_URL` | API, Worker | Book provider base URL |
-| `YOUTUBE_API_KEY` | API | Future trailer metadata key |
+Core variables:
 
-## API Reference
+- `DB_*` / `DB_URL`: PostgreSQL connection settings.
+- `REDIS_*`: cache, queue, and session settings.
+- `FRONTEND_URL`: SPA URL used by email verification redirects.
+- `VITE_API_URL`: frontend API base URL.
+- `VITE_PUBLIC_SITE_URL`: canonical SEO base URL.
+- `TMDB_API_KEY`: required for full film/series search.
+- `RAWG_API_KEY`: required for full game search.
+- `OPENLIBRARY_BASE_URL`: book search provider, no key required.
+- `MAIL_*`: email verification mail settings. Use `MAIL_MAILER=log` locally.
+- `REQUIRE_EMAIL_VERIFICATION`: set `true` to block sensitive mutations until verified.
+- `VITE_ANALYTICS_PROVIDER`, `VITE_GA_MEASUREMENT_ID`, `VITE_UMAMI_*`: optional consent-gated analytics.
+- `VITE_SENTRY_DSN`: reserved for optional frontend monitoring wiring.
 
-The API routes live in [`apps/api/routes/api.php`](apps/api/routes/api.php). Responses use a consistent JSON envelope:
+## Useful Commands
 
-```json
-{ "data": [], "meta": { "page": 1, "per_page": 20, "total": 0 } }
+```bash
+cd apps/web && npm run typecheck
+cd apps/web && npm run build
+cd apps/api && php artisan route:list --path=api
+docker compose exec api php artisan migrate
+docker compose exec worker python -m py_compile main.py jobs/sync_trending.py jobs/refresh_ratings.py db/connection.py
 ```
 
-## Development Notes
+## Notes
 
-- Web runs on `http://localhost:5173`.
-- API runs on `http://localhost:8000`.
-- Worker runs on `http://localhost:8001`; check `GET /health`.
-- The web app includes local sample content so the product shell is usable before API data is seeded.
+- The SPA SEO files include placeholder `https://example.com` values in `robots.txt` and `sitemap.xml`; update them for a real domain.
+- Dynamic content/profile sitemap generation is future work.
+- No production credentials should be committed. Use environment variables for API keys, mail, database, analytics, and monitoring.

@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SEO } from '@/components/seo/SEO';
 import { useAuth } from '@/hooks/useAuth';
 import { getApiErrorMessage } from '@/lib/apiError';
 
@@ -21,7 +22,8 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-secondary flex items-center justify-center px-4">
+    <main className="min-h-screen bg-bg-secondary flex items-center justify-center px-4">
+      <SEO title="Sign in" noIndex />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-semibold text-content-primary tracking-tight">
@@ -88,8 +90,13 @@ export function Login() {
             Don't have an account?{' '}
             <Link to="/register" className="text-accent hover:text-accent-hover font-medium">Create one</Link>
           </p>
+          <p className="mt-3 text-center text-xs text-content-tertiary">
+            <Link to="/privacy" className="hover:text-accent">Privacy</Link>
+            {' · '}
+            <Link to="/terms" className="hover:text-accent">Terms</Link>
+          </p>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

@@ -18,6 +18,10 @@ class FollowController extends Controller
 
     public function store(Request $request, string $username)
     {
+        if (config('auth.require_email_verification') && ! $request->user()->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Please verify your email before following users.'], 403);
+        }
+
         $target = User::where('username', $username)->firstOrFail();
         $actor = $request->user();
 

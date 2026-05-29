@@ -10,6 +10,7 @@ export interface User {
   bio: string | null;
   followersCount?: number;
   followingCount?: number;
+  emailVerified?: boolean;
   createdAt: string;
 }
 

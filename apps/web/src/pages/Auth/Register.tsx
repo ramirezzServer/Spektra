@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { SEO } from '@/components/seo/SEO';
 import { useAuth } from '@/hooks/useAuth';
 import { getApiErrorMessage } from '@/lib/apiError';
 
@@ -44,7 +45,8 @@ export function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-secondary flex items-center justify-center px-4">
+    <main className="min-h-screen bg-bg-secondary flex items-center justify-center px-4">
+      <SEO title="Create account" noIndex />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-semibold text-content-primary tracking-tight">
@@ -90,12 +92,16 @@ export function Register() {
             {register.isPending ? 'Creating account...' : 'Create account'}
           </button>
 
+          <p className="mt-3 text-center text-xs text-content-tertiary">
+            By creating an account, you agree to the <Link to="/terms" className="text-accent hover:text-accent-hover">Terms</Link> and <Link to="/privacy" className="text-accent hover:text-accent-hover">Privacy Policy</Link>.
+          </p>
+
           <p className="text-center text-sm text-content-secondary mt-4">
             Already have an account?{' '}
             <Link to="/login" className="text-accent hover:text-accent-hover font-medium">Sign in</Link>
           </p>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

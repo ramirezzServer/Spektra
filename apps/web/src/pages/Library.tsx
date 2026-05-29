@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ContentGrid } from '@/components/content/ContentGrid';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
+import { SEO } from '@/components/seo/SEO';
 import { useMyLibrary } from '@/hooks/useLibrary';
 import type { ContentItem, ContentType, EntryStatus } from '@/types';
 
@@ -42,6 +43,7 @@ export function LibraryPage() {
 
   return (
     <div className="space-y-6">
+      <SEO title="Library" noIndex />
       <div>
         <h1 className="text-2xl font-semibold text-content-primary">Library</h1>
         <p className="mt-1 text-sm text-content-secondary">Your saved content, ratings, and reviews.</p>

@@ -30,7 +30,7 @@ export function useAuth() {
     },
     onSuccess: (data) => {
       setAuth(data.token, data.data);
-      navigate('/');
+      navigate(data.data.emailVerified ? '/' : '/email/verify');
     },
   });
 
@@ -53,6 +53,16 @@ export function useAuth() {
     },
   });
 
+  const resendVerification = useMutation({
+    mutationFn: async () => {
+      const res = await api.post<{ data: { sent: boolean; verified: boolean } }>('/email/verification-notification');
+      return res.data.data;
+    },
+    onSuccess: (data) => {
+      if (data.verified && user) updateUser({ emailVerified: true });
+    },
+  });
+
   return {
     user,
     token,
@@ -60,5 +70,6 @@ export function useAuth() {
     register: registerMutation,
     login: loginMutation,
     logout: logoutMutation,
+    resendVerification,
   };
 }
