@@ -7,9 +7,6 @@ import { AppShell } from '@/components/layout/AppShell';
 import { RequireAuth } from '@/components/auth/RequireAuth';
 
 import { Home } from '@/pages/Home';
-import { Search } from '@/pages/Search';
-import { Feed } from '@/pages/Feed';
-import { Lists } from '@/pages/Lists';
 import { Login } from '@/pages/Auth/Login';
 import { Register } from '@/pages/Auth/Register';
 
@@ -18,6 +15,9 @@ import './index.css';
 const Profile = React.lazy(() => import('@/pages/Profile').then((module) => ({ default: module.Profile })));
 const ContentDetail = React.lazy(() => import('@/pages/ContentDetail').then((module) => ({ default: module.ContentDetail })));
 const LibraryPage = React.lazy(() => import('@/pages/Library').then((module) => ({ default: module.LibraryPage })));
+const Search = React.lazy(() => import('@/pages/Search').then((module) => ({ default: module.Search })));
+const Feed = React.lazy(() => import('@/pages/Feed').then((module) => ({ default: module.Feed })));
+const Lists = React.lazy(() => import('@/pages/Lists').then((module) => ({ default: module.Lists })));
 
 function lazyPage(element: React.ReactNode) {
   return <React.Suspense fallback={<div className="py-16 text-sm text-content-tertiary">Loading...</div>}>{element}</React.Suspense>;
@@ -33,13 +33,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
           <Route element={<AppShell />}>
             <Route path="/" element={<Home />} />
-            <Route path="/search" element={<Search />} />
+            <Route path="/search" element={lazyPage(<Search />)} />
             <Route path="/profile/:username" element={lazyPage(<Profile />)} />
             <Route path="/content/:type/:id" element={lazyPage(<ContentDetail />)} />
 
-            <Route path="/feed" element={<RequireAuth><Feed /></RequireAuth>} />
+            <Route path="/feed" element={<RequireAuth>{lazyPage(<Feed />)}</RequireAuth>} />
             <Route path="/library" element={<RequireAuth>{lazyPage(<LibraryPage />)}</RequireAuth>} />
-            <Route path="/lists" element={<RequireAuth><Lists /></RequireAuth>} />
+            <Route path="/lists" element={<RequireAuth>{lazyPage(<Lists />)}</RequireAuth>} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

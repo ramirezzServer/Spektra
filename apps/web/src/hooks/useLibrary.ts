@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { api } from '@/lib/axios';
+import { getApiErrorMessage } from '@/lib/apiError';
 import { useAuthStore } from '@/stores/authStore';
 import type { ContentType, EntryStatus, PaginatedResponse, User, UserEntry, UserStats } from '@/types';
 
@@ -119,10 +119,7 @@ export function useEntryByContent(contentId?: string) {
 }
 
 export function libraryErrorMessage(error: unknown) {
-  const axiosError = error as AxiosError<{ message?: string; errors?: Record<string, string[]> }>;
-  const errors = axiosError.response?.data?.errors;
-  if (errors) return Object.values(errors)[0]?.[0] ?? 'Unable to save changes.';
-  return axiosError.response?.data?.message ?? 'Unable to save changes.';
+  return getApiErrorMessage(error, 'Unable to save changes.');
 }
 
 export function useUpsertEntry() {

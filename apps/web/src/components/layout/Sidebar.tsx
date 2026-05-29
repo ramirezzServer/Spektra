@@ -26,13 +26,14 @@ export function Sidebar() {
           <NavLink key={item.to} to={item.to} end={item.to === '/'}>
             {({ isActive }) => (
               <div
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                   isActive
                     ? 'bg-accent-light text-accent font-medium'
                     : 'text-content-secondary hover:bg-bg-tertiary hover:text-content-primary'
                 }`}
               >
-                <item.icon size={17} />
+                <item.icon size={17} aria-hidden="true" />
                 {item.label}
               </div>
             )}
@@ -43,10 +44,10 @@ export function Sidebar() {
       <div className="px-3 py-4 border-t border-border">
         {isAuthenticated ? (
           <div className="flex items-center gap-2.5 px-2">
-            <img src={user?.avatarUrl ?? ''} className="w-7 h-7 rounded-full bg-accent-light" alt="" />
+            <img src={user?.avatarUrl ?? ''} className="w-7 h-7 rounded-full bg-accent-light" alt="" loading="lazy" decoding="async" />
             <span className="text-sm font-medium text-content-primary flex-1 truncate">{user?.username}</span>
-            <button onClick={() => logout.mutate()} title="Log out" type="button">
-              <LogOut size={15} className="text-content-tertiary hover:text-danger" />
+            <button onClick={() => logout.mutate()} title="Log out" aria-label="Log out" type="button">
+              <LogOut size={15} aria-hidden="true" className="text-content-tertiary hover:text-danger" />
             </button>
           </div>
         ) : (

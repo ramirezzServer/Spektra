@@ -9,6 +9,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -62,6 +63,14 @@ class UserController extends Controller
 
     public function library(Request $request, string $username)
     {
+        $request->validate([
+            'status' => ['nullable', Rule::in(self::STATUSES)],
+            'type' => ['nullable', Rule::in(self::TYPES)],
+            'sort' => ['nullable', Rule::in(self::SORTS)],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1'],
+        ]);
+
         $user = User::where('username', $username)->firstOrFail();
         $status = $this->valid($request->query('status'), self::STATUSES);
         $type = $this->valid($request->query('type'), self::TYPES);

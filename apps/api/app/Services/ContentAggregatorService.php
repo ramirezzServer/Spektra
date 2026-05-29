@@ -28,47 +28,57 @@ class ContentAggregatorService
             return ['results' => [], 'total' => 0];
         }
 
-        return Cache::remember($this->cacheKey('rawg', 'games', $query, $page), now()->addHours(self::CACHE_TTL_HOURS), function () use ($query, $page) {
-            try {
-                $response = Http::timeout(10)->get(config('services.rawg.base_url').'/games', [
-                    'key' => config('services.rawg.key'),
-                    'search' => $query,
-                    'page' => $page,
-                    'page_size' => 20,
-                ])->throw()->json();
+        $cacheKey = $this->cacheKey('rawg', 'games', $query, $page);
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
 
-                return [
-                    'results' => collect($response['results'] ?? [])->map(fn (array $item) => $this->normalizeRawg($item))->all(),
-                    'total' => (int) ($response['count'] ?? 0),
-                ];
-            } catch (Throwable $exception) {
-                Log::warning('RAWG search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+        try {
+            $response = Http::timeout(10)->get(config('services.rawg.base_url').'/games', [
+                'key' => config('services.rawg.key'),
+                'search' => $query,
+                'page' => $page,
+                'page_size' => 20,
+            ])->throw()->json();
 
-                return ['results' => [], 'total' => 0];
-            }
-        });
+            $result = [
+                'results' => collect($response['results'] ?? [])->map(fn (array $item) => $this->normalizeRawg($item))->all(),
+                'total' => (int) ($response['count'] ?? 0),
+            ];
+            Cache::put($cacheKey, $result, now()->addHours(self::CACHE_TTL_HOURS));
+            return $result;
+        } catch (Throwable $exception) {
+            Log::warning('RAWG search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+
+            return ['results' => [], 'total' => 0];
+        }
     }
 
     public function searchBooks(string $query, int $page = 1): array
     {
-        return Cache::remember($this->cacheKey('openlibrary', 'books', $query, $page), now()->addHours(self::CACHE_TTL_HOURS), function () use ($query, $page) {
-            try {
-                $response = Http::timeout(10)->get(config('services.openlibrary.base_url').'/search.json', [
-                    'q' => $query,
-                    'page' => $page,
-                    'limit' => 20,
-                ])->throw()->json();
+        $cacheKey = $this->cacheKey('openlibrary', 'books', $query, $page);
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
 
-                return [
-                    'results' => collect($response['docs'] ?? [])->map(fn (array $item) => $this->normalizeOpenLibrary($item))->all(),
-                    'total' => (int) ($response['numFound'] ?? 0),
-                ];
-            } catch (Throwable $exception) {
-                Log::warning('OpenLibrary search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+        try {
+            $response = Http::timeout(10)->get(config('services.openlibrary.base_url').'/search.json', [
+                'q' => $query,
+                'page' => $page,
+                'limit' => 20,
+            ])->throw()->json();
 
-                return ['results' => [], 'total' => 0];
-            }
-        });
+            $result = [
+                'results' => collect($response['docs'] ?? [])->map(fn (array $item) => $this->normalizeOpenLibrary($item))->all(),
+                'total' => (int) ($response['numFound'] ?? 0),
+            ];
+            Cache::put($cacheKey, $result, now()->addHours(self::CACHE_TTL_HOURS));
+            return $result;
+        } catch (Throwable $exception) {
+            Log::warning('OpenLibrary search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+
+            return ['results' => [], 'total' => 0];
+        }
     }
 
     public function getTrendingFilmsAndSeries(): array
@@ -77,23 +87,27 @@ class ContentAggregatorService
             return [];
         }
 
-        return Cache::remember('tmdb:trending:week', now()->addHours(self::CACHE_TTL_HOURS), function () {
-            try {
-                $response = Http::timeout(10)->get(config('services.tmdb.base_url').'/trending/all/week', [
-                    'api_key' => config('services.tmdb.key'),
-                ])->throw()->json();
+        if (Cache::has('tmdb:trending:week')) {
+            return Cache::get('tmdb:trending:week');
+        }
 
-                return collect($response['results'] ?? [])
-                    ->filter(fn (array $item) => in_array($item['media_type'] ?? null, ['movie', 'tv'], true))
-                    ->map(fn (array $item) => $this->normalizeTmdb($item, ($item['media_type'] ?? '') === 'tv' ? 'series' : 'film'))
-                    ->values()
-                    ->all();
-            } catch (Throwable $exception) {
-                Log::warning('TMDB trending failed', ['error' => $exception->getMessage()]);
+        try {
+            $response = Http::timeout(10)->get(config('services.tmdb.base_url').'/trending/all/week', [
+                'api_key' => config('services.tmdb.key'),
+            ])->throw()->json();
 
-                return [];
-            }
-        });
+            $result = collect($response['results'] ?? [])
+                ->filter(fn (array $item) => in_array($item['media_type'] ?? null, ['movie', 'tv'], true))
+                ->map(fn (array $item) => $this->normalizeTmdb($item, ($item['media_type'] ?? '') === 'tv' ? 'series' : 'film'))
+                ->values()
+                ->all();
+            Cache::put('tmdb:trending:week', $result, now()->addHours(self::CACHE_TTL_HOURS));
+            return $result;
+        } catch (Throwable $exception) {
+            Log::warning('TMDB trending failed', ['error' => $exception->getMessage()]);
+
+            return [];
+        }
     }
 
     public function normalizeTmdb(array $item, string $type): array
@@ -184,24 +198,29 @@ class ContentAggregatorService
             return ['results' => [], 'total' => 0];
         }
 
-        return Cache::remember($this->cacheKey('tmdb', $type, $query, $page), now()->addHours(self::CACHE_TTL_HOURS), function () use ($path, $query, $page, $type) {
-            try {
-                $response = Http::timeout(10)->get(config('services.tmdb.base_url').$path, [
-                    'api_key' => config('services.tmdb.key'),
-                    'query' => $query,
-                    'page' => $page,
-                ])->throw()->json();
+        $cacheKey = $this->cacheKey('tmdb', $type, $query, $page);
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
 
-                return [
-                    'results' => collect($response['results'] ?? [])->map(fn (array $item) => $this->normalizeTmdb($item, $type))->all(),
-                    'total' => (int) ($response['total_results'] ?? 0),
-                ];
-            } catch (Throwable $exception) {
-                Log::warning('TMDB search failed', ['type' => $type, 'query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+        try {
+            $response = Http::timeout(10)->get(config('services.tmdb.base_url').$path, [
+                'api_key' => config('services.tmdb.key'),
+                'query' => $query,
+                'page' => $page,
+            ])->throw()->json();
 
-                return ['results' => [], 'total' => 0];
-            }
-        });
+            $result = [
+                'results' => collect($response['results'] ?? [])->map(fn (array $item) => $this->normalizeTmdb($item, $type))->all(),
+                'total' => (int) ($response['total_results'] ?? 0),
+            ];
+            Cache::put($cacheKey, $result, now()->addHours(self::CACHE_TTL_HOURS));
+            return $result;
+        } catch (Throwable $exception) {
+            Log::warning('TMDB search failed', ['type' => $type, 'query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
+
+            return ['results' => [], 'total' => 0];
+        }
     }
 
     private function cacheKey(string $provider, string $type, string $query, int $page): string

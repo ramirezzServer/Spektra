@@ -2,6 +2,7 @@ import { Calendar, Check, Clock, Gamepad2, Plus, Star, Trash2, Users } from 'luc
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { RatingStars } from '@/components/content/RatingStars';
+import { PosterImage } from '@/components/content/PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -118,11 +119,9 @@ export function ContentDetail() {
       <div className="w-full max-w-80">
         <div className="aspect-[2/3] overflow-hidden rounded-lg border border-border bg-surface shadow-card">
           {item.posterUrl ? (
-            <img src={item.posterUrl} alt={item.title} className="h-full w-full object-cover" loading="lazy" />
+            <PosterImage src={item.posterUrl} title={item.title} type={item.type} className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full items-center justify-center bg-bg-tertiary px-6 text-center text-sm font-semibold text-content-tertiary">
-              No poster available
-            </div>
+            <PosterImage src={null} title={item.title} type={item.type} className="h-full w-full" />
           )}
         </div>
       </div>
@@ -184,6 +183,13 @@ export function ContentDetail() {
             </div>
           ) : (
             <>
+              {entry.isLoading && (
+                <div className="grid gap-2 sm:grid-cols-3" aria-label="Loading tracking controls">
+                  <Skeleton className="h-11" />
+                  <Skeleton className="h-11" />
+                  <Skeleton className="h-11" />
+                </div>
+              )}
               <div className="grid gap-2 sm:grid-cols-3">
                 {statusOptions.map((option) => {
                   const Icon = option.icon;
@@ -229,7 +235,7 @@ export function ContentDetail() {
                   </div>
                 </div>
               </div>
-              {message && <p className="text-sm text-content-secondary">{message}</p>}
+              {message && <p className="text-sm text-content-secondary" role="status" aria-live="polite">{message}</p>}
             </>
           )}
         </div>

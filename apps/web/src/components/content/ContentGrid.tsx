@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { ContentCard } from './ContentCard';
 import { ContentCardSkeleton } from '@/components/ui/Skeleton';
 import type { ContentItem, UserEntry } from '@/types';
@@ -10,6 +11,8 @@ interface ContentGridProps {
 }
 
 export function ContentGrid({ items, entries = [], isLoading = false, skeletonCount = 10 }: ContentGridProps) {
+  const entriesByContentId = useMemo(() => new Map(entries.map((entry) => [entry.contentId, entry])), [entries]);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
@@ -30,8 +33,8 @@ export function ContentGrid({ items, entries = [], isLoading = false, skeletonCo
         <ContentCard
           key={`${item.type}-${item.externalId}`}
           item={item}
-          userStatus={entries.find((entry) => entry.contentId === item.id)?.status}
-          userRating={entries.find((entry) => entry.contentId === item.id)?.rating}
+          userStatus={entriesByContentId.get(item.id)?.status}
+          userRating={entriesByContentId.get(item.id)?.rating}
         />
       ))}
     </div>

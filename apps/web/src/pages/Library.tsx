@@ -72,7 +72,12 @@ export function LibraryPage() {
       </section>
 
       <ContentGrid items={items} entries={entries} isLoading={library.isLoading} />
-      {!library.isLoading && items.length === 0 && (
+      {library.isError && (
+        <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary" role="status">
+          Unable to load your library right now.
+        </div>
+      )}
+      {!library.isLoading && !library.isError && items.length === 0 && (
         <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary">
           Your library is empty for this view.
         </div>

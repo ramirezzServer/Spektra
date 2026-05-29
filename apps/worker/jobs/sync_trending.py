@@ -73,7 +73,7 @@ async def sync_trending_job():
                 INSERT INTO content_items
                   (id, external_id, type, title, poster_url, release_year, genres, metadata, created_at, updated_at)
                 VALUES
-                  (gen_random_uuid(), $1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, now(), now())
+                  (gen_random_uuid(), $1, $2, $3, $4, $5, $6::text[], $7::jsonb, now(), now())
                 ON CONFLICT (external_id, type) DO UPDATE SET
                   title = EXCLUDED.title,
                   poster_url = EXCLUDED.poster_url,
@@ -87,7 +87,7 @@ async def sync_trending_job():
                 normalized["title"],
                 normalized["poster_url"],
                 normalized["release_year"],
-                json.dumps(normalized["genres"]),
+                normalized["genres"],
                 json.dumps(normalized["metadata"]),
             )
             synced += 1

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/axios';
 import type { ContentItem, ContentType, PaginatedResponse } from '@/types';
 
@@ -30,6 +30,9 @@ export function useSearch(query: string, type?: ContentType | 'all', page = 1) {
       };
     },
     enabled: query.trim().length >= 2,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 20,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -45,6 +48,8 @@ export function useTrending(type?: ContentType | 'all', limit = 20) {
       });
       return response.data.data;
     },
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 30,
   });
 }
 
@@ -56,6 +61,8 @@ export function useContentItem(type: string, externalId: string) {
       return response.data.data;
     },
     enabled: Boolean(type && externalId),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 20,
   });
 }
 

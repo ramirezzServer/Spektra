@@ -41,6 +41,8 @@ export function Search() {
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-content-tertiary" />
           <input
+            id="content-search"
+            aria-label="Search content"
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -76,7 +78,16 @@ export function Search() {
 
       {!isIdle && <ContentGrid items={items} isLoading={isLoading} skeletonCount={12} />}
 
-      {!isIdle && !isLoading && items.length === 0 && (
+      {!isIdle && search.isError && !isLoading && (
+        <div className="flex min-h-72 items-center justify-center rounded-lg border border-dashed border-border bg-surface px-6 text-center" role="status">
+          <div>
+            <h2 className="text-base font-semibold text-content-primary">Search is unavailable</h2>
+            <p className="mt-2 text-sm text-content-tertiary">Please try again in a moment.</p>
+          </div>
+        </div>
+      )}
+
+      {!isIdle && !search.isError && !isLoading && items.length === 0 && (
         <div className="flex min-h-72 items-center justify-center rounded-lg border border-dashed border-border bg-surface px-6 text-center">
           <div>
             <h2 className="text-base font-semibold text-content-primary">No results found</h2>

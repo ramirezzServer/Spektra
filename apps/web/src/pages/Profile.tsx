@@ -139,7 +139,12 @@ export function Profile() {
         </div>
 
         <ContentGrid items={items} entries={entries} isLoading={library.isLoading} />
-        {!library.isLoading && items.length === 0 && (
+        {library.isError && (
+          <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary" role="status">
+            Unable to load this library right now.
+          </div>
+        )}
+        {!library.isLoading && !library.isError && items.length === 0 && (
           <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary">
             No library entries here yet.
           </div>

@@ -13,12 +13,12 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <Link to="/search" className="p-2 rounded-md text-content-secondary hover:bg-bg-tertiary">
-            <Search size={19} />
+          <Link to="/search" aria-label="Search" className="p-2 rounded-md text-content-secondary hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30">
+            <Search size={19} aria-hidden="true" />
           </Link>
           {isAuthenticated ? (
-            <Link to={`/profile/${user?.username}`}>
-              <img src={user?.avatarUrl ?? ''} className="w-7 h-7 rounded-full bg-accent-light" alt="" />
+            <Link to={`/profile/${user?.username}`} aria-label="Open profile">
+              <img src={user?.avatarUrl ?? ''} className="w-7 h-7 rounded-full bg-accent-light" alt="" loading="lazy" decoding="async" />
             </Link>
           ) : (
             <Link to="/login" className="text-sm font-medium text-accent">Sign in</Link>

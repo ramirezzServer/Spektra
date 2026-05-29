@@ -1,23 +1,22 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-
-type ApiError = { response?: { data?: { message?: string; errors?: Record<string, string[]> } } };
-
-function getErrorMessage(error: unknown): string {
-  const response = (error as ApiError).response;
-  const validationError = response?.data?.errors ? Object.values(response.data.errors)[0]?.[0] : undefined;
-  return validationError ?? response?.data?.message ?? 'Unable to sign in. Please try again.';
-}
+import { getApiErrorMessage } from '@/lib/apiError';
 
 export function Login() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const error = login.isError ? getErrorMessage(login.error) : null;
+  const [localError, setLocalError] = useState<string | null>(null);
+  const error = localError ?? (login.isError ? getApiErrorMessage(login.error, 'Unable to sign in. Please try again.') : null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setLocalError(null);
+    if (!email.trim() || !password) {
+      setLocalError('Email and password are required.');
+      return;
+    }
     login.mutate({ email, password });
   }
 
@@ -35,28 +34,42 @@ export function Login() {
           <h2 className="text-lg font-semibold text-content-primary mb-6">Sign in to your account</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-danger-light border border-red-200 rounded-md">
+            <div className="mb-4 p-3 bg-danger-light border border-red-200 rounded-md" role="alert" aria-live="polite">
               <p className="text-sm text-danger-text">{error}</p>
             </div>
           )}
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-content-primary mb-1.5">Email</label>
+              <label htmlFor="login-email" className="block text-sm font-medium text-content-primary mb-1.5">Email</label>
               <input
+                id="login-email"
                 type="email"
+                required
+                autoComplete="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setLocalError(null);
+                  login.reset();
+                  setEmail(event.target.value);
+                }}
                 className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors"
                 placeholder="you@example.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-content-primary mb-1.5">Password</label>
+              <label htmlFor="login-password" className="block text-sm font-medium text-content-primary mb-1.5">Password</label>
               <input
+                id="login-password"
                 type="password"
+                required
+                autoComplete="current-password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  setLocalError(null);
+                  login.reset();
+                  setPassword(event.target.value);
+                }}
                 className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors"
                 placeholder="********"
               />

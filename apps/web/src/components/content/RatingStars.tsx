@@ -25,6 +25,8 @@ export function RatingStars({ value, onChange, readonly = false, disabled = fals
             type="button"
             disabled={inert}
             onClick={() => onChange?.(starValue)}
+            aria-label={`Rate ${starValue} out of 10`}
+            aria-pressed={score === starValue}
             className={cn(
               'relative grid h-9 w-9 place-items-center rounded-md text-warning transition hover:bg-warning-light',
               inert && 'cursor-default opacity-80 hover:bg-transparent',

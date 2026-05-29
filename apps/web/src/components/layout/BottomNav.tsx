@@ -21,11 +21,12 @@ export function BottomNav() {
           <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1">
             {({ isActive }) => (
               <div
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center justify-center pt-2 pb-1 gap-0.5 min-h-[44px] ${
                   isActive ? 'text-accent' : 'text-content-tertiary'
                 }`}
               >
-                <item.icon size={20} />
+                <item.icon size={20} aria-hidden="true" />
                 <span className="text-[10px] font-medium">{item.label}</span>
               </div>
             )}

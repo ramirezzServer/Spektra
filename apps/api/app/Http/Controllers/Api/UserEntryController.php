@@ -8,6 +8,8 @@ use App\Http\Resources\UserEntryResource;
 use App\Models\UserEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class UserEntryController extends Controller
 {
@@ -47,6 +49,14 @@ class UserEntryController extends Controller
 
     public function library(Request $request)
     {
+        $request->validate([
+            'status' => ['nullable', Rule::in(self::STATUSES)],
+            'type' => ['nullable', Rule::in(self::TYPES)],
+            'sort' => ['nullable', Rule::in(self::SORTS)],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1'],
+        ]);
+
         return $this->paginated(
             $this->libraryQuery($request, $request->user()->id)->paginate(
                 $this->perPage($request),
@@ -60,6 +70,10 @@ class UserEntryController extends Controller
 
     public function showByContent(Request $request, string $contentId)
     {
+        if (! Str::isUuid($contentId)) {
+            return $this->ok(null);
+        }
+
         $entry = UserEntry::query()
             ->with('content')
             ->where('user_id', $request->user()->id)

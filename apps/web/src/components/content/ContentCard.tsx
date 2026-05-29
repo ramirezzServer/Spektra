@@ -1,14 +1,8 @@
-import { BookOpen, Calendar, Gamepad2, Star, Tv, Video } from 'lucide-react';
+import { Calendar, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PosterImage } from './PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import type { ContentItem, ContentType, EntryStatus } from '@/types';
-
-const iconByType: Record<ContentType, typeof Video> = {
-  film: Video,
-  series: Tv,
-  game: Gamepad2,
-  book: BookOpen,
-};
 
 const badgeClass: Record<ContentType, string> = {
   film: 'border-film-light bg-film-light text-film-text',
@@ -30,22 +24,13 @@ const statusLabel: Record<EntryStatus, string> = {
 };
 
 export function ContentCard({ item, userStatus, userRating }: ContentCardProps) {
-  const FallbackIcon = iconByType[item.type];
-
   return (
     <Link
       to={`/content/${item.type}/${item.externalId}`}
       className="group block min-w-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2"
     >
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg border border-app-border bg-app-surface shadow-card">
-        {item.posterUrl ? (
-          <img className="h-full w-full object-cover transition duration-300 group-hover:scale-105" src={item.posterUrl} alt={item.title} loading="lazy" />
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-3 bg-bg-tertiary px-4 text-center text-app-muted">
-            <FallbackIcon className="h-9 w-9" />
-            <span className="line-clamp-3 text-xs font-semibold">{item.title}</span>
-          </div>
-        )}
+        <PosterImage src={item.posterUrl} title={item.title} type={item.type} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
         <div className="absolute left-2 top-2">
           <Badge className={`capitalize ${badgeClass[item.type]}`}>{item.type}</Badge>
         </div>

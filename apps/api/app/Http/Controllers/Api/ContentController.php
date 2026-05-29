@@ -8,6 +8,8 @@ use App\Http\Resources\ContentItemResource;
 use App\Models\ContentItem;
 use App\Services\ContentAggregatorService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rule;
 
 class ContentController extends Controller
 {
@@ -19,6 +21,12 @@ class ContentController extends Controller
 
     public function index(Request $request)
     {
+        $request->validate([
+            'type' => ['nullable', Rule::in(self::TYPES)],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'q' => ['nullable', 'string', 'max:200'],
+        ]);
+
         $query = trim((string) $request->query('q', ''));
         $type = $this->validType($request->query('type'));
         $page = max(1, (int) $request->integer('page', 1));
@@ -35,6 +43,7 @@ class ContentController extends Controller
 
         $searches = $this->searchProviders($query, $type, $page);
         $normalized = collect($searches)->flatMap(fn (array $search) => $search['results'] ?? []);
+        $total = collect($searches)->sum(fn (array $search) => (int) ($search['total'] ?? 0));
         $items = $normalized
             ->map(fn (array $item) => $this->aggregator->upsertContentItem($item))
             ->unique(fn (ContentItem $item) => $item->type.':'.$item->external_id)
@@ -50,18 +59,30 @@ class ContentController extends Controller
         return $this->ok(ContentItemResource::collection($items), [
             'page' => $page,
             'per_page' => $perPage,
-            'total' => $items->count(),
+            'perPage' => $perPage,
+            'total' => max($total, $items->count()),
+            'last_page' => max(1, (int) ceil(max($total, $items->count()) / $perPage)),
+            'lastPage' => max(1, (int) ceil(max($total, $items->count()) / $perPage)),
             'query' => $query,
         ]);
     }
 
     public function trending(Request $request)
     {
+        $request->validate([
+            'type' => ['nullable', Rule::in(self::TYPES)],
+            'limit' => ['nullable', 'integer', 'min:1'],
+        ]);
+
         $type = $this->validType($request->query('type'));
         $limit = min(40, max(5, (int) $request->integer('limit', 20)));
         $source = 'db';
 
-        $items = ContentItem::query()->byType($type)->trending()->limit($limit)->get();
+        $items = Cache::remember(
+            sprintf('content:trending:%s:%d', $type ?? 'all', $limit),
+            now()->addHours(6),
+            fn () => ContentItem::query()->byType($type)->trending()->limit($limit)->get()
+        );
 
         if ($items->count() < $limit) {
             collect($this->aggregator->getTrendingFilmsAndSeries())
