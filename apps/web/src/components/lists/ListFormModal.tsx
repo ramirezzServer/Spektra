@@ -4,6 +4,8 @@ import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import type { UserList } from '@/types';
+import { useDraftStorage } from '@/hooks/useDraftStorage';
+import { useAuthStore } from '@/stores/authStore';
 
 interface ListFormModalProps {
   open: boolean;
@@ -19,6 +21,10 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
+  const user = useAuthStore((state) => state.user);
+  const draftKey = open && !list ? `spektra:draft:list:${user?.id ?? 'guest'}:new` : null;
+  const nameDraft = useDraftStorage(draftKey ? `${draftKey}:name` : null);
+  const descriptionDraft = useDraftStorage(draftKey ? `${draftKey}:description` : null);
 
   useEffect(() => {
     if (!open) return;
@@ -27,6 +33,12 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
     setIsPublic(Boolean(list?.isPublic));
     setNameError(null);
   }, [open, list]);
+
+  useEffect(() => {
+    if (!open || list) return;
+    if (nameDraft.value) setName(nameDraft.value);
+    if (descriptionDraft.value) setDescription(descriptionDraft.value);
+  }, [descriptionDraft.value, list, nameDraft.value, open]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -39,6 +51,7 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
       setNameError('Name must be 100 characters or fewer.');
       return;
     }
+    if (isPending) return;
     onSubmit({ name: trimmed, description: description.trim() || null, isPublic });
   }
 
@@ -49,7 +62,18 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           <label htmlFor="list-name" className="text-sm font-medium text-content-primary">
             Name
           </label>
-          <Input id="list-name" value={name} maxLength={100} onChange={(event) => setName(event.target.value)} aria-invalid={Boolean(nameError)} aria-describedby="list-name-error" />
+          <Input
+            id="list-name"
+            value={name}
+            maxLength={100}
+            autoFocus
+            onChange={(event) => {
+              setName(event.target.value);
+              if (!list) nameDraft.setValue(event.target.value);
+            }}
+            aria-invalid={Boolean(nameError)}
+            aria-describedby="list-name-error"
+          />
           {nameError && (
             <p id="list-name-error" className="text-sm text-danger">
               {nameError}
@@ -60,7 +84,15 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           <label htmlFor="list-description" className="text-sm font-medium text-content-primary">
             Description
           </label>
-          <Textarea id="list-description" value={description} maxLength={1000} onChange={(event) => setDescription(event.target.value)} />
+          <Textarea
+            id="list-description"
+            value={description}
+            maxLength={1000}
+            onChange={(event) => {
+              setDescription(event.target.value);
+              if (!list) descriptionDraft.setValue(event.target.value);
+            }}
+          />
           <p className="text-xs text-content-tertiary">{description.length}/1000</p>
         </div>
         <label className="flex items-center gap-2 text-sm text-content-secondary">

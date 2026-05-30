@@ -1,5 +1,6 @@
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Avatar } from '@/components/ui/Avatar';
 import { useAuthStore } from '@/stores/authStore';
 
 export function Navbar() {
@@ -18,7 +19,7 @@ export function Navbar() {
           </Link>
           {isAuthenticated ? (
             <Link to={`/profile/${user?.username}`} aria-label="Open profile">
-              <img src={user?.avatarUrl ?? ''} className="w-7 h-7 rounded-full bg-accent-light" alt="" loading="lazy" decoding="async" />
+              <Avatar src={user?.avatarUrl} alt={user?.username ?? 'User'} size="sm" />
             </Link>
           ) : (
             <Link to="/login" className="text-sm font-medium text-accent">Sign in</Link>

@@ -22,6 +22,8 @@ export function Home() {
   const [active, setActive] = useState<ContentType | 'all'>('all');
   const trending = useTrending(active, 24);
   const items = trending.data ?? [];
+  const primaryItems = items.slice(0, 12);
+  const moreItems = items.slice(12);
 
   return (
     <div className="space-y-6 overflow-x-hidden">
@@ -83,7 +85,7 @@ export function Home() {
           <>
             <div className="md:hidden">
               <div className="flex gap-4 overflow-x-auto pb-2">
-                {items.map((item) => (
+                {primaryItems.map((item) => (
                   <div key={`${item.type}-${item.externalId}`} className="w-40 shrink-0">
                     <ContentGrid items={[item]} skeletonCount={1} />
                   </div>
@@ -91,16 +93,16 @@ export function Home() {
               </div>
             </div>
             <div className="hidden md:block">
-              <ContentGrid items={items} />
+              <ContentGrid items={primaryItems} />
             </div>
           </>
         )}
       </section>
 
-      {items.length >= 12 && (
+      {moreItems.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-content-primary">More to Explore</h2>
-          <ContentGrid items={items.slice(12)} />
+          <ContentGrid items={moreItems} />
         </section>
       )}
     </div>

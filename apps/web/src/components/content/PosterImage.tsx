@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BookOpen, Gamepad2, Tv, Video } from 'lucide-react';
 import type { ContentType } from '@/types';
 
@@ -19,6 +19,10 @@ interface PosterImageProps {
 export function PosterImage({ src, title, type, className = '' }: PosterImageProps) {
   const [failed, setFailed] = useState(false);
   const FallbackIcon = iconByType[type];
+
+  useEffect(() => {
+    setFailed(false);
+  }, [src]);
 
   if (!src || failed) {
     return (

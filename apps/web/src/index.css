@@ -28,4 +28,15 @@
   select {
     touch-action: manipulation;
   }
+
+  :focus-visible {
+    outline: 2px solid #4F46E5;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+  }
 }

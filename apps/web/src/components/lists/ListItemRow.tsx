@@ -33,7 +33,7 @@ export function ListItemRow({ item, canMoveUp, canMoveDown, isOwner, isPending, 
             {content.releaseYear ?? 'TBA'}
           </span>
         </div>
-        <Link to={`/content/${content.type}/${content.externalId}`} className="mt-2 block text-sm font-semibold text-content-primary hover:text-accent">
+        <Link to={`/content/${content.type}/${content.externalId}`} className="mt-2 block break-words text-sm font-semibold text-content-primary hover:text-accent">
           {content.title}
         </Link>
         <p className="mt-1 text-xs text-content-tertiary">Position {item.position}</p>

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { AppShell } from '@/components/layout/AppShell';
@@ -27,6 +27,7 @@ const ListDetail = React.lazy(() => import('@/pages/ListDetail').then((module) =
 const UserConnections = React.lazy(() => import('@/pages/UserConnections').then((module) => ({ default: module.UserConnections })));
 const Privacy = React.lazy(() => import('@/pages/Privacy').then((module) => ({ default: module.Privacy })));
 const Terms = React.lazy(() => import('@/pages/Terms').then((module) => ({ default: module.Terms })));
+const NotFound = React.lazy(() => import('@/pages/NotFound').then((module) => ({ default: module.NotFound })));
 
 function lazyPage(element: React.ReactNode) {
   return <React.Suspense fallback={<div className="py-16 text-sm text-content-tertiary">Loading...</div>}>{element}</React.Suspense>;
@@ -58,9 +59,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Route path="/library" element={<RequireAuth>{lazyPage(<LibraryPage />)}</RequireAuth>} />
               <Route path="/lists" element={<RequireAuth>{lazyPage(<Lists />)}</RequireAuth>} />
               <Route path="/lists/:listId" element={lazyPage(<ListDetail />)} />
+              <Route path="*" element={lazyPage(<NotFound />)} />
             </Route>
-
-            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <CookieConsentBanner />
         </BrowserRouter>

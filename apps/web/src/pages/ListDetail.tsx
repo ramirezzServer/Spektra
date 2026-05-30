@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { listErrorMessage, useDeleteList, useListDetail, useRemoveListItem, useReorderListItems, useUpdateList } from '@/hooks/useLists';
+import { formatNumber } from '@/lib/formatters';
 import { useAuthStore } from '@/stores/authStore';
 import type { ListItem } from '@/types';
 
@@ -31,6 +32,7 @@ export function ListDetail() {
 
   async function submit(input: { name: string; description: string | null; isPublic: boolean }) {
     if (!list) return;
+    if (updateList.isPending) return;
     setMessage(null);
     try {
       await updateList.mutateAsync({ ...input, id: list.id });
@@ -42,6 +44,7 @@ export function ListDetail() {
 
   async function deleteCurrentList() {
     if (!list) return;
+    if (deleteList.isPending) return;
     setMessage(null);
     try {
       await deleteList.mutateAsync(list.id);
@@ -53,6 +56,7 @@ export function ListDetail() {
 
   async function removeConfirmed() {
     if (!list || !removing) return;
+    if (removeItem.isPending) return;
     try {
       await removeItem.mutateAsync({ listId: list.id, contentId: removing.contentId });
       setRemoving(null);
@@ -63,6 +67,7 @@ export function ListDetail() {
 
   async function move(fromIndex: number, direction: -1 | 1) {
     if (!list) return;
+    if (reorderItems.isPending) return;
     const items = [...list.items];
     const toIndex = fromIndex + direction;
     if (toIndex < 0 || toIndex >= items.length) return;
@@ -110,9 +115,9 @@ export function ListDetail() {
             <Badge className={list.isPublic ? 'border-accent-light bg-accent-light text-accent' : 'border-border bg-bg-secondary text-content-tertiary'}>
               {list.isPublic ? 'Public' : 'Private'}
             </Badge>
-            <span className="text-sm text-content-tertiary">{list.itemsCount ?? detail.data?.meta.total ?? 0} items</span>
+            <span className="text-sm text-content-tertiary">{formatNumber(list.itemsCount ?? detail.data?.meta.total ?? 0)} items</span>
           </div>
-          <h1 className="mt-3 break-words text-3xl font-semibold text-content-primary">{list.name}</h1>
+          <h1 className="mt-3 overflow-wrap-anywhere text-3xl font-semibold text-content-primary">{list.name}</h1>
           {list.description && <p className="mt-2 max-w-3xl text-sm leading-6 text-content-secondary">{list.description}</p>}
           {list.owner && <p className="mt-2 text-xs text-content-tertiary">By {list.owner.username}</p>}
         </div>

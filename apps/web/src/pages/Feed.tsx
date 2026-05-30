@@ -27,6 +27,7 @@ export function Feed() {
         items={items}
         isLoading={feed.isLoading}
         isError={feed.isError}
+        error={feed.error}
         emptyMessage={emptyMessage}
         hasNextPage={feed.hasNextPage}
         isFetchingNextPage={feed.isFetchingNextPage}

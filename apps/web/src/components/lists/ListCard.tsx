@@ -1,7 +1,9 @@
 import { Edit2, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PosterImage } from '@/components/content/PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { formatNumber } from '@/lib/formatters';
 import type { UserList } from '@/types';
 
 interface ListCardProps {
@@ -20,11 +22,7 @@ export function ListCard({ list, onEdit, onDelete }: ListCardProps) {
           {previews.length > 0 ? (
             previews.slice(0, 5).map((item) => (
               <div key={item.id} className="min-w-0 bg-bg-tertiary">
-                {item.posterUrl ? (
-                  <img src={item.posterUrl} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center px-1 text-center text-[10px] font-semibold text-content-tertiary">{item.type}</div>
-                )}
+                <PosterImage src={item.posterUrl} title={item.title} type={item.type} className="h-full w-full object-cover" />
               </div>
             ))
           ) : (
@@ -33,13 +31,13 @@ export function ListCard({ list, onEdit, onDelete }: ListCardProps) {
         </div>
         <div className="mt-4 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h2 className="line-clamp-2 text-base font-semibold text-content-primary">{list.name}</h2>
+            <h2 className="line-clamp-2 break-words text-base font-semibold text-content-primary">{list.name}</h2>
             <Badge className={list.isPublic ? 'border-accent-light bg-accent-light text-accent' : 'border-border bg-bg-secondary text-content-tertiary'}>
               {list.isPublic ? 'Public' : 'Private'}
             </Badge>
           </div>
-          {list.description && <p className="mt-2 line-clamp-2 text-sm text-content-secondary">{list.description}</p>}
-          <p className="mt-3 text-xs font-medium text-content-tertiary">{list.itemsCount ?? 0} items</p>
+          {list.description && <p className="mt-2 line-clamp-2 break-words text-sm text-content-secondary">{list.description}</p>}
+          <p className="mt-3 text-xs font-medium text-content-tertiary">{formatNumber(list.itemsCount ?? 0)} items</p>
         </div>
       </Link>
       {(onEdit || onDelete) && (

@@ -9,8 +9,11 @@ import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { SEO } from '@/components/seo/SEO';
 import { useContentItem } from '@/hooks/useContent';
+import { useDraftStorage } from '@/hooks/useDraftStorage';
 import { libraryErrorMessage, useDeleteEntry, useEntryByContent, useUpsertEntry } from '@/hooks/useLibrary';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { cn } from '@/lib/utils';
+import { formatNumber } from '@/lib/formatters';
 import { useAuthStore } from '@/stores/authStore';
 import type { ContentType, EntryStatus, UserEntry } from '@/types';
 
@@ -49,13 +52,20 @@ export function ContentDetail() {
   const [review, setReview] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [addToListOpen, setAddToListOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const draft = useDraftStorage(item && user ? `spektra:draft:review:${user.id}:${item.id}` : null, entry.data?.review ?? '');
 
   useEffect(() => {
-    setReview(entry.data?.review ?? '');
-  }, [entry.data?.review]);
+    setReview(draft.value);
+  }, [draft.value]);
+
+  const savedReview = entry.data?.review ?? '';
+  const hasUnsavedReview = isAuthenticated && review !== savedReview;
+  useUnsavedChangesWarning(hasUnsavedReview);
 
   async function saveEntry(next: Partial<Pick<UserEntry, 'status' | 'rating' | 'review'>>) {
     if (!item) return;
+    if (upsertEntry.isPending) return;
     setMessage(null);
     try {
       await upsertEntry.mutateAsync({
@@ -64,6 +74,7 @@ export function ContentDetail() {
         rating: next.rating ?? entry.data?.rating ?? null,
         review: next.review ?? entry.data?.review ?? null,
       });
+      if (typeof next.review === 'string') draft.clearDraft();
       setMessage('Saved.');
     } catch (error) {
       setMessage(libraryErrorMessage(error));
@@ -72,10 +83,13 @@ export function ContentDetail() {
 
   async function removeEntry() {
     if (!entry.data || !item) return;
+    if (deleteEntry.isPending) return;
     setMessage(null);
     try {
       await deleteEntry.mutateAsync({ id: entry.data.id, contentId: item.id });
       setReview('');
+      draft.setValue('');
+      draft.clearDraft();
       setMessage('Removed from your library.');
     } catch (error) {
       setMessage(libraryErrorMessage(error));
@@ -151,7 +165,7 @@ export function ContentDetail() {
             </span>
             <span className="inline-flex items-center gap-2">
               <Users className="h-4 w-4" />
-              {item.ratingsCount} ratings
+              {formatNumber(item.ratingsCount)} ratings
             </span>
           </div>
         </div>
@@ -225,14 +239,34 @@ export function ContentDetail() {
                 <textarea
                   maxLength={5000}
                   value={review}
-                  onChange={(event) => setReview(event.target.value)}
+                  onChange={(event) => {
+                    setReview(event.target.value);
+                    draft.setValue(event.target.value);
+                  }}
                   disabled={upsertEntry.isPending}
                   className="min-h-28 w-full resize-none rounded-lg border border-border bg-bg-secondary p-3 text-sm text-content-secondary placeholder:text-content-tertiary"
                   placeholder="Write your review..."
                 />
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs text-content-tertiary">{review.length}/5000</span>
+                  <span className="text-xs text-content-tertiary">
+                    {review.length}/5000
+                    {draft.restored ? ' · Draft restored' : ''}
+                  </span>
                   <div className="flex gap-2">
+                    {hasUnsavedReview && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        disabled={upsertEntry.isPending}
+                        onClick={() => {
+                          setReview(savedReview);
+                          draft.setValue('');
+                          draft.clearDraft();
+                        }}
+                      >
+                        Discard draft
+                      </Button>
+                    )}
                     {entry.data && (
                       <Button variant="ghost" disabled={deleteEntry.isPending} onClick={removeEntry}>
                         <Trash2 className="h-4 w-4" />

@@ -1,5 +1,6 @@
 import { Activity, BookMarked, Home, Library, LogOut, Search } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
+import { Avatar } from '@/components/ui/Avatar';
 import { useAuth } from '@/hooks/useAuth';
 
 const navItems = [
@@ -44,7 +45,7 @@ export function Sidebar() {
       <div className="px-3 py-4 border-t border-border">
         {isAuthenticated ? (
           <div className="flex items-center gap-2.5 px-2">
-            <img src={user?.avatarUrl ?? ''} className="w-7 h-7 rounded-full bg-accent-light" alt="" loading="lazy" decoding="async" />
+            <Avatar src={user?.avatarUrl} alt={user?.username ?? 'User'} size="sm" />
             <span className="text-sm font-medium text-content-primary flex-1 truncate">{user?.username}</span>
             <button onClick={() => logout.mutate()} title="Log out" aria-label="Log out" type="button">
               <LogOut size={15} aria-hidden="true" className="text-content-tertiary hover:text-danger" />

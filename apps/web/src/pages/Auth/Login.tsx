@@ -18,6 +18,7 @@ export function Login() {
       setLocalError('Email and password are required.');
       return;
     }
+    if (login.isPending) return;
     login.mutate({ email, password });
   }
 
@@ -48,7 +49,9 @@ export function Login() {
                 id="login-email"
                 type="email"
                 required
+                autoFocus
                 autoComplete="email"
+                inputMode="email"
                 value={email}
                 onChange={(event) => {
                   setLocalError(null);

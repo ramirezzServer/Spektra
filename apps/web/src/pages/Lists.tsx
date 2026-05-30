@@ -6,6 +6,7 @@ import { SEO } from '@/components/seo/SEO';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { listErrorMessage, useCreateList, useDeleteList, useMyLists, useUpdateList } from '@/hooks/useLists';
+import { useAuthStore } from '@/stores/authStore';
 import type { UserList } from '@/types';
 
 export function Lists() {
@@ -18,12 +19,18 @@ export function Lists() {
   const [formOpen, setFormOpen] = useState(false);
   const [deleting, setDeleting] = useState<UserList | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const user = useAuthStore((state) => state.user);
 
   async function submit(input: { name: string; description: string | null; isPublic: boolean }) {
     setError(null);
+    if (createList.isPending || updateList.isPending) return;
     try {
       if (editing) await updateList.mutateAsync({ ...input, id: editing.id });
-      else await createList.mutateAsync(input);
+      else {
+        await createList.mutateAsync(input);
+        sessionStorage.removeItem(`spektra:draft:list:${user?.id ?? 'guest'}:new:name`);
+        sessionStorage.removeItem(`spektra:draft:list:${user?.id ?? 'guest'}:new:description`);
+      }
       setFormOpen(false);
       setEditing(null);
     } catch (err) {
@@ -33,6 +40,7 @@ export function Lists() {
 
   async function confirmDelete() {
     if (!deleting) return;
+    if (deleteList.isPending) return;
     try {
       await deleteList.mutateAsync(deleting.id);
       setDeleting(null);

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { listErrorMessage, useAddListItem, useCreateList, useMyLists } from '@/hooks/useLists';
+import { formatNumber } from '@/lib/formatters';
 import type { ContentItem } from '@/types';
 
 interface AddToListModalProps {
@@ -21,6 +22,7 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
 
   async function addToList(listId: string) {
     if (!content) return;
+    if (addItem.isPending) return;
     setMessage(null);
     try {
       await addItem.mutateAsync({ listId, contentId: content.id, content });
@@ -32,6 +34,7 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
 
   async function createAndAdd() {
     if (!content || !newName.trim()) return;
+    if (createList.isPending || addItem.isPending) return;
     setMessage(null);
     try {
       const list = await createList.mutateAsync({ name: newName, description: null, isPublic: false });
@@ -60,7 +63,7 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
               >
                 <span className="min-w-0">
                   <span className="block truncate font-semibold text-content-primary">{list.name}</span>
-                  <span className="text-xs text-content-tertiary">{list.itemsCount ?? 0} items</span>
+                  <span className="text-xs text-content-tertiary">{formatNumber(list.itemsCount ?? 0)} items</span>
                 </span>
                 <Plus className="h-4 w-4 shrink-0 text-accent" />
               </button>

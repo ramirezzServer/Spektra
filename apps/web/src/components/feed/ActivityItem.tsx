@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { PosterImage } from '@/components/content/PosterImage';
+import { Avatar } from '@/components/ui/Avatar';
+import { formatRelativeTime } from '@/lib/formatters';
 import type { ActivityFeedItem } from '@/types';
 
 const verbText: Record<ActivityFeedItem['verb'], string> = {
@@ -10,19 +12,6 @@ const verbText: Record<ActivityFeedItem['verb'], string> = {
   added_to_list: 'added to a list',
   followed: 'followed',
 };
-
-function relativeTime(value: string) {
-  const then = new Date(value).getTime();
-  const diff = Math.max(0, Date.now() - then);
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(value).toLocaleDateString();
-}
 
 function stringMeta(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value : null;
@@ -44,17 +33,17 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
       <div className="flex gap-3">
         {actor?.username ? (
           <Link to={`/profile/${actor.username}`} className="shrink-0">
-            <img src={actor.avatarUrl ?? ''} alt="" className="h-10 w-10 rounded-full bg-accent-light object-cover" loading="lazy" decoding="async" />
+            <Avatar src={actor.avatarUrl} alt={actor.username} />
           </Link>
         ) : (
-          <div className="h-10 w-10 shrink-0 rounded-full bg-accent-light" />
+          <Avatar alt="Someone" />
         )}
 
         <div className="min-w-0 flex-1 space-y-3">
           <div className="min-w-0">
             <p className="break-words text-sm text-content-secondary">
               {actor?.username ? (
-                <Link to={`/profile/${actor.username}`} className="font-semibold text-content-primary hover:text-accent">
+                <Link to={`/profile/${actor.username}`} className="font-semibold text-content-primary hover:text-accent overflow-wrap-anywhere">
                   @{actor.username}
                 </Link>
               ) : (
@@ -62,18 +51,18 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
               )}{' '}
               {verbText[item.verb] ?? 'updated'}{' '}
               {item.verb === 'followed' && followedUsername ? (
-                <Link to={`/profile/${followedUsername}`} className="font-semibold text-content-primary hover:text-accent">
+                <Link to={`/profile/${followedUsername}`} className="font-semibold text-content-primary hover:text-accent overflow-wrap-anywhere">
                   @{followedUsername}
                 </Link>
               ) : content ? (
-                <Link to={`/content/${content.type}/${content.externalId}`} className="font-semibold text-content-primary hover:text-accent">
+                <Link to={`/content/${content.type}/${content.externalId}`} className="font-semibold text-content-primary hover:text-accent overflow-wrap-anywhere">
                   {content.title}
                 </Link>
               ) : (
                 <span className="font-semibold text-content-primary">something</span>
               )}
             </p>
-            <time className="text-xs text-content-tertiary" dateTime={item.createdAt}>{relativeTime(item.createdAt)}</time>
+            <time className="text-xs text-content-tertiary" dateTime={item.createdAt}>{formatRelativeTime(item.createdAt)}</time>
           </div>
 
           {content && (
@@ -90,7 +79,7 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
           )}
 
           {review && (
-            <blockquote className="rounded-md border-l-4 border-accent bg-bg-secondary px-3 py-2 text-sm text-content-secondary">
+            <blockquote className="overflow-wrap-anywhere rounded-md border-l-4 border-accent bg-bg-secondary px-3 py-2 text-sm text-content-secondary">
               {review}
             </blockquote>
           )}

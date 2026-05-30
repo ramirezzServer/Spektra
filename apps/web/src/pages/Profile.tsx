@@ -5,10 +5,12 @@ import { ContentGrid } from '@/components/content/ContentGrid';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Avatar } from '@/components/ui/Avatar';
 import { SEO } from '@/components/seo/SEO';
 import { useUserLibrary, useUserProfile, useUserStats } from '@/hooks/useLibrary';
 import { useFollowUser, useRelationship, useUnfollowUser } from '@/hooks/useSocial';
 import { getApiErrorMessage } from '@/lib/apiError';
+import { formatDate, formatNumber } from '@/lib/formatters';
 import { useAuthStore } from '@/stores/authStore';
 import type { ContentItem, ContentType, EntryStatus } from '@/types';
 
@@ -26,10 +28,6 @@ const typeTabs: Array<{ label: string; value?: ContentType }> = [
   { label: 'Games', value: 'game' },
   { label: 'Books', value: 'book' },
 ];
-
-function initials(username?: string) {
-  return (username?.slice(0, 2) || 'SP').toUpperCase();
-}
 
 export function Profile() {
   const { username } = useParams();
@@ -103,28 +101,22 @@ export function Profile() {
           </>
         ) : (
           <>
-            {profile.data?.avatarUrl ? (
-              <img src={profile.data.avatarUrl} alt="" className="h-20 w-20 rounded-full bg-accent-light object-cover" loading="lazy" />
-            ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-accent">
-                {initials(username)}
-              </div>
-            )}
+            <Avatar src={profile.data?.avatarUrl} alt={profile.data?.username ?? username ?? 'User'} size="lg" />
             <div className="min-w-0 flex-1">
-              <h1 className="break-words text-2xl font-semibold text-content-primary">@{profile.data?.username}</h1>
-              <p className="mt-1 max-w-2xl text-sm text-content-secondary">
+              <h1 className="overflow-wrap-anywhere text-2xl font-semibold text-content-primary">@{profile.data?.username}</h1>
+              <p className="mt-1 max-w-2xl break-words text-sm text-content-secondary">
                 {profile.data?.bio || (isOwnProfile ? 'Your library lives here.' : 'Member of Spektra')}
               </p>
               <div className="mt-3 flex flex-wrap gap-3 text-sm text-content-secondary">
                 <Link to={`/profile/${username}/followers`} className="hover:text-accent" aria-label={`${profile.data?.followersCount ?? 0} followers`}>
-                  <span className="font-semibold text-content-primary">{profile.data?.followersCount ?? 0}</span> followers
+                  <span className="font-semibold text-content-primary">{formatNumber(profile.data?.followersCount ?? 0)}</span> followers
                 </Link>
                 <Link to={`/profile/${username}/following`} className="hover:text-accent" aria-label={`${profile.data?.followingCount ?? 0} following`}>
-                  <span className="font-semibold text-content-primary">{profile.data?.followingCount ?? 0}</span> following
+                  <span className="font-semibold text-content-primary">{formatNumber(profile.data?.followingCount ?? 0)}</span> following
                 </Link>
               </div>
               {profile.data?.createdAt && (
-                <p className="mt-2 text-xs text-content-tertiary">Joined {new Date(profile.data.createdAt).toLocaleDateString()}</p>
+                <p className="mt-2 text-xs text-content-tertiary">Joined {formatDate(profile.data.createdAt, { day: '2-digit', month: 'long', year: 'numeric' })}</p>
               )}
               {followError && <p className="mt-2 text-sm text-danger-text" role="alert">{followError}</p>}
             </div>
@@ -138,7 +130,7 @@ export function Profile() {
                 onClick={toggleFollow}
               >
                 {relationship.data?.isFollowing ? <UserCheck className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
-                {relationship.data?.isFollowing ? 'Unfollow' : 'Follow'}
+                {followUser.isPending || unfollowUser.isPending ? 'Saving...' : relationship.data?.isFollowing ? 'Unfollow' : 'Follow'}
               </Button>
             ) : (
               <Link to="/login" className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-semibold text-accent hover:text-accent-hover">
@@ -158,7 +150,7 @@ export function Profile() {
         ].map((card) => (
           <div key={card.label} className="rounded-lg border border-border bg-surface p-4">
             <card.icon className="h-5 w-5 text-accent" />
-            <p className="mt-3 text-2xl font-semibold text-content-primary">{stats.isLoading ? '-' : card.value}</p>
+            <p className="mt-3 text-2xl font-semibold text-content-primary">{stats.isLoading ? '-' : formatNumber(card.value)}</p>
             <p className="text-sm text-content-tertiary">{card.label}</p>
           </div>
         ))}
@@ -166,13 +158,13 @@ export function Profile() {
 
       <section className="flex flex-wrap gap-3 text-sm text-content-secondary">
         <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
-          <Library className="h-4 w-4" /> {stats.data?.total ?? 0} entries
+          <Library className="h-4 w-4" /> {formatNumber(stats.data?.total ?? 0)} entries
         </span>
         <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
-          <Star className="h-4 w-4" /> {stats.data?.ratedCount ?? 0} rated
+          <Star className="h-4 w-4" /> {formatNumber(stats.data?.ratedCount ?? 0)} rated
         </span>
         <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
-          <MessageSquare className="h-4 w-4" /> {stats.data?.reviewedCount ?? 0} reviewed
+          <MessageSquare className="h-4 w-4" /> {formatNumber(stats.data?.reviewedCount ?? 0)} reviewed
         </span>
       </section>
 

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
 import { SEO } from '@/components/seo/SEO';
 import { useMyLibrary } from '@/hooks/useLibrary';
+import { getApiErrorMessage } from '@/lib/apiError';
 import type { ContentItem, ContentType, EntryStatus } from '@/types';
 
 const statuses: Array<{ label: string; value?: EntryStatus }> = [
@@ -76,7 +77,7 @@ export function LibraryPage() {
       <ContentGrid items={items} entries={entries} isLoading={library.isLoading} />
       {library.isError && (
         <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary" role="status">
-          Unable to load your library right now.
+          {getApiErrorMessage(library.error, 'Unable to load your library right now.')}
         </div>
       )}
       {!library.isLoading && !library.isError && items.length === 0 && (

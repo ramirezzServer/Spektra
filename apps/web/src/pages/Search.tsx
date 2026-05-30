@@ -1,8 +1,11 @@
-import { Search as SearchIcon } from 'lucide-react';
+import { Search as SearchIcon, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { ContentGrid } from '@/components/content/ContentGrid';
 import { SEO } from '@/components/seo/SEO';
 import { useSearch } from '@/hooks/useContent';
+import { getApiErrorMessage } from '@/lib/apiError';
+import { formatNumber } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import type { ContentType } from '@/types';
 
@@ -15,14 +18,23 @@ const filters: Array<{ label: string; value: ContentType | 'all' }> = [
 ];
 
 export function Search() {
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [type, setType] = useState<ContentType | 'all'>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialType = filters.some((filter) => filter.value === searchParams.get('type')) ? (searchParams.get('type') as ContentType | 'all') : 'all';
+  const [query, setQuery] = useState(searchParams.get('q') ?? '');
+  const [debouncedQuery, setDebouncedQuery] = useState(searchParams.get('q')?.trim() ?? '');
+  const [type, setType] = useState<ContentType | 'all'>(initialType);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 400);
     return () => window.clearTimeout(timeout);
   }, [query]);
+
+  useEffect(() => {
+    const next = new URLSearchParams();
+    if (debouncedQuery) next.set('q', debouncedQuery);
+    if (type !== 'all') next.set('type', type);
+    setSearchParams(next, { replace: true });
+  }, [debouncedQuery, setSearchParams, type]);
 
   const search = useSearch(debouncedQuery, type);
   const items = search.data?.data ?? [];
@@ -33,7 +45,7 @@ export function Search() {
 
   const resultLabel = useMemo(() => {
     if (isIdle || isLoading) return null;
-    return `${total} ${total === 1 ? 'result' : 'results'} for "${debouncedQuery}"`;
+    return `${formatNumber(total)} ${total === 1 ? 'result' : 'results'} for "${debouncedQuery}"`;
   }, [debouncedQuery, isIdle, isLoading, total]);
 
   return (
@@ -46,11 +58,27 @@ export function Search() {
             id="content-search"
             aria-label="Search content"
             autoFocus
+            type="search"
+            autoComplete="off"
+            enterKeyHint="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="w-full rounded-lg border border-border bg-surface py-3 pl-12 pr-4 text-base text-content-primary placeholder:text-content-tertiary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') setQuery('');
+            }}
+            className="w-full rounded-lg border border-border bg-surface py-3 pl-12 pr-12 text-base text-content-primary placeholder:text-content-tertiary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
             placeholder="Search films, series, games, books..."
           />
+          {query && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => setQuery('')}
+              className="absolute right-3 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-content-tertiary hover:bg-bg-tertiary hover:text-content-primary"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
@@ -59,6 +87,7 @@ export function Search() {
               key={filter.value}
               type="button"
               onClick={() => setType(filter.value)}
+              aria-pressed={type === filter.value}
               className={cn(
                 'shrink-0 rounded-full border border-border bg-surface px-4 py-2 text-sm font-semibold text-content-secondary transition hover:border-border-strong hover:text-content-primary',
                 type === filter.value && 'border-accent bg-accent-light text-accent',
@@ -84,7 +113,7 @@ export function Search() {
         <div className="flex min-h-72 items-center justify-center rounded-lg border border-dashed border-border bg-surface px-6 text-center" role="status">
           <div>
             <h2 className="text-base font-semibold text-content-primary">Search is unavailable</h2>
-            <p className="mt-2 text-sm text-content-tertiary">Please try again in a moment.</p>
+            <p className="mt-2 text-sm text-content-tertiary">{getApiErrorMessage(search.error, 'Please try again in a moment.')}</p>
           </div>
         </div>
       )}

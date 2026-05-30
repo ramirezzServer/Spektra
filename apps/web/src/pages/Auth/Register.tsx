@@ -27,6 +27,10 @@ export function Register() {
       setLocalError('All fields are required.');
       return;
     }
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setLocalError('Enter a valid email address.');
+      return;
+    }
     if (password.length < 8) {
       setLocalError('Password must be at least 8 characters.');
       return;
@@ -35,6 +39,7 @@ export function Register() {
       setLocalError('Password confirmation does not match.');
       return;
     }
+    if (register.isPending) return;
     register.mutate({
       name,
       username,
@@ -67,7 +72,7 @@ export function Register() {
           <div className="space-y-4">
             <div>
               <label htmlFor="register-name" className="block text-sm font-medium text-content-primary mb-1.5">Name</label>
-              <input id="register-name" required autoComplete="name" value={name} onChange={(event) => clearAndSet(setName, event.target.value)} className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors" placeholder="Your name" />
+              <input id="register-name" required autoFocus autoComplete="name" value={name} onChange={(event) => clearAndSet(setName, event.target.value)} className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors" placeholder="Your name" />
             </div>
             <div>
               <label htmlFor="register-username" className="block text-sm font-medium text-content-primary mb-1.5">Username</label>
@@ -76,7 +81,7 @@ export function Register() {
             </div>
             <div>
               <label htmlFor="register-email" className="block text-sm font-medium text-content-primary mb-1.5">Email</label>
-              <input id="register-email" required type="email" autoComplete="email" value={email} onChange={(event) => clearAndSet(setEmail, event.target.value)} className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors" placeholder="you@example.com" />
+              <input id="register-email" required type="email" autoComplete="email" inputMode="email" value={email} onChange={(event) => clearAndSet(setEmail, event.target.value)} className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors" placeholder="you@example.com" />
             </div>
             <div>
               <label htmlFor="register-password" className="block text-sm font-medium text-content-primary mb-1.5">Password</label>

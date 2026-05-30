@@ -1,6 +1,7 @@
 import { ActivityItem } from './ActivityItem';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { getApiErrorMessage } from '@/lib/apiError';
 import type { ActivityFeedItem } from '@/types';
 
 interface ActivityListProps {
@@ -10,10 +11,11 @@ interface ActivityListProps {
   emptyMessage: string;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
+  error?: unknown;
   onLoadMore: () => void;
 }
 
-export function ActivityList({ items, isLoading, isError, emptyMessage, hasNextPage, isFetchingNextPage, onLoadMore }: ActivityListProps) {
+export function ActivityList({ items, isLoading, isError, emptyMessage, hasNextPage, isFetchingNextPage, error, onLoadMore }: ActivityListProps) {
   if (isLoading) {
     return (
       <div className="space-y-3" aria-label="Loading activity">
@@ -35,7 +37,7 @@ export function ActivityList({ items, isLoading, isError, emptyMessage, hasNextP
   if (isError) {
     return (
       <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary" role="status">
-        Unable to load activity right now.
+        {getApiErrorMessage(error, 'Unable to load activity right now.')}
       </div>
     );
   }

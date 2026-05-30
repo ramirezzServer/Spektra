@@ -50,6 +50,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
       navigate('/login');
       return;
     }
+    if (upsertEntry.isPending) return;
     setLocalStatus(status);
     try {
       await upsertEntry.mutateAsync({ content_id: item.id, status });
@@ -80,7 +81,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
             {userRating ? <Badge className="border-white/20 bg-app-text/85 text-white">{userRating}/10</Badge> : null}
           </div>
         )}
-        <div className="pointer-events-none absolute inset-x-2 bottom-2 hidden translate-y-2 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 md:block">
+        <div className="pointer-events-none absolute inset-x-2 bottom-2 hidden translate-y-2 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:block">
           <div className="pointer-events-auto grid gap-1 rounded-md bg-app-text/90 p-1 shadow-lg">
             {quickActions.map((action) => {
               const Icon = action.icon;
