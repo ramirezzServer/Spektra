@@ -8,6 +8,7 @@ import { RequireAuth } from '@/components/auth/RequireAuth';
 import { AppErrorBoundary } from '@/components/monitoring/AppErrorBoundary';
 import { CookieConsentBanner } from '@/components/privacy/CookieConsentBanner';
 import { RouteAnalytics } from '@/components/monitoring/RouteAnalytics';
+import { UpdatePrompt } from '@/components/pwa/UpdatePrompt';
 
 import { Home } from '@/pages/Home';
 import { Login } from '@/pages/Auth/Login';
@@ -63,6 +64,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             </Route>
           </Routes>
           <CookieConsentBanner />
+          <UpdatePrompt />
         </BrowserRouter>
       </QueryClientProvider>
     </AppErrorBoundary>

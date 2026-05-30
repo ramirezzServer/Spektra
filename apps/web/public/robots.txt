@@ -3,5 +3,6 @@ Allow: /
 Disallow: /login
 Disallow: /register
 Disallow: /library
+Disallow: /lists
 
-Sitemap: https://example.com/sitemap.xml
+Sitemap: https://your-domain.example/sitemap.xml

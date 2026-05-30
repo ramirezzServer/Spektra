@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ListController;
 use App\Http\Controllers\Api\ListItemController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserEntryController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -23,8 +25,42 @@ Route::prefix('auth')->group(function () {
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
     ->name('verification.verify');
 
-// Placeholder routes - will be filled in later phases
-Route::get('/health', fn() => response()->json(['status' => 'ok', 'service' => 'spektra-api']));
+Route::get('/health', fn () => response()->json([
+    'status' => 'ok',
+    'service' => 'spektra-api',
+    'environment' => app()->environment(),
+    'timestamp' => now()->toISOString(),
+]));
+
+Route::get('/health/deep', function () {
+    $checks = [
+        'database' => false,
+        'redis' => false,
+    ];
+
+    try {
+        DB::select('select 1');
+        $checks['database'] = true;
+    } catch (Throwable) {
+        $checks['database'] = false;
+    }
+
+    try {
+        Redis::connection()->ping();
+        $checks['redis'] = true;
+    } catch (Throwable) {
+        $checks['redis'] = false;
+    }
+
+    $ok = ! in_array(false, $checks, true);
+
+    return response()->json([
+        'status' => $ok ? 'ok' : 'degraded',
+        'service' => 'spektra-api',
+        'checks' => $checks,
+        'timestamp' => now()->toISOString(),
+    ], $ok ? 200 : 503);
+});
 
 Route::get('/content', [ContentController::class, 'index']);
 Route::get('/content/trending', [ContentController::class, 'trending']);

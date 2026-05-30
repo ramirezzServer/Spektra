@@ -4,6 +4,7 @@ import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 
+from db.connection import check_database
 from jobs.refresh_ratings import refresh_ratings_job
 from jobs.sync_trending import sync_trending_job
 
@@ -33,7 +34,12 @@ app = FastAPI(title="Spektra Worker", lifespan=lifespan)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "jobs": [str(job) for job in scheduler.get_jobs()]}
+    return {
+        "status": "ok",
+        "service": "spektra-worker",
+        "jobs": [job.id for job in scheduler.get_jobs()],
+        "database": await check_database(),
+    }
 
 
 @app.post("/jobs/sync-trending")

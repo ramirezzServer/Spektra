@@ -1,4 +1,5 @@
 import { getConsent } from './consent';
+import { env } from './env';
 
 let initialized = false;
 
@@ -13,10 +14,10 @@ function appendScript(src: string, attrs: Record<string, string> = {}) {
 
 export function initAnalytics() {
   if (initialized || getConsent() !== 'accepted') return;
-  const provider = import.meta.env.VITE_ANALYTICS_PROVIDER ?? 'none';
+  const provider = env.analyticsProvider;
 
-  if (provider === 'ga' && import.meta.env.VITE_GA_MEASUREMENT_ID) {
-    const id = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  if (provider === 'ga' && env.gaMeasurementId) {
+    const id = env.gaMeasurementId;
     appendScript(`https://www.googletagmanager.com/gtag/js?id=${id}`);
     window.dataLayer = window.dataLayer || [];
     window.gtag = function gtag() {
@@ -27,9 +28,9 @@ export function initAnalytics() {
     initialized = true;
   }
 
-  if (provider === 'umami' && import.meta.env.VITE_UMAMI_SRC && import.meta.env.VITE_UMAMI_WEBSITE_ID) {
-    appendScript(import.meta.env.VITE_UMAMI_SRC, {
-      'data-website-id': import.meta.env.VITE_UMAMI_WEBSITE_ID,
+  if (provider === 'umami' && env.umamiSrc && env.umamiWebsiteId) {
+    appendScript(env.umamiSrc, {
+      'data-website-id': env.umamiWebsiteId,
       defer: 'true',
     });
     initialized = true;
@@ -39,10 +40,10 @@ export function initAnalytics() {
 export function trackPageView(path: string) {
   if (getConsent() !== 'accepted') return;
   initAnalytics();
-  if (window.gtag && import.meta.env.VITE_GA_MEASUREMENT_ID) {
+  if (window.gtag && env.gaMeasurementId) {
     window.gtag('event', 'page_view', {
       page_path: path,
-      send_to: import.meta.env.VITE_GA_MEASUREMENT_ID,
+      send_to: env.gaMeasurementId,
     });
   }
 }
