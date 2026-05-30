@@ -11,6 +11,11 @@ class ListItem extends Model
 
     protected $fillable = ['list_id', 'content_id', 'position', 'added_at'];
 
+    protected $casts = [
+        'position' => 'integer',
+        'added_at' => 'datetime',
+    ];
+
     public function list()
     {
         return $this->belongsTo(UserList::class, 'list_id');

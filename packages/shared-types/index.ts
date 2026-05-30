@@ -58,15 +58,32 @@ export interface FollowRelationship {
   isFollowing: boolean;
 }
 
-export interface List {
+export interface UserList {
   id: string;
   userId: string;
   name: string;
   description: string | null;
   isPublic: boolean;
-  itemCount?: number;
+  itemsCount?: number;
+  previewItems?: ContentItem[];
   createdAt: string;
+  updatedAt: string;
 }
+
+export interface ListItem {
+  listId: string;
+  contentId: string;
+  position: number;
+  content?: ContentItem;
+  addedAt: string | null;
+}
+
+export interface ListDetail extends UserList {
+  owner?: User;
+  items: ListItem[];
+}
+
+export type List = UserList;
 
 export interface ActivityFeedItem {
   id: number | string;

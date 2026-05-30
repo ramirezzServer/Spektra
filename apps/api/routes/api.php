@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\FeedController;
 use App\Http\Controllers\Api\FollowController;
+use App\Http\Controllers\Api\ListController;
+use App\Http\Controllers\Api\ListItemController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserEntryController;
 use Illuminate\Support\Facades\Route;
@@ -38,8 +40,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/follows/{username}', [FollowController::class, 'store']);
     Route::delete('/follows/{username}', [FollowController::class, 'destroy']);
     Route::get('/users/{username}/relationship', [FollowController::class, 'relationship']);
+
+    Route::get('/lists', [ListController::class, 'index']);
+    Route::post('/lists', [ListController::class, 'store']);
+    Route::put('/lists/{id}', [ListController::class, 'update']);
+    Route::delete('/lists/{id}', [ListController::class, 'destroy']);
+    Route::post('/lists/{id}/items', [ListItemController::class, 'store']);
+    Route::delete('/lists/{id}/items/{contentId}', [ListItemController::class, 'destroy']);
+    Route::put('/lists/{id}/items/reorder', [ListItemController::class, 'reorder']);
 });
 
+Route::get('/lists/{id}', [ListController::class, 'show']);
 Route::get('/users/{username}/stats', [UserController::class, 'stats']);
 Route::get('/users/{username}/library', [UserController::class, 'library']);
 Route::get('/users/{username}/followers', [FollowController::class, 'followers']);

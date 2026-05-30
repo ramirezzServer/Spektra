@@ -7,8 +7,11 @@ export type {
   Follow,
   FollowRelationship,
   List,
+  ListDetail,
+  ListItem,
   PaginatedResponse,
   User,
   UserEntry,
+  UserList,
   UserStats,
 } from '@spektra/shared-types';

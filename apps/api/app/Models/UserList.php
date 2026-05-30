@@ -23,11 +23,13 @@ class UserList extends Model
 
     public function items()
     {
-        return $this->hasMany(ListItem::class, 'list_id');
+        return $this->hasMany(ListItem::class, 'list_id')->orderBy('position');
     }
 
     public function contents()
     {
-        return $this->belongsToMany(ContentItem::class, 'list_items', 'list_id', 'content_id');
+        return $this->belongsToMany(ContentItem::class, 'list_items', 'list_id', 'content_id')
+            ->withPivot(['position', 'added_at'])
+            ->orderBy('list_items.position');
     }
 }

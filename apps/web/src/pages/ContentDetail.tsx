@@ -1,6 +1,7 @@
 import { Calendar, Check, Clock, Gamepad2, Plus, Star, Trash2, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { AddToListModal } from '@/components/lists/AddToListModal';
 import { RatingStars } from '@/components/content/RatingStars';
 import { PosterImage } from '@/components/content/PosterImage';
 import { Badge } from '@/components/ui/Badge';
@@ -47,6 +48,7 @@ export function ContentDetail() {
   const deleteEntry = useDeleteEntry();
   const [review, setReview] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const [addToListOpen, setAddToListOpen] = useState(false);
 
   useEffect(() => {
     setReview(entry.data?.review ?? '');
@@ -248,6 +250,25 @@ export function ContentDetail() {
           )}
         </div>
 
+        <div className="rounded-lg border border-border bg-surface p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-content-primary">Custom lists</p>
+              <p className="mt-1 text-sm text-content-tertiary">Add this item to one of your curated lists.</p>
+            </div>
+            {isAuthenticated ? (
+              <Button type="button" variant="secondary" onClick={() => setAddToListOpen(true)}>
+                <Plus className="h-4 w-4" />
+                Add to List
+              </Button>
+            ) : (
+              <Link to="/login" className="text-sm font-semibold text-accent hover:text-accent-hover">
+                Sign in to add
+              </Link>
+            )}
+          </div>
+        </div>
+
         {item.type === 'game' && platforms.length > 0 && (
           <p className="inline-flex items-center gap-2 text-sm text-content-secondary">
             <Gamepad2 className="h-4 w-4" />
@@ -255,6 +276,7 @@ export function ContentDetail() {
           </p>
         )}
       </section>
+      <AddToListModal open={addToListOpen} content={item} onClose={() => setAddToListOpen(false)} />
     </div>
   );
 }

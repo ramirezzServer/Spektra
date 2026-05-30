@@ -23,6 +23,7 @@ const LibraryPage = React.lazy(() => import('@/pages/Library').then((module) => 
 const Search = React.lazy(() => import('@/pages/Search').then((module) => ({ default: module.Search })));
 const Feed = React.lazy(() => import('@/pages/Feed').then((module) => ({ default: module.Feed })));
 const Lists = React.lazy(() => import('@/pages/Lists').then((module) => ({ default: module.Lists })));
+const ListDetail = React.lazy(() => import('@/pages/ListDetail').then((module) => ({ default: module.ListDetail })));
 const UserConnections = React.lazy(() => import('@/pages/UserConnections').then((module) => ({ default: module.UserConnections })));
 const Privacy = React.lazy(() => import('@/pages/Privacy').then((module) => ({ default: module.Privacy })));
 const Terms = React.lazy(() => import('@/pages/Terms').then((module) => ({ default: module.Terms })));
@@ -56,6 +57,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Route path="/feed" element={<RequireAuth>{lazyPage(<Feed />)}</RequireAuth>} />
               <Route path="/library" element={<RequireAuth>{lazyPage(<LibraryPage />)}</RequireAuth>} />
               <Route path="/lists" element={<RequireAuth>{lazyPage(<Lists />)}</RequireAuth>} />
+              <Route path="/lists/:listId" element={lazyPage(<ListDetail />)} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
