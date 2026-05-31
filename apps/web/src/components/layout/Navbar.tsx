@@ -14,11 +14,11 @@ export function Navbar() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <Link to="/search" aria-label="Search" className="p-2 rounded-md text-content-secondary hover:bg-bg-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30">
+          <Link to="/search" aria-label="Search" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-md text-content-secondary hover:bg-bg-tertiary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 motion-reduce:transition-none motion-reduce:active:scale-100">
             <Search size={19} aria-hidden="true" />
           </Link>
           {isAuthenticated ? (
-            <Link to={`/profile/${user?.username}`} aria-label="Open profile">
+            <Link to={`/profile/${user?.username}`} aria-label="Open profile" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-md active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
               <Avatar src={user?.avatarUrl} alt={user?.username ?? 'User'} size="sm" />
             </Link>
           ) : (

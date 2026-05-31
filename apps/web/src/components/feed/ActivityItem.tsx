@@ -66,7 +66,7 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
           </div>
 
           {content && (
-            <Link to={`/content/${content.type}/${content.externalId}`} className="flex gap-3 rounded-md border border-border bg-bg-secondary p-2 hover:border-border-strong">
+            <Link to={`/content/${content.type}/${content.externalId}`} className="flex gap-3 rounded-md border border-border bg-bg-secondary p-2 transition hover:border-border-strong active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
               <div className="h-20 w-14 shrink-0 overflow-hidden rounded-md border border-border bg-surface">
                 <PosterImage src={content.posterUrl} title={content.title} type={content.type} className="h-full w-full object-cover" />
               </div>

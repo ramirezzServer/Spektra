@@ -18,11 +18,11 @@ export function BottomNav() {
     >
       <div className="flex">
         {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1">
+          <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
             {({ isActive }) => (
               <div
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex flex-col items-center justify-center pt-2 pb-1 gap-0.5 min-h-[44px] ${
+                className={`flex min-h-12 flex-col items-center justify-center gap-0.5 pb-1 pt-2 ${
                   isActive ? 'text-accent' : 'text-content-tertiary'
                 }`}
               >

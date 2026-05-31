@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -21,6 +22,7 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
+  const [discarding, setDiscarding] = useState(false);
   const user = useAuthStore((state) => state.user);
   const draftKey = open && !list ? `spektra:draft:list:${user?.id ?? 'guest'}:new` : null;
   const nameDraft = useDraftStorage(draftKey ? `${draftKey}:name` : null);
@@ -55,8 +57,31 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
     onSubmit({ name: trimmed, description: description.trim() || null, isPublic });
   }
 
+  const hasMeaningfulDraft = open && (
+    name.trim() !== (list?.name ?? '') ||
+    description.trim() !== (list?.description ?? '') ||
+    isPublic !== Boolean(list?.isPublic)
+  );
+
+  function requestClose() {
+    if (hasMeaningfulDraft) {
+      setDiscarding(true);
+      return;
+    }
+    onClose();
+  }
+
+  function discardDraft() {
+    if (!list) {
+      nameDraft.clearDraft();
+      descriptionDraft.clearDraft();
+    }
+    setDiscarding(false);
+    onClose();
+  }
+
   return (
-    <Dialog open={open} title={list ? 'Edit list' : 'Create list'} description="Organize content into your own curated collection." onClose={onClose}>
+    <Dialog open={open} title={list ? 'Edit list' : 'Create list'} description="Organize content into your own curated collection." onClose={requestClose}>
       <form className="space-y-4" onSubmit={submit}>
         <div className="space-y-1.5">
           <label htmlFor="list-name" className="text-sm font-medium text-content-primary">
@@ -105,7 +130,7 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           </p>
         )}
         <div className="flex flex-wrap justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={requestClose}>
             Cancel
           </Button>
           <Button type="submit" disabled={isPending}>
@@ -113,6 +138,14 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           </Button>
         </div>
       </form>
+      <ConfirmDialog
+        open={discarding}
+        title="Discard this draft?"
+        description="Your unsaved list changes will be removed."
+        confirmLabel="Discard"
+        onCancel={() => setDiscarding(false)}
+        onConfirm={discardDraft}
+      />
     </Dialog>
   );
 }

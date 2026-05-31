@@ -21,6 +21,10 @@
     font-family: 'Instrument Sans', sans-serif;
   }
 
+  img {
+    display: block;
+  }
+
   button,
   a,
   input,
@@ -38,5 +42,17 @@
 @layer utilities {
   .overflow-wrap-anywhere {
     overflow-wrap: anywhere;
+  }
+
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (pointer: coarse) {
+  .tap-target {
+    min-height: 48px;
+    min-width: 48px;
   }
 }

@@ -28,8 +28,8 @@ export function RatingStars({ value, onChange, readonly = false, disabled = fals
             aria-label={`Rate ${starValue} out of 10`}
             aria-pressed={score === starValue}
             className={cn(
-              'relative grid h-9 w-9 place-items-center rounded-md text-warning transition hover:bg-warning-light',
-              inert && 'cursor-default opacity-80 hover:bg-transparent',
+              'relative grid min-h-12 min-w-12 place-items-center rounded-md text-warning transition hover:bg-warning-light active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100',
+              inert && 'cursor-default opacity-80 hover:bg-transparent active:scale-100',
             )}
           >
             <Star className={cn('h-5 w-5', filled ? 'fill-warning text-warning' : 'fill-transparent')} />

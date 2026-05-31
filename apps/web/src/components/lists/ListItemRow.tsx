@@ -41,13 +41,13 @@ export function ListItemRow({ item, canMoveUp, canMoveDown, isOwner, isPending, 
       {isOwner && (
         <div className="col-span-2 flex items-center justify-end gap-1 border-t border-border pt-3 sm:col-span-1 sm:border-t-0 sm:pt-0">
           <GripVertical className="h-4 w-4 text-content-tertiary" aria-hidden="true" />
-          <Button type="button" variant="ghost" className="min-h-9 px-2" aria-label={`Move ${content.title} up`} disabled={!canMoveUp || isPending} onClick={onMoveUp}>
+          <Button type="button" variant="ghost" className="min-w-12 px-2" aria-label={`Move ${content.title} up`} disabled={!canMoveUp || isPending} onClick={onMoveUp}>
             <ArrowUp className="h-4 w-4" />
           </Button>
-          <Button type="button" variant="ghost" className="min-h-9 px-2" aria-label={`Move ${content.title} down`} disabled={!canMoveDown || isPending} onClick={onMoveDown}>
+          <Button type="button" variant="ghost" className="min-w-12 px-2" aria-label={`Move ${content.title} down`} disabled={!canMoveDown || isPending} onClick={onMoveDown}>
             <ArrowDown className="h-4 w-4" />
           </Button>
-          <Button type="button" variant="ghost" className="min-h-9 px-2 text-danger hover:text-danger" aria-label={`Remove ${content.title}`} disabled={isPending} onClick={onRemove}>
+          <Button type="button" variant="ghost" className="min-w-12 px-2 text-danger hover:text-danger" aria-label={`Remove ${content.title}`} disabled={isPending} onClick={onRemove}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>

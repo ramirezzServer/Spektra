@@ -28,7 +28,7 @@ export function Sidebar() {
             {({ isActive }) => (
               <div
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                className={`flex min-h-12 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 ${
                   isActive
                     ? 'bg-accent-light text-accent font-medium'
                     : 'text-content-secondary hover:bg-bg-tertiary hover:text-content-primary'
@@ -47,12 +47,12 @@ export function Sidebar() {
           <div className="flex items-center gap-2.5 px-2">
             <Avatar src={user?.avatarUrl} alt={user?.username ?? 'User'} size="sm" />
             <span className="text-sm font-medium text-content-primary flex-1 truncate">{user?.username}</span>
-            <button onClick={() => logout.mutate()} title="Log out" aria-label="Log out" type="button">
+            <button className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-md transition active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100" onClick={() => logout.mutate()} title="Log out" aria-label="Log out" type="button">
               <LogOut size={15} aria-hidden="true" className="text-content-tertiary hover:text-danger" />
             </button>
           </div>
         ) : (
-          <Link to="/login" className="block text-center text-sm text-accent hover:text-accent-hover font-medium py-2">
+          <Link to="/login" className="flex min-h-12 items-center justify-center text-sm font-medium text-accent hover:text-accent-hover">
             Sign in
           </Link>
         )}

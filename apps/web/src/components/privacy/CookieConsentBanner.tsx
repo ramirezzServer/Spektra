@@ -28,10 +28,10 @@ export function CookieConsentBanner() {
           Spektra can use optional analytics and error monitoring to improve reliability. Read the <Link to="/privacy" className="font-semibold text-accent hover:text-accent-hover">Privacy Policy</Link>.
         </p>
         <div className="flex shrink-0 gap-2">
-          <button type="button" className="rounded-md border border-border px-3 py-2 text-sm font-semibold text-content-secondary hover:text-content-primary" onClick={() => choose('declined')}>
+          <button type="button" className="min-h-12 rounded-md border border-border px-3 py-2 text-sm font-semibold text-content-secondary transition hover:text-content-primary active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100" onClick={() => choose('declined')}>
             Decline
           </button>
-          <button type="button" className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-accent-text hover:bg-accent-hover" onClick={() => choose('accepted')}>
+          <button type="button" className="min-h-12 rounded-md bg-accent px-3 py-2 text-sm font-semibold text-accent-text transition hover:bg-accent-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100" onClick={() => choose('accepted')}>
             Accept
           </button>
         </div>

@@ -6,6 +6,7 @@ import { RatingStars } from '@/components/content/RatingStars';
 import { PosterImage } from '@/components/content/PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { SEO } from '@/components/seo/SEO';
 import { useContentItem } from '@/hooks/useContent';
@@ -52,6 +53,8 @@ export function ContentDetail() {
   const [review, setReview] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [addToListOpen, setAddToListOpen] = useState(false);
+  const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
+  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const draft = useDraftStorage(item && user ? `spektra:draft:review:${user.id}:${item.id}` : null, entry.data?.review ?? '');
 
@@ -94,6 +97,13 @@ export function ContentDetail() {
     } catch (error) {
       setMessage(libraryErrorMessage(error));
     }
+  }
+
+  function discardReviewDraft() {
+    setReview(savedReview);
+    draft.setValue('');
+    draft.clearDraft();
+    setConfirmDiscardOpen(false);
   }
 
   if (content.isLoading) {
@@ -258,17 +268,13 @@ export function ContentDetail() {
                         type="button"
                         variant="ghost"
                         disabled={upsertEntry.isPending}
-                        onClick={() => {
-                          setReview(savedReview);
-                          draft.setValue('');
-                          draft.clearDraft();
-                        }}
+                        onClick={() => setConfirmDiscardOpen(true)}
                       >
                         Discard draft
                       </Button>
                     )}
                     {entry.data && (
-                      <Button variant="ghost" disabled={deleteEntry.isPending} onClick={removeEntry}>
+                      <Button variant="ghost" disabled={deleteEntry.isPending} onClick={() => setConfirmRemoveOpen(true)}>
                         <Trash2 className="h-4 w-4" />
                         Remove
                       </Button>
@@ -311,6 +317,26 @@ export function ContentDetail() {
         )}
       </section>
       <AddToListModal open={addToListOpen} content={item} onClose={() => setAddToListOpen(false)} />
+      <ConfirmDialog
+        open={confirmDiscardOpen}
+        title="Discard this draft?"
+        description="Your unsaved review text will be removed."
+        confirmLabel="Discard"
+        onCancel={() => setConfirmDiscardOpen(false)}
+        onConfirm={discardReviewDraft}
+      />
+      <ConfirmDialog
+        open={confirmRemoveOpen}
+        title="Remove from library?"
+        description={`${item.title} will be removed from your library. You can add it again later.`}
+        confirmLabel="Remove"
+        isPending={deleteEntry.isPending}
+        onCancel={() => setConfirmRemoveOpen(false)}
+        onConfirm={async () => {
+          await removeEntry();
+          setConfirmRemoveOpen(false);
+        }}
+      />
     </div>
   );
 }

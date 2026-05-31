@@ -43,12 +43,12 @@ export function ListCard({ list, onEdit, onDelete }: ListCardProps) {
       {(onEdit || onDelete) && (
         <div className="mt-4 flex justify-end gap-2 border-t border-border pt-3">
           {onEdit && (
-            <Button type="button" variant="ghost" className="min-h-9 px-2" aria-label={`Edit ${list.name}`} onClick={() => onEdit(list)}>
+            <Button type="button" variant="ghost" className="min-w-12 px-2" aria-label={`Edit ${list.name}`} onClick={() => onEdit(list)}>
               <Edit2 className="h-4 w-4" />
             </Button>
           )}
           {onDelete && (
-            <Button type="button" variant="ghost" className="min-h-9 px-2 text-danger hover:text-danger" aria-label={`Delete ${list.name}`} onClick={() => onDelete(list)}>
+            <Button type="button" variant="ghost" className="min-w-12 px-2 text-danger hover:text-danger" aria-label={`Delete ${list.name}`} onClick={() => onDelete(list)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           )}

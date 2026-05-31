@@ -6,7 +6,7 @@ import { ListItemGrid } from '@/components/lists/ListItemGrid';
 import { SEO } from '@/components/seo/SEO';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Dialog } from '@/components/ui/Dialog';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { listErrorMessage, useDeleteList, useListDetail, useRemoveListItem, useReorderListItems, useUpdateList } from '@/hooks/useLists';
 import { formatNumber } from '@/lib/formatters';
@@ -154,33 +154,25 @@ export function ListDetail() {
 
       <ListFormModal open={editing} list={list} isPending={updateList.isPending} error={message} onClose={() => setEditing(false)} onSubmit={submit} />
 
-      <Dialog open={confirmDelete} title="Delete list" description="This action removes the list and its items." onClose={() => setConfirmDelete(false)}>
-        <div className="space-y-4">
-          <p className="text-sm text-content-secondary">Delete “{list.name}”?</p>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setConfirmDelete(false)}>
-              Cancel
-            </Button>
-            <Button type="button" disabled={deleteList.isPending} className="bg-danger hover:bg-danger/90" onClick={deleteCurrentList}>
-              Delete
-            </Button>
-          </div>
-        </div>
-      </Dialog>
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete this list?"
+        description={`${list.name} and its items will be removed. This action cannot be undone.`}
+        confirmLabel="Delete"
+        isPending={deleteList.isPending}
+        onCancel={() => setConfirmDelete(false)}
+        onConfirm={deleteCurrentList}
+      />
 
-      <Dialog open={Boolean(removing)} title="Remove item" description="This removes the item from this list only." onClose={() => setRemoving(null)}>
-        <div className="space-y-4">
-          <p className="text-sm text-content-secondary">Remove “{removing?.content?.title ?? 'this item'}”?</p>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setRemoving(null)}>
-              Cancel
-            </Button>
-            <Button type="button" disabled={removeItem.isPending} className="bg-danger hover:bg-danger/90" onClick={removeConfirmed}>
-              Remove
-            </Button>
-          </div>
-        </div>
-      </Dialog>
+      <ConfirmDialog
+        open={Boolean(removing)}
+        title="Remove this item?"
+        description={`${removing?.content?.title ?? 'This item'} will be removed from this list. You can add it again later.`}
+        confirmLabel="Remove"
+        isPending={removeItem.isPending}
+        onCancel={() => setRemoving(null)}
+        onConfirm={removeConfirmed}
+      />
     </div>
   );
 }

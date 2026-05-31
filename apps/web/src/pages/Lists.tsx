@@ -4,7 +4,7 @@ import { ListFormModal } from '@/components/lists/ListFormModal';
 import { ListGrid } from '@/components/lists/ListGrid';
 import { SEO } from '@/components/seo/SEO';
 import { Button } from '@/components/ui/Button';
-import { Dialog } from '@/components/ui/Dialog';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { listErrorMessage, useCreateList, useDeleteList, useMyLists, useUpdateList } from '@/hooks/useLists';
 import { useAuthStore } from '@/stores/authStore';
 import type { UserList } from '@/types';
@@ -63,6 +63,8 @@ export function Lists() {
         </Button>
       </div>
 
+      {error && !formOpen && !deleting && <p className="text-sm text-danger">{error}</p>}
+
       <ListGrid
         lists={lists.data?.data ?? []}
         page={page}
@@ -84,20 +86,15 @@ export function Lists() {
         onSubmit={submit}
       />
 
-      <Dialog open={Boolean(deleting)} title="Delete list" description="This removes the list and its saved item order." onClose={() => setDeleting(null)}>
-        <div className="space-y-4">
-          <p className="text-sm text-content-secondary">Delete “{deleting?.name}”?</p>
-          {error && <p className="text-sm text-danger">{error}</p>}
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setDeleting(null)}>
-              Cancel
-            </Button>
-            <Button type="button" disabled={deleteList.isPending} className="bg-danger hover:bg-danger/90" onClick={confirmDelete}>
-              Delete
-            </Button>
-          </div>
-        </div>
-      </Dialog>
+      <ConfirmDialog
+        open={Boolean(deleting)}
+        title="Delete this list?"
+        description={deleting ? `${deleting.name} and its items will be removed. This action cannot be undone.` : 'This list and its items will be removed. This action cannot be undone.'}
+        confirmLabel="Delete"
+        isPending={deleteList.isPending}
+        onCancel={() => setDeleting(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

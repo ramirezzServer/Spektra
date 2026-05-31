@@ -45,7 +45,7 @@ export function Home() {
                 aria-selected={active === tab.value}
                 onClick={() => setActive(tab.value)}
                 className={cn(
-                  'whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-accent',
+                  'min-h-12 whitespace-nowrap rounded-md px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-accent active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100',
                   active === tab.value ? 'bg-accent text-white' : 'bg-surface text-content-secondary hover:bg-bg-tertiary',
                 )}
               >

@@ -59,7 +59,7 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
                 type="button"
                 disabled={addItem.isPending}
                 onClick={() => addToList(list.id)}
-                className="flex w-full items-center justify-between gap-3 rounded-md border border-border bg-bg-secondary px-3 py-3 text-left text-sm transition hover:border-accent disabled:opacity-60"
+                className="flex min-h-12 w-full items-center justify-between gap-3 rounded-md border border-border bg-bg-secondary px-3 py-3 text-left text-sm transition hover:border-accent active:scale-[0.99] disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
               >
                 <span className="min-w-0">
                   <span className="block truncate font-semibold text-content-primary">{list.name}</span>
