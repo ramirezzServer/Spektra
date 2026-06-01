@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Avatar } from '@/components/ui/Avatar';
 import { SEO } from '@/components/seo/SEO';
 import { useUserLibrary, useUserProfile, useUserStats } from '@/hooks/useLibrary';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useFollowUser, useRelationship, useUnfollowUser } from '@/hooks/useSocial';
 import { getApiErrorMessage } from '@/lib/apiError';
 import { formatDate, formatNumber } from '@/lib/formatters';
@@ -41,6 +42,7 @@ export function Profile() {
   const followUser = useFollowUser();
   const unfollowUser = useUnfollowUser();
   const [followError, setFollowError] = useState<string | null>(null);
+  const { isOnline } = useOnlineStatus();
   const library = useUserLibrary(username, { status, type, page, perPage: 20, sort: 'updated_desc' });
   const entries = library.data?.data ?? [];
   const items = useMemo(() => entries.map((entry) => entry.content).filter((item): item is ContentItem => Boolean(item)), [entries]);
@@ -58,6 +60,10 @@ export function Profile() {
 
   async function toggleFollow() {
     if (!username) return;
+    if (!isOnline) {
+      setFollowError('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     setFollowError(null);
     try {
       if (relationship.data?.isFollowing) {
@@ -126,7 +132,7 @@ export function Profile() {
               <Button
                 type="button"
                 variant={relationship.data?.isFollowing ? 'secondary' : 'primary'}
-                disabled={relationship.isLoading || followUser.isPending || unfollowUser.isPending}
+                disabled={relationship.isLoading || followUser.isPending || unfollowUser.isPending || !isOnline}
                 onClick={toggleFollow}
               >
                 {relationship.data?.isFollowing ? <UserCheck className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { listErrorMessage, useAddListItem, useCreateList, useMyLists } from '@/hooks/useLists';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { formatNumber } from '@/lib/formatters';
 import type { ContentItem } from '@/types';
 
@@ -17,11 +18,16 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
   const lists = useMyLists(1, 50);
   const addItem = useAddListItem();
   const createList = useCreateList();
+  const { isOnline } = useOnlineStatus();
   const [newName, setNewName] = useState('');
   const [message, setMessage] = useState<string | null>(null);
 
   async function addToList(listId: string) {
     if (!content) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (addItem.isPending) return;
     setMessage(null);
     try {
@@ -34,6 +40,10 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
 
   async function createAndAdd() {
     if (!content || !newName.trim()) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (createList.isPending || addItem.isPending) return;
     setMessage(null);
     try {
@@ -57,7 +67,7 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
               <button
                 key={list.id}
                 type="button"
-                disabled={addItem.isPending}
+                disabled={addItem.isPending || !isOnline}
                 onClick={() => addToList(list.id)}
                 className="flex min-h-12 w-full items-center justify-between gap-3 rounded-md border border-border bg-bg-secondary px-3 py-3 text-left text-sm transition hover:border-accent active:scale-[0.99] disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
               >
@@ -77,8 +87,8 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
             New private list
           </label>
           <div className="flex gap-2">
-            <Input id="quick-list-name" value={newName} maxLength={100} onChange={(event) => setNewName(event.target.value)} placeholder="List name" />
-            <Button type="button" disabled={!newName.trim() || createList.isPending || addItem.isPending} onClick={createAndAdd}>
+            <Input id="quick-list-name" name="list-name" value={newName} maxLength={100} autoComplete="off" enterKeyHint="done" onChange={(event) => setNewName(event.target.value)} placeholder="List name" />
+            <Button type="button" disabled={!newName.trim() || createList.isPending || addItem.isPending || !isOnline} onClick={createAndAdd}>
               Create
             </Button>
           </div>

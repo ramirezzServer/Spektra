@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import type { UserList } from '@/types';
 import { useDraftStorage } from '@/hooks/useDraftStorage';
 import { useAuthStore } from '@/stores/authStore';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 interface ListFormModalProps {
   open: boolean;
@@ -27,6 +28,7 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
   const draftKey = open && !list ? `spektra:draft:list:${user?.id ?? 'guest'}:new` : null;
   const nameDraft = useDraftStorage(draftKey ? `${draftKey}:name` : null);
   const descriptionDraft = useDraftStorage(draftKey ? `${draftKey}:description` : null);
+  const { isOnline } = useOnlineStatus();
 
   useEffect(() => {
     if (!open) return;
@@ -51,6 +53,10 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
     }
     if (trimmed.length > 100) {
       setNameError('Name must be 100 characters or fewer.');
+      return;
+    }
+    if (!isOnline) {
+      setNameError('You appear to be offline. Check your connection and try again.');
       return;
     }
     if (isPending) return;
@@ -89,8 +95,11 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           </label>
           <Input
             id="list-name"
+            name="list-name"
             value={name}
             maxLength={100}
+            autoComplete="off"
+            enterKeyHint="next"
             autoFocus
             onChange={(event) => {
               setName(event.target.value);
@@ -111,8 +120,10 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           </label>
           <Textarea
             id="list-description"
+            name="list-description"
             value={description}
             maxLength={1000}
+            autoComplete="off"
             onChange={(event) => {
               setDescription(event.target.value);
               if (!list) descriptionDraft.setValue(event.target.value);
@@ -133,7 +144,7 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           <Button type="button" variant="secondary" onClick={requestClose}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" disabled={isPending || !isOnline}>
             {isPending ? 'Saving...' : 'Save list'}
           </Button>
         </div>

@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { PosterImage } from './PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import { useUpsertEntry } from '@/hooks/useLibrary';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { buildContentPath } from '@/lib/slugs';
 import { useAuthStore } from '@/stores/authStore';
 import type { ContentItem, ContentType, EntryStatus } from '@/types';
 
@@ -36,6 +38,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const upsertEntry = useUpsertEntry();
+  const { isOnline } = useOnlineStatus();
   const [localStatus, setLocalStatus] = useState<EntryStatus | undefined>(userStatus);
   const visibleStatus = localStatus ?? userStatus;
 
@@ -50,7 +53,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
       navigate('/login');
       return;
     }
-    if (upsertEntry.isPending) return;
+    if (upsertEntry.isPending || !isOnline) return;
     setLocalStatus(status);
     try {
       await upsertEntry.mutateAsync({ content_id: item.id, status });
@@ -61,7 +64,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
 
   return (
     <Link
-      to={`/content/${item.type}/${item.externalId}`}
+      to={buildContentPath(item)}
       className="group block min-w-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-app-accent focus:ring-offset-2"
     >
       <div className="relative aspect-[2/3] overflow-hidden rounded-lg border border-app-border bg-app-surface shadow-card">
@@ -90,7 +93,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
                 <button
                   key={action.value}
                   type="button"
-                  disabled={upsertEntry.isPending}
+                  disabled={upsertEntry.isPending || !isOnline}
                   onClick={(event) => setStatus(action.value, event)}
                   className={`inline-flex min-h-8 items-center justify-center gap-1 rounded px-2 text-xs font-semibold transition ${
                     active ? 'bg-white text-app-text' : 'text-white hover:bg-white/15'

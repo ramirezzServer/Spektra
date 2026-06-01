@@ -1,6 +1,6 @@
 import { Calendar, Check, Clock, Gamepad2, Plus, Star, Trash2, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AddToListModal } from '@/components/lists/AddToListModal';
 import { RatingStars } from '@/components/content/RatingStars';
 import { PosterImage } from '@/components/content/PosterImage';
@@ -12,9 +12,11 @@ import { SEO } from '@/components/seo/SEO';
 import { useContentItem } from '@/hooks/useContent';
 import { useDraftStorage } from '@/hooks/useDraftStorage';
 import { libraryErrorMessage, useDeleteEntry, useEntryByContent, useUpsertEntry } from '@/hooks/useLibrary';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { cn } from '@/lib/utils';
 import { formatNumber } from '@/lib/formatters';
+import { buildContentPath } from '@/lib/slugs';
 import { useAuthStore } from '@/stores/authStore';
 import type { ContentType, EntryStatus, UserEntry } from '@/types';
 
@@ -42,7 +44,9 @@ const statusOptions: Array<{ value: EntryStatus; label: string; icon: typeof Plu
 ];
 
 export function ContentDetail() {
-  const { type = '', id = '' } = useParams();
+  const { type = '', id = '', slug = '' } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const content = useContentItem(type, id);
   const item = content.data;
   const metadata = item?.metadata ?? {};
@@ -56,7 +60,16 @@ export function ContentDetail() {
   const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
+  const { isOnline } = useOnlineStatus();
   const draft = useDraftStorage(item && user ? `spektra:draft:review:${user.id}:${item.id}` : null, entry.data?.review ?? '');
+
+  useEffect(() => {
+    if (!item) return;
+    const canonicalPath = buildContentPath(item);
+    if (location.pathname !== canonicalPath) {
+      navigate(`${canonicalPath}${location.search}${location.hash}`, { replace: true });
+    }
+  }, [item, location.hash, location.pathname, location.search, navigate, slug]);
 
   useEffect(() => {
     setReview(draft.value);
@@ -68,6 +81,10 @@ export function ContentDetail() {
 
   async function saveEntry(next: Partial<Pick<UserEntry, 'status' | 'rating' | 'review'>>) {
     if (!item) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (upsertEntry.isPending) return;
     setMessage(null);
     try {
@@ -86,6 +103,10 @@ export function ContentDetail() {
 
   async function removeEntry() {
     if (!entry.data || !item) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (deleteEntry.isPending) return;
     setMessage(null);
     try {
@@ -148,7 +169,7 @@ export function ContentDetail() {
         description={typeof metadata.overview === 'string' && metadata.overview ? metadata.overview : `${item.title} on Spektra.`}
         image={item.posterUrl ?? undefined}
         type="article"
-        canonicalPath={`/content/${item.type}/${item.externalId}`}
+        canonicalPath={buildContentPath(item)}
       />
       <div className="w-full max-w-80">
         <div className="aspect-[2/3] overflow-hidden rounded-lg border border-border bg-surface shadow-card">
@@ -231,7 +252,7 @@ export function ContentDetail() {
                   return (
                     <Button
                       key={option.value}
-                      disabled={upsertEntry.isPending || deleteEntry.isPending}
+                      disabled={upsertEntry.isPending || deleteEntry.isPending || !isOnline}
                       variant={active ? 'primary' : 'secondary'}
                       onClick={() => saveEntry({ status: option.value })}
                     >
@@ -243,10 +264,13 @@ export function ContentDetail() {
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-content-primary">Your rating</p>
-                <RatingStars value={entry.data?.rating ?? null} disabled={upsertEntry.isPending} onChange={(rating) => saveEntry({ rating })} />
+                <RatingStars value={entry.data?.rating ?? null} disabled={upsertEntry.isPending || !isOnline} onChange={(rating) => saveEntry({ rating })} />
               </div>
               <div className="space-y-2">
                 <textarea
+                  name="review"
+                  autoComplete="off"
+                  spellCheck={true}
                   maxLength={5000}
                   value={review}
                   onChange={(event) => {
@@ -279,7 +303,7 @@ export function ContentDetail() {
                         Remove
                       </Button>
                     )}
-                    <Button disabled={upsertEntry.isPending} onClick={() => saveEntry({ review })}>
+                    <Button disabled={upsertEntry.isPending || !isOnline} onClick={() => saveEntry({ review })}>
                       Save review
                     </Button>
                   </div>
@@ -297,7 +321,7 @@ export function ContentDetail() {
               <p className="mt-1 text-sm text-content-tertiary">Add this item to one of your curated lists.</p>
             </div>
             {isAuthenticated ? (
-              <Button type="button" variant="secondary" onClick={() => setAddToListOpen(true)}>
+              <Button type="button" variant="secondary" disabled={!isOnline} onClick={() => setAddToListOpen(true)}>
                 <Plus className="h-4 w-4" />
                 Add to List
               </Button>

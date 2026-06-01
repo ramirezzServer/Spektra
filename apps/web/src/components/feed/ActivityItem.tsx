@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { PosterImage } from '@/components/content/PosterImage';
 import { Avatar } from '@/components/ui/Avatar';
 import { formatRelativeTime } from '@/lib/formatters';
+import { buildContentPath } from '@/lib/slugs';
 import type { ActivityFeedItem } from '@/types';
 
 const verbText: Record<ActivityFeedItem['verb'], string> = {
@@ -55,7 +56,7 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
                   @{followedUsername}
                 </Link>
               ) : content ? (
-                <Link to={`/content/${content.type}/${content.externalId}`} className="font-semibold text-content-primary hover:text-accent overflow-wrap-anywhere">
+                <Link to={buildContentPath(content)} className="font-semibold text-content-primary hover:text-accent overflow-wrap-anywhere">
                   {content.title}
                 </Link>
               ) : (
@@ -66,7 +67,7 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
           </div>
 
           {content && (
-            <Link to={`/content/${content.type}/${content.externalId}`} className="flex gap-3 rounded-md border border-border bg-bg-secondary p-2 transition hover:border-border-strong active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
+            <Link to={buildContentPath(content)} className="flex gap-3 rounded-md border border-border bg-bg-secondary p-2 transition hover:border-border-strong active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
               <div className="h-20 w-14 shrink-0 overflow-hidden rounded-md border border-border bg-surface">
                 <PosterImage src={content.posterUrl} title={content.title} type={content.type} className="h-full w-full object-cover" />
               </div>

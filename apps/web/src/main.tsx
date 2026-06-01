@@ -9,6 +9,8 @@ import { AppErrorBoundary } from '@/components/monitoring/AppErrorBoundary';
 import { CookieConsentBanner } from '@/components/privacy/CookieConsentBanner';
 import { RouteAnalytics } from '@/components/monitoring/RouteAnalytics';
 import { UpdatePrompt } from '@/components/pwa/UpdatePrompt';
+import { ScrollRestoration } from '@/components/navigation/ScrollRestoration';
+import { NetworkStatusBanner } from '@/components/network/NetworkStatusBanner';
 
 import { Home } from '@/pages/Home';
 import { Login } from '@/pages/Auth/Login';
@@ -40,6 +42,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <RouteAnalytics />
+          <ScrollRestoration />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -52,17 +55,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Route path="/profile/:username" element={lazyPage(<Profile />)} />
               <Route path="/profile/:username/followers" element={lazyPage(<UserConnections kind="followers" />)} />
               <Route path="/profile/:username/following" element={lazyPage(<UserConnections kind="following" />)} />
-              <Route path="/content/:type/:id" element={lazyPage(<ContentDetail />)} />
+              <Route path="/content/:type/:id/:slug?" element={lazyPage(<ContentDetail />)} />
               <Route path="/privacy" element={lazyPage(<Privacy />)} />
               <Route path="/terms" element={lazyPage(<Terms />)} />
 
               <Route path="/feed" element={<RequireAuth>{lazyPage(<Feed />)}</RequireAuth>} />
               <Route path="/library" element={<RequireAuth>{lazyPage(<LibraryPage />)}</RequireAuth>} />
               <Route path="/lists" element={<RequireAuth>{lazyPage(<Lists />)}</RequireAuth>} />
-              <Route path="/lists/:listId" element={lazyPage(<ListDetail />)} />
+              <Route path="/lists/:listId/:slug?" element={lazyPage(<ListDetail />)} />
               <Route path="*" element={lazyPage(<NotFound />)} />
             </Route>
           </Routes>
+          <NetworkStatusBanner />
           <CookieConsentBanner />
           <UpdatePrompt />
         </BrowserRouter>

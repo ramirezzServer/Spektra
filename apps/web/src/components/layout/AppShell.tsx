@@ -11,7 +11,7 @@ export function AppShell() {
         <Sidebar />
       </aside>
 
-      <main className="md:ml-60 min-h-screen flex flex-col">
+      <main id="main-content" tabIndex={-1} className="md:ml-60 min-h-screen flex flex-col focus:outline-none">
         <Navbar />
         <EmailVerificationBanner />
         <div className="flex-1 px-4 md:px-8 py-6 pb-24 md:pb-8 max-w-screen-xl mx-auto w-full">

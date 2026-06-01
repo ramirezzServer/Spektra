@@ -56,11 +56,13 @@ export function Search() {
           <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-content-tertiary" />
           <input
             id="content-search"
+            name="search"
             aria-label="Search content"
             autoFocus
             type="search"
             autoComplete="off"
             enterKeyHint="search"
+            spellCheck={false}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={(event) => {

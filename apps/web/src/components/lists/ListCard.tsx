@@ -4,6 +4,7 @@ import { PosterImage } from '@/components/content/PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { formatNumber } from '@/lib/formatters';
+import { buildListPath } from '@/lib/slugs';
 import type { UserList } from '@/types';
 
 interface ListCardProps {
@@ -17,7 +18,7 @@ export function ListCard({ list, onEdit, onDelete }: ListCardProps) {
 
   return (
     <article className="rounded-lg border border-border bg-surface p-4 shadow-card">
-      <Link to={`/lists/${list.id}`} className="block focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+      <Link to={buildListPath(list)} className="block focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
         <div className="grid h-28 grid-cols-5 gap-1 overflow-hidden rounded-md bg-bg-secondary">
           {previews.length > 0 ? (
             previews.slice(0, 5).map((item) => (

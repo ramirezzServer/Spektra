@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { PosterImage } from '@/components/content/PosterImage';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { buildContentPath } from '@/lib/slugs';
 import type { ListItem } from '@/types';
 
 interface ListItemRowProps {
@@ -22,7 +23,7 @@ export function ListItemRow({ item, canMoveUp, canMoveDown, isOwner, isPending, 
 
   return (
     <article className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-lg border border-border bg-surface p-3 sm:grid-cols-[72px_minmax(0,1fr)_auto]">
-      <Link to={`/content/${content.type}/${content.externalId}`} className="block aspect-[2/3] overflow-hidden rounded-md bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-accent">
+      <Link to={buildContentPath(content)} className="block aspect-[2/3] overflow-hidden rounded-md bg-bg-secondary focus:outline-none focus:ring-2 focus:ring-accent">
         <PosterImage src={content.posterUrl} title={content.title} type={content.type} className="h-full w-full object-cover" />
       </Link>
       <div className="min-w-0 self-center">
@@ -33,7 +34,7 @@ export function ListItemRow({ item, canMoveUp, canMoveDown, isOwner, isPending, 
             {content.releaseYear ?? 'TBA'}
           </span>
         </div>
-        <Link to={`/content/${content.type}/${content.externalId}`} className="mt-2 block break-words text-sm font-semibold text-content-primary hover:text-accent">
+        <Link to={buildContentPath(content)} className="mt-2 block break-words text-sm font-semibold text-content-primary hover:text-accent">
           {content.title}
         </Link>
         <p className="mt-1 text-xs text-content-tertiary">Position {item.position}</p>

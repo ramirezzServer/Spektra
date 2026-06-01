@@ -47,11 +47,13 @@ export function Login() {
               <label htmlFor="login-email" className="block text-sm font-medium text-content-primary mb-1.5">Email</label>
               <input
                 id="login-email"
+                name="email"
                 type="email"
                 required
                 autoFocus
                 autoComplete="email"
                 inputMode="email"
+                enterKeyHint="next"
                 value={email}
                 onChange={(event) => {
                   setLocalError(null);
@@ -66,9 +68,11 @@ export function Login() {
               <label htmlFor="login-password" className="block text-sm font-medium text-content-primary mb-1.5">Password</label>
               <input
                 id="login-password"
+                name="password"
                 type="password"
                 required
                 autoComplete="current-password"
+                enterKeyHint="done"
                 value={password}
                 onChange={(event) => {
                   setLocalError(null);

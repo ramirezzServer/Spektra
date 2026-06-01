@@ -1,6 +1,6 @@
 import { Edit2, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ListFormModal } from '@/components/lists/ListFormModal';
 import { ListItemGrid } from '@/components/lists/ListItemGrid';
 import { SEO } from '@/components/seo/SEO';
@@ -9,13 +9,16 @@ import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { listErrorMessage, useDeleteList, useListDetail, useRemoveListItem, useReorderListItems, useUpdateList } from '@/hooks/useLists';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { formatNumber } from '@/lib/formatters';
+import { buildListPath } from '@/lib/slugs';
 import { useAuthStore } from '@/stores/authStore';
 import type { ListItem } from '@/types';
 
 export function ListDetail() {
   const { listId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const [page, setPage] = useState(1);
   const detail = useListDetail(listId, page, 20);
@@ -29,9 +32,22 @@ export function ListDetail() {
   const [message, setMessage] = useState<string | null>(null);
   const list = detail.data?.data;
   const isOwner = Boolean(user?.id && list?.userId === user.id);
+  const { isOnline } = useOnlineStatus();
+
+  useEffect(() => {
+    if (!list) return;
+    const canonicalPath = buildListPath(list);
+    if (location.pathname !== canonicalPath) {
+      navigate(`${canonicalPath}${location.search}${location.hash}`, { replace: true });
+    }
+  }, [list, location.hash, location.pathname, location.search, navigate]);
 
   async function submit(input: { name: string; description: string | null; isPublic: boolean }) {
     if (!list) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (updateList.isPending) return;
     setMessage(null);
     try {
@@ -44,6 +60,10 @@ export function ListDetail() {
 
   async function deleteCurrentList() {
     if (!list) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (deleteList.isPending) return;
     setMessage(null);
     try {
@@ -56,6 +76,10 @@ export function ListDetail() {
 
   async function removeConfirmed() {
     if (!list || !removing) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (removeItem.isPending) return;
     try {
       await removeItem.mutateAsync({ listId: list.id, contentId: removing.contentId });
@@ -67,6 +91,10 @@ export function ListDetail() {
 
   async function move(fromIndex: number, direction: -1 | 1) {
     if (!list) return;
+    if (!isOnline) {
+      setMessage('You appear to be offline. Check your connection and try again.');
+      return;
+    }
     if (reorderItems.isPending) return;
     const items = [...list.items];
     const toIndex = fromIndex + direction;
@@ -108,7 +136,7 @@ export function ListDetail() {
 
   return (
     <div className="space-y-6">
-      <SEO title={list.name} description={list.description ?? `${list.name} on Spektra.`} canonicalPath={`/lists/${list.id}`} noIndex={!list.isPublic} />
+      <SEO title={list.name} description={list.description ?? `${list.name} on Spektra.`} canonicalPath={buildListPath(list)} noIndex={!list.isPublic} />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -123,11 +151,11 @@ export function ListDetail() {
         </div>
         {isOwner && (
           <div className="flex gap-2">
-            <Button type="button" variant="secondary" onClick={() => setEditing(true)}>
+            <Button type="button" variant="secondary" disabled={!isOnline} onClick={() => setEditing(true)}>
               <Edit2 className="h-4 w-4" />
               Edit
             </Button>
-            <Button type="button" variant="ghost" className="text-danger hover:text-danger" onClick={() => setConfirmDelete(true)}>
+            <Button type="button" variant="ghost" className="text-danger hover:text-danger" disabled={!isOnline} onClick={() => setConfirmDelete(true)}>
               <Trash2 className="h-4 w-4" />
               Delete
             </Button>
@@ -145,7 +173,7 @@ export function ListDetail() {
         isLoading={detail.isLoading}
         isError={detail.isError}
         isFetching={detail.isFetching}
-        isPending={removeItem.isPending || reorderItems.isPending}
+        isPending={removeItem.isPending || reorderItems.isPending || !isOnline}
         emptyMessage={isOwner ? 'Add content from Search or Content pages.' : 'This list has no items yet.'}
         onPageChange={setPage}
         onMove={move}
