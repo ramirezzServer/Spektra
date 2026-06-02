@@ -66,7 +66,7 @@ export function Login() {
                   login.reset();
                   setEmail(event.target.value);
                 }}
-                className="w-full rounded-xl border border-border bg-bg-subtle px-3.5 py-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary transition-colors focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
+                className="w-full rounded-xl border border-border bg-bg-subtle px-3.5 py-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary transition-colors focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/20"
                 placeholder="you@example.com"
               />
             </div>
@@ -85,7 +85,7 @@ export function Login() {
                   login.reset();
                   setPassword(event.target.value);
                 }}
-                className="w-full rounded-xl border border-border bg-bg-subtle px-3.5 py-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary transition-colors focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
+                className="w-full rounded-xl border border-border bg-bg-subtle px-3.5 py-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary transition-colors focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/20"
                 placeholder="********"
               />
             </div>

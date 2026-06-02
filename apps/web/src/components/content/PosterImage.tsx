@@ -34,7 +34,7 @@ export function PosterImage({ src, title, type, className = '' }: PosterImagePro
   if (!src || failed) {
     return (
       <div className={`relative flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-br px-4 text-center ${fallbackByType[type]} ${className}`}>
-        <div className="absolute inset-x-4 top-6 h-24 rounded-full bg-white/45 blur-2xl" aria-hidden="true" />
+        <div className="absolute inset-x-4 top-6 h-24 rounded-full bg-white/50 blur-2xl" aria-hidden="true" />
         <FallbackIcon className="relative h-10 w-10 opacity-80" aria-hidden="true" />
         <span className="relative line-clamp-3 text-xs font-black leading-snug">{title}</span>
       </div>

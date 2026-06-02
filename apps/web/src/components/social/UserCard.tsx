@@ -5,7 +5,7 @@ import type { User } from '@/types';
 
 export function UserCard({ user }: { user: User }) {
   return (
-    <Link to={`/profile/${user.username}`} className="flex min-w-0 items-center gap-3 rounded-2xl border border-border-subtle bg-surface/95 p-4 shadow-card transition hover:border-accent/35 hover:shadow-cardHover active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
+    <Link to={`/profile/${user.username}`} className="flex min-w-0 items-center gap-3 rounded-2xl border border-border-subtle bg-surface/95 p-4 shadow-card transition hover:border-accent/40 hover:shadow-cardHover active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
       <Avatar src={user.avatarUrl} alt={user.username} />
       <div className="min-w-0">
         <p className="truncate text-sm font-bold text-content-primary">@{user.username}</p>

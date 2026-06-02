@@ -4,11 +4,12 @@ import { useAuthStore } from '@/stores/authStore';
 
 export function BottomNav() {
   const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const navItems = [
     { to: '/', label: 'Home', icon: Home },
     { to: '/search', label: 'Search', icon: Search },
     { to: '/library', label: 'Library', icon: Library },
-    { to: '/profile/' + (user?.username ?? ''), label: 'Profile', icon: User },
+    { to: isAuthenticated && user?.username ? `/profile/${user.username}` : '/login', label: isAuthenticated ? 'Profile' : 'Sign in', icon: User },
   ];
 
   return (

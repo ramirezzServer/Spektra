@@ -16,6 +16,7 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { cn } from '@/lib/utils';
 import { formatNumber } from '@/lib/formatters';
+import { rememberRecentContent } from '@/lib/recentContent';
 import { buildContentPath } from '@/lib/slugs';
 import { useAuthStore } from '@/stores/authStore';
 import type { ContentType, EntryStatus, UserEntry } from '@/types';
@@ -65,6 +66,7 @@ export function ContentDetail() {
 
   useEffect(() => {
     if (!item) return;
+    rememberRecentContent(item);
     const canonicalPath = buildContentPath(item);
     if (location.pathname !== canonicalPath) {
       navigate(`${canonicalPath}${location.search}${location.hash}`, { replace: true });
@@ -182,7 +184,7 @@ export function ContentDetail() {
       </div>
 
       <section className="min-w-0 space-y-5">
-        <div className="relative overflow-hidden rounded-3xl border border-border-subtle bg-surface/92 p-5 shadow-card md:p-6">
+        <div className="relative overflow-hidden rounded-3xl border border-border-subtle bg-surface/90 p-5 shadow-card md:p-6">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(91,77,255,0.12),transparent_24rem)]" aria-hidden="true" />
           <div className="relative space-y-3">
           <Badge className={cn('capitalize', typeClass[item.type])}>{item.type}</Badge>
@@ -281,7 +283,7 @@ export function ContentDetail() {
                     draft.setValue(event.target.value);
                   }}
                   disabled={upsertEntry.isPending}
-                  className="min-h-28 w-full resize-none rounded-2xl border border-border bg-bg-subtle p-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
+                  className="min-h-28 w-full resize-none rounded-2xl border border-border bg-bg-subtle p-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/20"
                   placeholder="Write your review..."
                 />
                 <div className="flex flex-wrap items-center justify-between gap-2">

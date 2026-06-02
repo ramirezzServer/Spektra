@@ -7,7 +7,7 @@ export function Navbar() {
   const { user, isAuthenticated } = useAuthStore();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border-subtle bg-surface/82 backdrop-blur-xl md:hidden">
+    <header className="sticky top-0 z-20 border-b border-border-subtle bg-surface/80 backdrop-blur-xl md:hidden">
       <div className="flex h-16 items-center justify-between px-4">
         <Link to="/" className="text-xl font-black tracking-tight text-content-primary">
           spek<span className="text-accent">.</span>tra

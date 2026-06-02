@@ -67,22 +67,22 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
       to={buildContentPath(item)}
       className="group block min-w-0 rounded-2xl focus:outline-none focus:ring-4 focus:ring-accent/20"
     >
-      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-card transition duration-200 group-hover:-translate-y-1 group-hover:border-accent/35 group-hover:shadow-cardHover motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-card transition duration-200 group-hover:-translate-y-1 group-hover:border-accent/40 group-hover:shadow-cardHover motion-reduce:transition-none motion-reduce:group-hover:translate-y-0">
         <PosterImage src={item.posterUrl} title={item.title} type={item.type} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-slate-950/25 opacity-75" aria-hidden="true" />
         <div className="absolute left-2 top-2">
           <Badge className={`capitalize ${badgeClass[item.type]}`}>{item.type}</Badge>
         </div>
         {item.avgRating !== null && (
-          <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-950/85 px-2 py-1 text-xs font-bold text-white shadow-sm backdrop-blur">
+          <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-950/90 px-2 py-1 text-xs font-bold text-white shadow-sm backdrop-blur">
             <Star className="h-3 w-3 fill-white" />
             {item.avgRating.toFixed(1)}
           </div>
         )}
         {(visibleStatus || userRating) && (
           <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
-            {visibleStatus && <Badge className="border-white/20 bg-slate-950/85 text-white">{statusLabel[visibleStatus]}</Badge>}
-            {userRating ? <Badge className="border-white/20 bg-slate-950/85 text-white">{userRating}/10</Badge> : null}
+            {visibleStatus && <Badge className="border-white/20 bg-slate-950/90 text-white">{statusLabel[visibleStatus]}</Badge>}
+            {userRating ? <Badge className="border-white/20 bg-slate-950/90 text-white">{userRating}/10</Badge> : null}
           </div>
         )}
         <div className="pointer-events-none absolute inset-x-2 bottom-2 hidden translate-y-2 opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:block">
@@ -97,7 +97,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
                   disabled={upsertEntry.isPending || !isOnline}
                   onClick={(event) => setStatus(action.value, event)}
                   className={`inline-flex min-h-9 items-center justify-center gap-1 rounded-lg px-2 text-xs font-bold transition ${
-                    active ? 'bg-white text-content-primary' : 'text-white hover:bg-white/15'
+                    active ? 'bg-white text-content-primary' : 'text-white hover:bg-white/20'
                   } disabled:opacity-60`}
                   aria-label={`Mark ${item.title} as ${action.label}`}
                 >

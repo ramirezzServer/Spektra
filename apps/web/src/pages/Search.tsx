@@ -51,7 +51,7 @@ export function Search() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-5 overflow-x-hidden">
       <SEO title="Search" description="Search films, series, games, and books on Spektra." canonicalPath="/search" />
-      <div className="sticky top-16 z-10 space-y-3 rounded-3xl border border-border-subtle bg-surface/88 p-3 shadow-card backdrop-blur-xl md:top-4 md:p-4">
+      <div className="sticky top-16 z-10 space-y-3 rounded-3xl border border-border-subtle bg-surface/90 p-3 shadow-card backdrop-blur-xl md:top-4 md:p-4">
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-content-tertiary" />
           <input
@@ -68,7 +68,7 @@ export function Search() {
             onKeyDown={(event) => {
               if (event.key === 'Escape') setQuery('');
             }}
-            className="w-full rounded-2xl border border-border bg-bg-subtle py-3.5 pl-12 pr-12 text-base font-semibold text-content-primary placeholder:text-content-tertiary focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
+            className="w-full rounded-2xl border border-border bg-bg-subtle py-3.5 pl-12 pr-12 text-base font-semibold text-content-primary placeholder:text-content-tertiary focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/20"
             placeholder="Search films, series, games, books..."
           />
           {query && (

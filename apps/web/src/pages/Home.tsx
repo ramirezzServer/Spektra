@@ -42,7 +42,7 @@ export function Home() {
               <Search className="h-4 w-4" />
               Search
             </Link>
-            <Link to="/library" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur hover:bg-white/15">
+            <Link to="/library" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur hover:bg-white/20">
               <Library className="h-4 w-4" />
               Library
             </Link>

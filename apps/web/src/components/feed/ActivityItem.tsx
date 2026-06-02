@@ -67,7 +67,7 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
           </div>
 
           {content && (
-            <Link to={buildContentPath(content)} className="flex gap-3 rounded-xl border border-border-subtle bg-bg-subtle p-2 transition hover:border-accent/35 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
+            <Link to={buildContentPath(content)} className="flex gap-3 rounded-xl border border-border-subtle bg-bg-subtle p-2 transition hover:border-accent/40 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
               <div className="h-24 w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-surface shadow-xs">
                 <PosterImage src={content.posterUrl} title={content.title} type={content.type} className="h-full w-full object-cover" />
               </div>
