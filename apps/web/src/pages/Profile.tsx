@@ -96,7 +96,7 @@ export function Profile() {
         type="profile"
         canonicalPath={username ? `/profile/${username}` : undefined}
       />
-      <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col gap-4 rounded-3xl border border-border-subtle bg-surface/90 p-5 shadow-card sm:flex-row sm:items-center sm:justify-between">
         {profile.isLoading ? (
           <>
             <Skeleton className="h-20 w-20 rounded-full" />
@@ -109,8 +109,8 @@ export function Profile() {
           <>
             <Avatar src={profile.data?.avatarUrl} alt={profile.data?.username ?? username ?? 'User'} size="lg" />
             <div className="min-w-0 flex-1">
-              <h1 className="overflow-wrap-anywhere text-2xl font-semibold text-content-primary">@{profile.data?.username}</h1>
-              <p className="mt-1 max-w-2xl break-words text-sm text-content-secondary">
+              <h1 className="overflow-wrap-anywhere text-3xl font-black text-content-primary">@{profile.data?.username}</h1>
+              <p className="mt-1 max-w-2xl break-words text-sm font-medium text-content-secondary">
                 {profile.data?.bio || (isOwnProfile ? 'Your library lives here.' : 'Member of Spektra')}
               </p>
               <div className="mt-3 flex flex-wrap gap-3 text-sm text-content-secondary">
@@ -127,7 +127,7 @@ export function Profile() {
               {followError && <p className="mt-2 text-sm text-danger-text" role="alert">{followError}</p>}
             </div>
             {isOwnProfile ? (
-              <span className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-semibold text-content-secondary">This is you</span>
+              <span className="rounded-xl border border-border bg-bg-subtle px-4 py-2 text-sm font-bold text-content-secondary">This is you</span>
             ) : currentUser ? (
               <Button
                 type="button"
@@ -139,7 +139,7 @@ export function Profile() {
                 {followUser.isPending || unfollowUser.isPending ? 'Saving...' : relationship.data?.isFollowing ? 'Unfollow' : 'Follow'}
               </Button>
             ) : (
-              <Link to="/login" className="rounded-md border border-border bg-surface px-4 py-2 text-sm font-semibold text-accent hover:text-accent-hover">
+              <Link to="/login" className="rounded-xl border border-border bg-surface px-4 py-2 text-sm font-bold text-accent hover:text-accent-hover">
                 Sign in to follow
               </Link>
             )}
@@ -154,22 +154,22 @@ export function Profile() {
           { label: 'Games', value: stats.data?.byType.game ?? 0, icon: Gamepad2 },
           { label: 'Books', value: stats.data?.byType.book ?? 0, icon: BookOpen },
         ].map((card) => (
-          <div key={card.label} className="rounded-lg border border-border bg-surface p-4">
+          <div key={card.label} className="rounded-2xl border border-border-subtle bg-surface p-4 shadow-card">
             <card.icon className="h-5 w-5 text-accent" />
-            <p className="mt-3 text-2xl font-semibold text-content-primary">{stats.isLoading ? '-' : formatNumber(card.value)}</p>
-            <p className="text-sm text-content-tertiary">{card.label}</p>
+            <p className="mt-3 text-2xl font-black text-content-primary">{stats.isLoading ? '-' : formatNumber(card.value)}</p>
+            <p className="text-sm font-semibold text-content-tertiary">{card.label}</p>
           </div>
         ))}
       </section>
 
       <section className="flex flex-wrap gap-3 text-sm text-content-secondary">
-        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
+        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 font-semibold shadow-xs">
           <Library className="h-4 w-4" /> {formatNumber(stats.data?.total ?? 0)} entries
         </span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
+        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 font-semibold shadow-xs">
           <Star className="h-4 w-4" /> {formatNumber(stats.data?.ratedCount ?? 0)} rated
         </span>
-        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
+        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 font-semibold shadow-xs">
           <MessageSquare className="h-4 w-4" /> {formatNumber(stats.data?.reviewedCount ?? 0)} reviewed
         </span>
       </section>
@@ -192,12 +192,12 @@ export function Profile() {
 
         <ContentGrid items={items} entries={entries} isLoading={library.isLoading} />
         {library.isError && (
-          <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary" role="status">
+          <div className="rounded-3xl border border-dashed border-border bg-surface py-14 text-center text-sm font-medium text-content-tertiary shadow-card" role="status">
             Unable to load this library right now.
           </div>
         )}
         {!library.isLoading && !library.isError && items.length === 0 && (
-          <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary">
+          <div className="rounded-3xl border border-dashed border-border bg-surface py-14 text-center text-sm font-medium text-content-tertiary shadow-card">
             No library entries here yet.
           </div>
         )}

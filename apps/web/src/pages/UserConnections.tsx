@@ -17,7 +17,9 @@ export function UserConnections({ kind }: { kind: 'followers' | 'following' }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <SEO title={title} description={`View ${title} on Spektra.`} canonicalPath={username ? `/profile/${username}/${kind}` : undefined} />
-      <h1 className="text-2xl font-semibold text-content-primary">{title}</h1>
+      <div className="rounded-3xl border border-border-subtle bg-surface/90 p-5 shadow-card">
+        <h1 className="text-3xl font-black text-content-primary">{title}</h1>
+      </div>
       <UserList users={query.data?.data ?? []} isLoading={query.isLoading} isError={query.isError} emptyMessage={emptyMessage} />
       <Pagination page={page} lastPage={query.data?.meta.lastPage ?? 1} isFetching={query.isFetching} onPageChange={setPage} />
     </div>

@@ -123,7 +123,7 @@ export function ListDetail() {
 
   if (detail.isError || !list) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-surface px-6 py-16 text-center">
+      <div className="rounded-3xl border border-dashed border-border bg-surface px-6 py-14 text-center shadow-card">
         <SEO title="List not found" description="This list is unavailable." noIndex />
         <h1 className="text-lg font-semibold text-content-primary">List not found</h1>
         <p className="mt-2 text-sm text-content-tertiary">It may be private or deleted.</p>
@@ -137,16 +137,16 @@ export function ListDetail() {
   return (
     <div className="space-y-6">
       <SEO title={list.name} description={list.description ?? `${list.name} on Spektra.`} canonicalPath={buildListPath(list)} noIndex={!list.isPublic} />
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 rounded-3xl border border-border-subtle bg-surface/90 p-5 shadow-card">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className={list.isPublic ? 'border-accent-light bg-accent-light text-accent' : 'border-border bg-bg-secondary text-content-tertiary'}>
               {list.isPublic ? 'Public' : 'Private'}
             </Badge>
-            <span className="text-sm text-content-tertiary">{formatNumber(list.itemsCount ?? detail.data?.meta.total ?? 0)} items</span>
+            <span className="text-sm font-semibold text-content-tertiary">{formatNumber(list.itemsCount ?? detail.data?.meta.total ?? 0)} items</span>
           </div>
-          <h1 className="mt-3 overflow-wrap-anywhere text-3xl font-semibold text-content-primary">{list.name}</h1>
-          {list.description && <p className="mt-2 max-w-3xl text-sm leading-6 text-content-secondary">{list.description}</p>}
+          <h1 className="mt-3 overflow-wrap-anywhere text-3xl font-black text-content-primary">{list.name}</h1>
+          {list.description && <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-content-secondary">{list.description}</p>}
           {list.owner && <p className="mt-2 text-xs text-content-tertiary">By {list.owner.username}</p>}
         </div>
         {isOwner && (
@@ -163,7 +163,7 @@ export function ListDetail() {
         )}
       </div>
 
-      {message && <p className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-content-secondary">{message}</p>}
+      {message && <p className="rounded-xl border border-border bg-surface px-3 py-2 text-sm font-medium text-content-secondary shadow-xs">{message}</p>}
 
       <ListItemGrid
         items={list.items}

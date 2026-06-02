@@ -15,7 +15,7 @@ export function ContentGrid({ items, entries = [], isLoading = false, skeletonCo
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
         {Array.from({ length: skeletonCount }).map((_, index) => (
           <ContentCardSkeleton key={index} />
         ))}
@@ -28,7 +28,7 @@ export function ContentGrid({ items, entries = [], isLoading = false, skeletonCo
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
       {items.map((item) => (
         <ContentCard
           key={`${item.type}-${item.externalId}`}

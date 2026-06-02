@@ -20,7 +20,7 @@ export function ActivityList({ items, isLoading, isError, emptyMessage, hasNextP
     return (
       <div className="space-y-3" aria-label="Loading activity">
         {Array.from({ length: 5 }).map((_, index) => (
-          <div key={index} className="rounded-lg border border-border bg-surface p-4">
+          <div key={index} className="rounded-2xl border border-border-subtle bg-surface p-4 shadow-card">
             <div className="flex gap-3">
               <Skeleton className="h-10 w-10 rounded-full" />
               <div className="flex-1 space-y-3">
@@ -36,7 +36,7 @@ export function ActivityList({ items, isLoading, isError, emptyMessage, hasNextP
 
   if (isError) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary" role="status">
+      <div className="rounded-2xl border border-dashed border-border bg-surface py-14 text-center text-sm font-medium text-content-tertiary shadow-card" role="status">
         {getApiErrorMessage(error, 'Unable to load activity right now.')}
       </div>
     );
@@ -44,7 +44,7 @@ export function ActivityList({ items, isLoading, isError, emptyMessage, hasNextP
 
   if (!items.length) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary">
+      <div className="rounded-2xl border border-dashed border-border bg-surface py-14 text-center text-sm font-medium text-content-tertiary shadow-card">
         {emptyMessage}
       </div>
     );

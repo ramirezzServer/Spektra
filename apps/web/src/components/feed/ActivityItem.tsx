@@ -30,7 +30,7 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
   const followedUsername = stringMeta(item.metadata.username);
 
   return (
-    <article className="rounded-lg border border-border bg-surface p-4">
+    <article className="rounded-2xl border border-border-subtle bg-surface/95 p-4 shadow-card">
       <div className="flex gap-3">
         {actor?.username ? (
           <Link to={`/profile/${actor.username}`} className="shrink-0">
@@ -67,8 +67,8 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
           </div>
 
           {content && (
-            <Link to={buildContentPath(content)} className="flex gap-3 rounded-md border border-border bg-bg-secondary p-2 transition hover:border-border-strong active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
-              <div className="h-20 w-14 shrink-0 overflow-hidden rounded-md border border-border bg-surface">
+            <Link to={buildContentPath(content)} className="flex gap-3 rounded-xl border border-border-subtle bg-bg-subtle p-2 transition hover:border-accent/35 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100">
+              <div className="h-24 w-16 shrink-0 overflow-hidden rounded-lg border border-border bg-surface shadow-xs">
                 <PosterImage src={content.posterUrl} title={content.title} type={content.type} className="h-full w-full object-cover" />
               </div>
               <div className="min-w-0 py-1">
@@ -80,7 +80,7 @@ export function ActivityItem({ item }: { item: ActivityFeedItem }) {
           )}
 
           {review && (
-            <blockquote className="overflow-wrap-anywhere rounded-md border-l-4 border-accent bg-bg-secondary px-3 py-2 text-sm text-content-secondary">
+            <blockquote className="overflow-wrap-anywhere rounded-xl border-l-4 border-accent bg-accent-soft px-3 py-2 text-sm font-medium text-content-secondary">
               {review}
             </blockquote>
           )}

@@ -163,7 +163,7 @@ export function ContentDetail() {
   ].filter(Boolean) as Array<{ label: string; value: string | null }>;
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-8 overflow-x-hidden lg:grid-cols-[minmax(220px,320px)_1fr]">
+    <div className="mx-auto grid w-full max-w-6xl gap-6 overflow-x-hidden lg:grid-cols-[minmax(220px,320px)_1fr]">
       <SEO
         title={item.title}
         description={typeof metadata.overview === 'string' && metadata.overview ? metadata.overview : `${item.title} on Spektra.`}
@@ -172,7 +172,7 @@ export function ContentDetail() {
         canonicalPath={buildContentPath(item)}
       />
       <div className="w-full max-w-80">
-        <div className="aspect-[2/3] overflow-hidden rounded-lg border border-border bg-surface shadow-card">
+        <div className="aspect-[2/3] overflow-hidden rounded-3xl border border-border-subtle bg-surface shadow-panel">
           {item.posterUrl ? (
             <PosterImage src={item.posterUrl} title={item.title} type={item.type} className="h-full w-full object-cover" />
           ) : (
@@ -181,10 +181,12 @@ export function ContentDetail() {
         </div>
       </div>
 
-      <section className="min-w-0 space-y-6">
-        <div className="space-y-3">
+      <section className="min-w-0 space-y-5">
+        <div className="relative overflow-hidden rounded-3xl border border-border-subtle bg-surface/92 p-5 shadow-card md:p-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(91,77,255,0.12),transparent_24rem)]" aria-hidden="true" />
+          <div className="relative space-y-3">
           <Badge className={cn('capitalize', typeClass[item.type])}>{item.type}</Badge>
-          <h1 className="break-words text-3xl font-bold text-content-primary md:text-5xl">{item.title}</h1>
+          <h1 className="break-words text-3xl font-black tracking-tight text-content-primary md:text-5xl">{item.title}</h1>
           <div className="flex flex-wrap items-center gap-4 text-sm text-content-secondary">
             <span className="inline-flex items-center gap-2">
               <Calendar className="h-4 w-4" />
@@ -199,12 +201,13 @@ export function ContentDetail() {
               {formatNumber(item.ratingsCount)} ratings
             </span>
           </div>
+          </div>
         </div>
 
         {item.genres.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {item.genres.map((genre) => (
-              <span key={genre} className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-content-secondary">
+              <span key={genre} className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-bold text-content-secondary shadow-xs">
                 {genre}
               </span>
             ))}
@@ -218,7 +221,7 @@ export function ContentDetail() {
         {highlights.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2">
             {highlights.map((highlight) => (
-              <div key={highlight.label} className="rounded-lg border border-border bg-surface p-4">
+              <div key={highlight.label} className="rounded-2xl border border-border-subtle bg-surface p-4 shadow-card">
                 <p className="text-xs font-semibold uppercase text-content-tertiary">{highlight.label}</p>
                 <p className="mt-1 break-words text-sm font-semibold text-content-primary">{highlight.value}</p>
               </div>
@@ -226,14 +229,14 @@ export function ContentDetail() {
           </div>
         )}
 
-        <div className="space-y-4 rounded-lg border border-border bg-surface p-4">
+        <div className="space-y-4 rounded-3xl border border-border-subtle bg-surface p-4 shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-semibold text-content-primary">Your library</p>
             {entry.isFetching && isAuthenticated && <span className="text-xs text-content-tertiary">Syncing...</span>}
           </div>
 
           {!isAuthenticated ? (
-            <div className="rounded-md border border-dashed border-border bg-bg-secondary p-4 text-sm text-content-secondary">
+            <div className="rounded-2xl border border-dashed border-border bg-bg-subtle p-4 text-sm font-medium text-content-secondary">
               <Link to="/login" className="font-semibold text-accent hover:text-accent-hover">Sign in</Link> to track status, rating, and review.
             </div>
           ) : (
@@ -278,7 +281,7 @@ export function ContentDetail() {
                     draft.setValue(event.target.value);
                   }}
                   disabled={upsertEntry.isPending}
-                  className="min-h-28 w-full resize-none rounded-lg border border-border bg-bg-secondary p-3 text-sm text-content-secondary placeholder:text-content-tertiary"
+                  className="min-h-28 w-full resize-none rounded-2xl border border-border bg-bg-subtle p-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
                   placeholder="Write your review..."
                 />
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -314,7 +317,7 @@ export function ContentDetail() {
           )}
         </div>
 
-        <div className="rounded-lg border border-border bg-surface p-4">
+        <div className="rounded-3xl border border-border-subtle bg-surface p-4 shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-content-primary">Custom lists</p>

@@ -7,22 +7,22 @@ export function Navbar() {
   const { user, isAuthenticated } = useAuthStore();
 
   return (
-    <header className="md:hidden sticky top-0 z-20 bg-surface border-b border-border">
-      <div className="flex items-center justify-between px-4 h-14">
-        <Link to="/" className="text-lg font-semibold tracking-tight text-content-primary">
+    <header className="sticky top-0 z-20 border-b border-border-subtle bg-surface/82 backdrop-blur-xl md:hidden">
+      <div className="flex h-16 items-center justify-between px-4">
+        <Link to="/" className="text-xl font-black tracking-tight text-content-primary">
           spek<span className="text-accent">.</span>tra
         </Link>
 
         <div className="flex items-center gap-2">
-          <Link to="/search" aria-label="Search" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-md text-content-secondary hover:bg-bg-tertiary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 motion-reduce:transition-none motion-reduce:active:scale-100">
+          <Link to="/search" aria-label="Search" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-xl text-content-secondary hover:bg-bg-tertiary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20 motion-reduce:transition-none motion-reduce:active:scale-100">
             <Search size={19} aria-hidden="true" />
           </Link>
           {isAuthenticated ? (
-            <Link to={`/profile/${user?.username}`} aria-label="Open profile" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-md active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
+            <Link to={`/profile/${user?.username}`} aria-label="Open profile" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-xl active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
               <Avatar src={user?.avatarUrl} alt={user?.username ?? 'User'} size="sm" />
             </Link>
           ) : (
-            <Link to="/login" className="text-sm font-medium text-accent">Sign in</Link>
+            <Link to="/login" className="rounded-xl bg-accent px-3 py-2 text-sm font-bold text-white">Sign in</Link>
           )}
         </div>
       </div>

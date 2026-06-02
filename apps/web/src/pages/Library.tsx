@@ -45,12 +45,12 @@ export function LibraryPage() {
   return (
     <div className="space-y-6">
       <SEO title="Library" noIndex />
-      <div>
-        <h1 className="text-2xl font-semibold text-content-primary">Library</h1>
-        <p className="mt-1 text-sm text-content-secondary">Your saved content, ratings, and reviews.</p>
+      <div className="rounded-3xl border border-border-subtle bg-surface/90 p-5 shadow-card">
+        <h1 className="text-3xl font-black text-content-primary">Library</h1>
+        <p className="mt-1 text-sm font-medium text-content-secondary">Your saved content, ratings, and reviews.</p>
       </div>
 
-      <section className="space-y-3">
+      <section className="space-y-3 rounded-3xl border border-border-subtle bg-surface/90 p-4 shadow-card">
         <div className="flex flex-wrap gap-2">
           {statuses.map((tab) => (
             <Button key={tab.label} variant={status === tab.value ? 'primary' : 'secondary'} onClick={() => resetPage(() => setStatus(tab.value))}>
@@ -76,12 +76,12 @@ export function LibraryPage() {
 
       <ContentGrid items={items} entries={entries} isLoading={library.isLoading} />
       {library.isError && (
-        <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary" role="status">
+        <div className="rounded-3xl border border-dashed border-border bg-surface py-14 text-center text-sm font-medium text-content-tertiary shadow-card" role="status">
           {getApiErrorMessage(library.error, 'Unable to load your library right now.')}
         </div>
       )}
       {!library.isLoading && !library.isError && items.length === 0 && (
-        <div className="rounded-lg border border-dashed border-border bg-surface py-16 text-center text-sm text-content-tertiary">
+        <div className="rounded-3xl border border-dashed border-border bg-surface py-14 text-center text-sm font-medium text-content-tertiary shadow-card">
           Your library is empty for this view.
         </div>
       )}

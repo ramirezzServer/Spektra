@@ -13,21 +13,21 @@ export function BottomNav() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface border-t border-border"
-      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)' }}
+      className="fixed bottom-0 left-0 right-0 z-30 px-3 md:hidden"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 10px)' }}
     >
-      <div className="flex">
+      <div className="mx-auto flex max-w-md rounded-2xl border border-border-subtle bg-surface/90 p-1.5 shadow-panel backdrop-blur-xl">
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
             {({ isActive }) => (
               <div
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex min-h-12 flex-col items-center justify-center gap-0.5 pb-1 pt-2 ${
-                  isActive ? 'text-accent' : 'text-content-tertiary'
+                className={`flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 ${
+                  isActive ? 'bg-accent text-white shadow-sm' : 'text-content-tertiary'
                 }`}
               >
                 <item.icon size={20} aria-hidden="true" />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-[10px] font-bold leading-none">{item.label}</span>
               </div>
             )}
           </NavLink>

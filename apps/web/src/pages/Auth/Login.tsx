@@ -23,22 +23,28 @@ export function Login() {
   }
 
   return (
-    <main className="min-h-screen bg-bg-secondary flex items-center justify-center px-4">
+    <main className="app-gradient flex min-h-screen items-center justify-center px-4 py-8">
       <SEO title="Sign in" noIndex />
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold text-content-primary tracking-tight">
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-3xl border border-border-subtle bg-surface shadow-panel md:grid-cols-[0.9fr_1fr]">
+        <div className="hidden bg-slate-950 p-8 text-white md:flex md:flex-col md:justify-end">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-100/80">Spektra</p>
+          <h2 className="mt-2 text-3xl font-black tracking-tight">Track the media that stays with you.</h2>
+          <p className="mt-3 text-sm font-medium text-slate-200">Films, series, games, and books in one polished library.</p>
+        </div>
+        <div className="p-6 sm:p-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-black tracking-tight text-content-primary">
             spek<span className="text-accent">.</span>tra
           </h1>
-          <p className="text-content-secondary text-sm mt-2">Track everything you watch, play, and read</p>
+          <p className="mt-2 text-sm font-medium text-content-secondary">Track everything you watch, play, and read</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl shadow-card p-8">
-          <h2 className="text-lg font-semibold text-content-primary mb-6">Sign in to your account</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <h2 className="text-lg font-bold text-content-primary">Sign in to your account</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-danger-light border border-red-200 rounded-md" role="alert" aria-live="polite">
-              <p className="text-sm text-danger-text">{error}</p>
+            <div className="rounded-xl border border-danger/20 bg-danger-light p-3" role="alert" aria-live="polite">
+              <p className="text-sm font-semibold text-danger-text">{error}</p>
             </div>
           )}
 
@@ -60,7 +66,7 @@ export function Login() {
                   login.reset();
                   setEmail(event.target.value);
                 }}
-                className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors"
+                className="w-full rounded-xl border border-border bg-bg-subtle px-3.5 py-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary transition-colors focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
                 placeholder="you@example.com"
               />
             </div>
@@ -79,7 +85,7 @@ export function Login() {
                   login.reset();
                   setPassword(event.target.value);
                 }}
-                className="w-full px-3 py-2 text-sm bg-surface border border-border rounded-md text-content-primary placeholder:text-content-tertiary focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-colors"
+                className="w-full rounded-xl border border-border bg-bg-subtle px-3.5 py-3 text-sm font-medium text-content-primary placeholder:text-content-tertiary transition-colors focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15"
                 placeholder="********"
               />
             </div>
@@ -88,12 +94,12 @@ export function Login() {
           <button
             type="submit"
             disabled={login.isPending}
-            className="mt-6 w-full bg-accent hover:bg-accent-hover text-accent-text text-sm font-medium py-2.5 px-4 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-bold text-accent-text transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {login.isPending ? 'Signing in...' : 'Sign in'}
           </button>
 
-          <p className="text-center text-sm text-content-secondary mt-4">
+          <p className="text-center text-sm text-content-secondary">
             Don't have an account?{' '}
             <Link to="/register" className="text-accent hover:text-accent-hover font-medium">Create one</Link>
           </p>
@@ -103,6 +109,7 @@ export function Login() {
             <Link to="/terms" className="hover:text-accent">Terms</Link>
           </p>
         </form>
+        </div>
       </div>
     </main>
   );

@@ -16,9 +16,14 @@
   body {
     margin: 0;
     overflow-x: hidden;
-    background: #F8F9FB;
-    color: #0F1117;
-    font-family: 'Instrument Sans', sans-serif;
+    background:
+      radial-gradient(circle at 18% -10%, rgba(91, 77, 255, 0.16), transparent 30rem),
+      radial-gradient(circle at 88% 2%, rgba(20, 184, 166, 0.12), transparent 28rem),
+      linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 48%, #F4F7FB 100%);
+    color: #111827;
+    font-family: Inter, 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   img {
@@ -34,7 +39,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid #4F46E5;
+    outline: 2px solid #5B4DFF;
     outline-offset: 2px;
   }
 
@@ -47,9 +52,9 @@
   select:-webkit-autofill,
   select:-webkit-autofill:hover,
   select:-webkit-autofill:focus {
-    -webkit-text-fill-color: #0F1117;
-    caret-color: #0F1117;
-    box-shadow: 0 0 0 1000px #FCFCFD inset;
+    -webkit-text-fill-color: #111827;
+    caret-color: #111827;
+    box-shadow: 0 0 0 1000px #FFFFFF inset;
     transition: background-color 9999s ease-in-out 0s;
   }
 }
@@ -62,6 +67,57 @@
   .tap-target {
     min-height: 44px;
     min-width: 44px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .app-gradient {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(91, 77, 255, 0.16), transparent 24rem),
+      radial-gradient(circle at 90% 12%, rgba(16, 185, 129, 0.12), transparent 22rem),
+      linear-gradient(180deg, #F8FAFC 0%, #F4F7FB 100%);
+  }
+
+  .glass-surface {
+    border: 1px solid rgba(216, 222, 232, 0.78);
+    background: rgba(255, 255, 255, 0.76);
+    backdrop-filter: blur(18px);
+  }
+
+  .card-hover {
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    border-color: rgba(91, 77, 255, 0.42);
+    box-shadow: 0 18px 42px rgba(16, 24, 40, 0.13);
+  }
+
+  .focus-ring {
+    outline: none;
+  }
+
+  .focus-ring:focus-visible {
+    box-shadow: 0 0 0 3px rgba(91, 77, 255, 0.22);
+  }
+
+  .dense-section {
+    display: grid;
+    gap: 0.875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

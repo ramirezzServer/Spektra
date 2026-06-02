@@ -124,7 +124,7 @@ export function Dialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-4 py-6 backdrop-blur-sm"
       role="presentation"
       onMouseDown={() => {
         if (closeOnBackdrop) onClose();
@@ -137,21 +137,21 @@ export function Dialog({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className="max-h-[min(90vh,calc(100dvh-2rem))] w-full max-w-lg overflow-y-auto rounded-lg border border-border bg-surface p-5 shadow-xl outline-none"
+        className="max-h-[min(90vh,calc(100dvh-2rem))] w-full max-w-lg overflow-y-auto rounded-2xl border border-border-subtle bg-surface p-5 shadow-modal outline-none"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 id={titleId} className="text-lg font-semibold text-content-primary">
+            <h2 id={titleId} className="text-xl font-bold text-content-primary">
               {title}
             </h2>
             {description && (
-              <p id={descriptionId} className="mt-1 text-sm text-content-tertiary">
+              <p id={descriptionId} className="mt-1 text-sm font-medium text-content-secondary">
                 {description}
               </p>
             )}
           </div>
-          <Button type="button" variant="ghost" className="min-h-12 min-w-12 px-2" aria-label="Close dialog" onClick={onClose}>
+          <Button type="button" variant="icon" size="icon" aria-label="Close dialog" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         </div>

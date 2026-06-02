@@ -13,10 +13,10 @@ export function Feed() {
   const emptyMessage = scope === 'following' ? 'Follow people to see their activity here.' : 'No public activity yet.';
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-5">
       <SEO title="Activity Feed" description="Recent Spektra activity from followed users and the global community." canonicalPath="/feed" />
-      <div className="space-y-3">
-        <h1 className="text-2xl font-semibold text-content-primary">Activity Feed</h1>
+      <div className="space-y-3 rounded-3xl border border-border-subtle bg-surface/90 p-5 shadow-card">
+        <h1 className="text-3xl font-black text-content-primary">Activity Feed</h1>
         <FeedTabs active={scope} isAuthenticated={isAuthenticated} onChange={setScope} />
         {!isAuthenticated && (
           <p className="text-sm text-content-tertiary">Sign in to see activity from people you follow.</p>
