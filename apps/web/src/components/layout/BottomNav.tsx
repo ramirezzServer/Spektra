@@ -1,8 +1,12 @@
-import { Home, Library, Search, User } from 'lucide-react';
+import { Command, Home, Library, Search, User } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 
-export function BottomNav() {
+interface BottomNavProps {
+  onOpenCommandPalette: () => void;
+}
+
+export function BottomNav({ onOpenCommandPalette }: BottomNavProps) {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const navItems = [
@@ -18,6 +22,12 @@ export function BottomNav() {
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 10px)' }}
     >
       <div className="mx-auto flex max-w-md rounded-2xl border border-border-subtle bg-surface/90 p-1.5 shadow-panel backdrop-blur-xl">
+        <button type="button" onClick={onOpenCommandPalette} className="flex-1 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20 motion-reduce:transition-none motion-reduce:active:scale-100">
+          <div className="flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-content-tertiary">
+            <Command size={20} aria-hidden="true" />
+            <span className="text-[10px] font-bold leading-none">Jump</span>
+          </div>
+        </button>
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
             {({ isActive }) => (

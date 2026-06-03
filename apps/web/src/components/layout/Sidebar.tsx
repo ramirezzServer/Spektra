@@ -1,13 +1,13 @@
-import { Activity, BookMarked, CircleDot, Compass, Home, Library, LogOut, Plus, Search, ShieldAlert, ShieldCheck, Sparkles, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Activity, BookMarked, CircleDot, Command, Compass, Home, Library, LogOut, Plus, Search, ShieldAlert, ShieldCheck, Sparkles, User } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
+import { PosterImage } from '@/components/content/PosterImage';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStats } from '@/hooks/useLibrary';
 import { formatNumber } from '@/lib/formatters';
-import { getRecentContent, type RecentContentItem } from '@/lib/recentContent';
 import { slugify } from '@/lib/slugs';
+import type { RecentlyViewedItem } from '@/hooks/useRecentlyViewed';
 
 const baseNavItems = [
   { to: '/', label: 'Home', icon: Home },
@@ -17,37 +17,23 @@ const baseNavItems = [
   { to: '/lists', label: 'Lists', icon: BookMarked },
 ];
 
-const quickActions = [
-  { to: '/search', label: 'Search content', icon: Search },
-  { to: '/lists', label: 'Create list', icon: Plus },
-  { to: '/library', label: 'Open library', icon: Library },
-  { to: '/feed', label: 'Explore feed', icon: Compass },
-];
-
-function recentContentPath(item: RecentContentItem) {
+function recentContentPath(item: RecentlyViewedItem) {
   return `/content/${encodeURIComponent(item.type)}/${encodeURIComponent(item.externalId)}/${slugify(item.title) || 'content'}`;
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  recentItems: RecentlyViewedItem[];
+  shortcutLabel: string;
+  onOpenCommandPalette: () => void;
+  onCreateList: () => void;
+}
+
+export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCreateList }: SidebarProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const stats = useUserStats(isAuthenticated ? user?.username : undefined);
-  const [recent, setRecent] = useState<RecentContentItem[]>(() => getRecentContent());
   const navItems = isAuthenticated && user?.username
     ? [...baseNavItems, { to: `/profile/${user.username}`, label: 'Profile', icon: User }]
     : baseNavItems;
-
-  useEffect(() => {
-    function refreshRecent() {
-      setRecent(getRecentContent());
-    }
-
-    window.addEventListener('storage', refreshRecent);
-    window.addEventListener('spektra:recent-content-updated', refreshRecent);
-    return () => {
-      window.removeEventListener('storage', refreshRecent);
-      window.removeEventListener('spektra:recent-content-updated', refreshRecent);
-    };
-  }, []);
 
   return (
     <div className="flex min-h-full flex-col">
@@ -64,6 +50,23 @@ export function Sidebar() {
       </div>
 
       <div className="flex-1 space-y-4 px-3 pb-4">
+        <section aria-label="Command palette">
+          <button
+            type="button"
+            onClick={onOpenCommandPalette}
+            className="flex min-h-12 w-full items-center gap-3 rounded-2xl border border-border-subtle bg-white/80 px-3 text-left text-sm font-black text-content-primary shadow-card transition hover:border-border-strong hover:bg-white focus-ring"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent text-white shadow-sm">
+              <Command className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate">Command menu</span>
+              <span className="block text-[11px] font-bold text-content-tertiary">Press {shortcutLabel} to jump</span>
+            </span>
+            <kbd className="rounded-lg border border-border bg-bg-subtle px-2 py-1 text-[10px] font-black text-content-tertiary">{shortcutLabel}</kbd>
+          </button>
+        </section>
+
         <section aria-label="Primary navigation">
           <div className="mb-2 px-2 text-[10px] font-black uppercase tracking-[0.18em] text-content-tertiary">Navigate</div>
           <nav className="space-y-1">
@@ -93,16 +96,33 @@ export function Sidebar() {
             Quick Actions
           </div>
           <div className="grid gap-1.5">
-            {quickActions.map((action) => (
-              <Link
-                key={action.label}
-                to={action.to}
-                className="flex min-h-10 items-center gap-2 rounded-2xl px-2.5 text-xs font-bold text-content-secondary transition hover:bg-surface hover:text-content-primary focus-ring"
-              >
-                <action.icon className="h-4 w-4 text-accent" aria-hidden="true" />
-                {action.label}
+            <button type="button" onClick={onOpenCommandPalette} className="flex min-h-10 items-center gap-2 rounded-2xl px-2.5 text-xs font-bold text-content-secondary transition hover:bg-surface hover:text-content-primary focus-ring">
+              <Command className="h-4 w-4 text-accent" aria-hidden="true" />
+              Open command menu
+            </button>
+            <Link to="/search" className="flex min-h-10 items-center gap-2 rounded-2xl px-2.5 text-xs font-bold text-content-secondary transition hover:bg-surface hover:text-content-primary focus-ring">
+              <Search className="h-4 w-4 text-accent" aria-hidden="true" />
+              Quick search
+            </Link>
+            {isAuthenticated ? (
+              <button type="button" onClick={onCreateList} className="flex min-h-10 items-center gap-2 rounded-2xl px-2.5 text-xs font-bold text-content-secondary transition hover:bg-surface hover:text-content-primary focus-ring">
+                <Plus className="h-4 w-4 text-accent" aria-hidden="true" />
+                Quick create list
+              </button>
+            ) : (
+              <Link to="/login" className="flex min-h-10 items-center gap-2 rounded-2xl px-2.5 text-xs font-bold text-content-secondary transition hover:bg-surface hover:text-content-primary focus-ring">
+                <Plus className="h-4 w-4 text-accent" aria-hidden="true" />
+                Sign in to create lists
               </Link>
-            ))}
+            )}
+            <Link to={isAuthenticated ? '/library' : '/login'} className="flex min-h-10 items-center gap-2 rounded-2xl px-2.5 text-xs font-bold text-content-secondary transition hover:bg-surface hover:text-content-primary focus-ring">
+              <Library className="h-4 w-4 text-accent" aria-hidden="true" />
+              {isAuthenticated ? 'Open library' : 'Sign in for library'}
+            </Link>
+            <Link to="/feed" className="flex min-h-10 items-center gap-2 rounded-2xl px-2.5 text-xs font-bold text-content-secondary transition hover:bg-surface hover:text-content-primary focus-ring">
+              <Compass className="h-4 w-4 text-accent" aria-hidden="true" />
+              Open global feed
+            </Link>
           </div>
         </section>
 
@@ -138,12 +158,12 @@ export function Sidebar() {
             <CircleDot className="h-3.5 w-3.5 text-accent-secondary" />
             Recent
           </div>
-          {recent.length > 0 ? (
+          {recentItems.length > 0 ? (
             <div className="space-y-1.5">
-              {recent.slice(0, 4).map((item) => (
-                <Link key={item.id} to={recentContentPath(item)} className="group flex min-h-10 min-w-0 items-center gap-2 rounded-2xl px-2 py-1.5 hover:bg-surface focus-ring">
+              {recentItems.slice(0, 5).map((item) => (
+                <Link key={`${item.type}:${item.externalId}`} to={recentContentPath(item)} className="group flex min-h-10 min-w-0 items-center gap-2 rounded-2xl px-2 py-1.5 hover:bg-surface focus-ring">
                   <span className="h-8 w-6 shrink-0 overflow-hidden rounded-md bg-bg-tertiary">
-                    {item.posterUrl ? <img src={item.posterUrl} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" /> : null}
+                    <PosterImage src={item.posterUrl} title={item.title} type={item.type} className="h-full w-full object-cover" />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-xs font-bold text-content-primary group-hover:text-accent">{item.title}</span>
