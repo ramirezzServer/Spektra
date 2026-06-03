@@ -1,6 +1,8 @@
-import { CheckCircle2, ListPlus, Plus, RefreshCw } from 'lucide-react';
-import { useState } from 'react';
+import { CheckCircle2, Eye, ListPlus, Lock, Plus, RefreshCw, Search, WifiOff } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { PosterImage } from '@/components/content/PosterImage';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { listErrorMessage, useAddListItem, useCreateList, useMyLists } from '@/hooks/useLists';
@@ -20,7 +22,14 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
   const createList = useCreateList();
   const { isOnline } = useOnlineStatus();
   const [newName, setNewName] = useState('');
+  const [listQuery, setListQuery] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const filteredLists = useMemo(() => {
+    const query = listQuery.trim().toLowerCase();
+    const all = lists.data?.data ?? [];
+    if (!query) return all;
+    return all.filter((list) => `${list.name} ${list.description ?? ''}`.toLowerCase().includes(query));
+  }, [listQuery, lists.data?.data]);
 
   async function addToList(listId: string) {
     if (!content) return;
@@ -71,10 +80,21 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
             Loading your lists...
           </div>
         )}
+        {!isOnline ? (
+          <div className="flex items-center gap-2 rounded-2xl bg-warning-light p-3 text-sm font-bold text-warning-text">
+            <WifiOff className="h-4 w-4" aria-hidden="true" />
+            You are offline. Add/create actions are disabled.
+          </div>
+        ) : null}
         {lists.isError && <p className="rounded-2xl bg-danger-light p-3 text-sm font-bold text-danger-text">Unable to load lists.</p>}
         {lists.data?.data.length ? (
+          <>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-content-tertiary" aria-hidden="true" />
+            <Input value={listQuery} name="list-filter" autoComplete="off" onChange={(event) => setListQuery(event.target.value)} placeholder="Filter lists..." className="pl-9" />
+          </div>
           <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-            {lists.data.data.map((list) => (
+            {filteredLists.map((list) => (
               <button
                 key={list.id}
                 type="button"
@@ -83,18 +103,30 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
                 className="flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl border border-border bg-bg-subtle px-3 py-3 text-left text-sm shadow-xs transition hover:border-accent/50 hover:bg-surface active:scale-[0.99] disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
               >
                 <span className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-light text-accent">
-                    <ListPlus className="h-4 w-4" aria-hidden="true" />
+                  <span className="grid h-12 w-12 shrink-0 grid-cols-2 gap-0.5 overflow-hidden rounded-xl bg-accent-light text-accent">
+                    {list.previewItems?.length ? list.previewItems.slice(0, 4).map((item) => (
+                      <span key={item.id} className="overflow-hidden bg-bg-tertiary">
+                        <PosterImage src={item.posterUrl} title={item.title} type={item.type} className="h-full w-full object-cover" />
+                      </span>
+                    )) : <span className="col-span-2 flex items-center justify-center"><ListPlus className="h-4 w-4" aria-hidden="true" /></span>}
                   </span>
                   <span className="min-w-0">
-                  <span className="block truncate font-semibold text-content-primary">{list.name}</span>
-                  <span className="text-xs text-content-tertiary">{formatNumber(list.itemsCount ?? 0)} items</span>
+                  <span className="block truncate font-black text-content-primary">{list.name}</span>
+                  <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-content-tertiary">
+                    <span>{formatNumber(list.itemsCount ?? 0)} items</span>
+                    <Badge className={list.isPublic ? 'bg-accent-light text-accent' : 'bg-bg-tertiary text-content-tertiary'}>
+                      {list.isPublic ? <Eye className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                      {list.isPublic ? 'Public' : 'Private'}
+                    </Badge>
+                  </span>
                   </span>
                 </span>
                 <Plus className="h-4 w-4 shrink-0 text-accent" />
               </button>
             ))}
+            {!filteredLists.length ? <p className="rounded-2xl border border-dashed border-border bg-bg-subtle p-4 text-sm font-semibold text-content-tertiary">No lists match that filter.</p> : null}
           </div>
+          </>
         ) : (
           !lists.isLoading && <p className="rounded-2xl border border-dashed border-border bg-bg-subtle p-4 text-sm font-semibold text-content-tertiary">You do not have any lists yet. Create a private list below and this item will be added automatically.</p>
         )}

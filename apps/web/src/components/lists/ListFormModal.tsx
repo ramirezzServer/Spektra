@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { Eye, Lock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Dialog } from '@/components/ui/Dialog';
@@ -89,8 +90,15 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
   return (
     <Dialog open={open} title={list ? 'Edit list' : 'Create list'} description="Organize content into your own curated collection." onClose={requestClose}>
       <form className="space-y-4" onSubmit={submit}>
+        <div className="rounded-3xl border border-border-subtle bg-slate-950 p-4 text-white shadow-card">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-cyan-200" aria-hidden="true" />
+            <p className="text-sm font-black">Collection settings</p>
+          </div>
+          <p className="mt-2 text-xs font-semibold leading-5 text-slate-300">Lists can stay private or become public showcases. No fake data, only content you add.</p>
+        </div>
         <div className="space-y-1.5">
-          <label htmlFor="list-name" className="text-sm font-medium text-content-primary">
+          <label htmlFor="list-name" className="text-sm font-black text-content-primary">
             Name
           </label>
           <Input
@@ -115,7 +123,7 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           )}
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="list-description" className="text-sm font-medium text-content-primary">
+          <label htmlFor="list-description" className="text-sm font-black text-content-primary">
             Description
           </label>
           <Textarea
@@ -131,9 +139,15 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
           />
           <p className="text-xs text-content-tertiary">{description.length}/1000</p>
         </div>
-        <label className="flex items-center gap-2 text-sm text-content-secondary">
+        <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-bg-subtle px-3 text-sm font-bold text-content-secondary">
           <input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} className="h-4 w-4 rounded border-border text-accent focus:ring-accent" />
-          Public list
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface text-accent">
+            {isPublic ? <Eye className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+          </span>
+          <span>
+            <span className="block text-content-primary">{isPublic ? 'Public list' : 'Private list'}</span>
+            <span className="block text-xs text-content-tertiary">{isPublic ? 'Visible to others when routed publicly.' : 'Only you can manage this collection.'}</span>
+          </span>
         </label>
         {error && (
           <p className="rounded-md border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger" role="alert">
