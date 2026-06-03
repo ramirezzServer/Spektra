@@ -11,12 +11,13 @@ function initials(value: string) {
     .toUpperCase() || 'SP';
 }
 
-export function Avatar({ src, alt, size = 'md' }: { src?: string | null; alt: string; size?: 'sm' | 'md' | 'lg' }) {
+export function Avatar({ src, alt, size = 'md' }: { src?: string | null; alt: string; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
   const [failed, setFailed] = useState(false);
   const classes = {
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
     lg: 'h-20 w-20',
+    xl: 'h-28 w-28',
   };
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export function Avatar({ src, alt, size = 'md' }: { src?: string | null; alt: st
   }, [src]);
 
   return (
-    <div className={`${classes[size]} flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-app-border bg-accent-light text-sm font-semibold text-accent`}>
+    <div className={`${classes[size]} flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-accent-light text-sm font-black text-accent shadow-card`}>
       {src && !failed ? (
         <img className="h-full w-full object-cover" src={src} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />
       ) : (
