@@ -8,14 +8,18 @@ interface ContentGridProps {
   entries?: UserEntry[];
   isLoading?: boolean;
   skeletonCount?: number;
+  density?: 'normal' | 'dense';
 }
 
-export function ContentGrid({ items, entries = [], isLoading = false, skeletonCount = 10 }: ContentGridProps) {
+export function ContentGrid({ items, entries = [], isLoading = false, skeletonCount = 10, density = 'normal' }: ContentGridProps) {
   const entriesByContentId = useMemo(() => new Map(entries.map((entry) => [entry.contentId, entry])), [entries]);
+  const gridClass = density === 'dense'
+    ? 'grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-8'
+    : 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+      <div className={gridClass}>
         {Array.from({ length: skeletonCount }).map((_, index) => (
           <ContentCardSkeleton key={index} />
         ))}
@@ -28,7 +32,7 @@ export function ContentGrid({ items, entries = [], isLoading = false, skeletonCo
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
+    <div className={gridClass}>
       {items.map((item) => (
         <ContentCard
           key={`${item.type}-${item.externalId}`}

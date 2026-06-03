@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { CheckCircle2, ListPlus, Plus, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -59,8 +59,19 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
   return (
     <Dialog open={open} title="Add to list" description={content ? `Choose a list for ${content.title}.` : undefined} onClose={onClose}>
       <div className="space-y-4">
-        {lists.isLoading && <p className="text-sm text-content-tertiary">Loading your lists...</p>}
-        {lists.isError && <p className="text-sm text-danger">Unable to load lists.</p>}
+        {content ? (
+          <div className="rounded-3xl border border-border-subtle bg-bg-subtle p-3">
+            <p className="line-clamp-2 text-sm font-black text-content-primary">{content.title}</p>
+            <p className="mt-1 text-xs font-bold capitalize text-content-tertiary">{content.type}{content.releaseYear ? ` / ${content.releaseYear}` : ''}</p>
+          </div>
+        ) : null}
+        {lists.isLoading && (
+          <div className="flex items-center gap-2 rounded-2xl border border-border-subtle bg-bg-subtle p-3 text-sm font-bold text-content-tertiary">
+            <RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Loading your lists...
+          </div>
+        )}
+        {lists.isError && <p className="rounded-2xl bg-danger-light p-3 text-sm font-bold text-danger-text">Unable to load lists.</p>}
         {lists.data?.data.length ? (
           <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
             {lists.data.data.map((list) => (
@@ -69,24 +80,29 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
                 type="button"
                 disabled={addItem.isPending || !isOnline}
                 onClick={() => addToList(list.id)}
-                className="flex min-h-12 w-full items-center justify-between gap-3 rounded-md border border-border bg-bg-secondary px-3 py-3 text-left text-sm transition hover:border-accent active:scale-[0.99] disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
+                className="flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl border border-border bg-bg-subtle px-3 py-3 text-left text-sm shadow-xs transition hover:border-accent/50 hover:bg-surface active:scale-[0.99] disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
               >
-                <span className="min-w-0">
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-light text-accent">
+                    <ListPlus className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
                   <span className="block truncate font-semibold text-content-primary">{list.name}</span>
                   <span className="text-xs text-content-tertiary">{formatNumber(list.itemsCount ?? 0)} items</span>
+                  </span>
                 </span>
                 <Plus className="h-4 w-4 shrink-0 text-accent" />
               </button>
             ))}
           </div>
         ) : (
-          !lists.isLoading && <p className="text-sm text-content-tertiary">You do not have any lists yet.</p>
+          !lists.isLoading && <p className="rounded-2xl border border-dashed border-border bg-bg-subtle p-4 text-sm font-semibold text-content-tertiary">You do not have any lists yet. Create a private list below and this item will be added automatically.</p>
         )}
         <div className="space-y-2 border-t border-border pt-4">
-          <label htmlFor="quick-list-name" className="text-sm font-medium text-content-primary">
+          <label htmlFor="quick-list-name" className="text-sm font-black text-content-primary">
             New private list
           </label>
-          <div className="flex gap-2">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <Input id="quick-list-name" name="list-name" value={newName} maxLength={100} autoComplete="off" enterKeyHint="done" onChange={(event) => setNewName(event.target.value)} placeholder="List name" />
             <Button type="button" disabled={!newName.trim() || createList.isPending || addItem.isPending || !isOnline} onClick={createAndAdd}>
               Create
@@ -94,7 +110,8 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
           </div>
         </div>
         {message && (
-          <p className="text-sm text-content-secondary" role="status" aria-live="polite">
+          <p className="inline-flex items-center gap-2 rounded-2xl bg-success-light p-3 text-sm font-bold text-success-text" role="status" aria-live="polite">
+            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
             {message}
           </p>
         )}

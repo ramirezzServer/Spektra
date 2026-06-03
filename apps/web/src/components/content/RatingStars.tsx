@@ -13,7 +13,7 @@ export function RatingStars({ value, onChange, readonly = false, disabled = fals
   const inert = readonly || disabled;
 
   return (
-    <div className="flex flex-wrap items-center gap-1" aria-label={`Rating ${score} out of 10`}>
+    <div className="flex flex-wrap items-center gap-1.5" aria-label={`Rating ${score} out of 10`}>
       {Array.from({ length: 5 }).map((_, index) => {
         const starValue = (index + 1) * 2;
         const filled = score >= starValue;
@@ -28,16 +28,16 @@ export function RatingStars({ value, onChange, readonly = false, disabled = fals
             aria-label={`Rate ${starValue} out of 10`}
             aria-pressed={score === starValue}
             className={cn(
-              'relative grid min-h-12 min-w-12 place-items-center rounded-md text-warning transition hover:bg-warning-light active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100',
+              'relative grid min-h-12 min-w-12 place-items-center rounded-2xl border border-transparent text-warning transition hover:border-warning/25 hover:bg-warning-light active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100',
               inert && 'cursor-default opacity-80 hover:bg-transparent active:scale-100',
             )}
           >
-            <Star className={cn('h-5 w-5', filled ? 'fill-warning text-warning' : 'fill-transparent')} />
-            {half && <Star className="absolute h-5 w-5 fill-warning text-warning [clip-path:inset(0_50%_0_0)]" />}
+            <Star className={cn('h-6 w-6', filled ? 'fill-warning text-warning' : 'fill-transparent')} />
+            {half && <Star className="absolute h-6 w-6 fill-warning text-warning [clip-path:inset(0_50%_0_0)]" />}
           </button>
         );
       })}
-      <span className="ml-1 text-sm font-semibold text-app-muted">{score ? `${score}/10` : 'Not rated'}</span>
+      <span className="ml-1 text-sm font-black text-content-secondary">{score ? `${score}/10` : 'Not rated'}</span>
     </div>
   );
 }
