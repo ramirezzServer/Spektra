@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { buildCanonicalUrl } from '@/lib/canonical';
+import { safeUrl } from '@/lib/safeUrl';
 
 type SEOProps = {
   title: string;
@@ -30,20 +31,21 @@ export function SEO({ title, description = 'Track films, series, games, and book
   useEffect(() => {
     const fullTitle = title.includes('Spektra') ? title : `${title} | Spektra`;
     const canonical = canonicalPath ? buildCanonicalUrl(canonicalPath) : undefined;
+    const safeImage = safeUrl(image);
 
     document.title = fullTitle;
     setMeta('description', description);
     setMeta('og:title', fullTitle, true);
     setMeta('og:description', description, true);
     setMeta('og:type', type, true);
-    setMeta('twitter:card', image ? 'summary_large_image' : 'summary');
+    setMeta('twitter:card', safeImage ? 'summary_large_image' : 'summary');
     setMeta('twitter:title', fullTitle);
     setMeta('twitter:description', description);
     setMeta('robots', noIndex ? 'noindex,nofollow' : 'index,follow');
 
-    if (image) {
-      setMeta('og:image', image, true);
-      setMeta('twitter:image', image);
+    if (safeImage) {
+      setMeta('og:image', safeImage, true);
+      setMeta('twitter:image', safeImage);
     } else {
       removeMeta('og:image', true);
       removeMeta('twitter:image');

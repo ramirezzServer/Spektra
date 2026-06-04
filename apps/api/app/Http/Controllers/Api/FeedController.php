@@ -20,8 +20,8 @@ class FeedController extends Controller
     {
         $request->validate([
             'scope' => ['nullable', Rule::in(['following', 'global'])],
-            'cursor' => ['nullable', 'string'],
-            'per_page' => ['nullable', 'integer', 'min:1'],
+            'cursor' => ['nullable', 'string', 'max:500'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
         $scope = $request->query('scope', 'global');

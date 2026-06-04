@@ -19,6 +19,11 @@ class ListController extends Controller
 
     public function index(Request $request)
     {
+        $request->validate([
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
+        ]);
+
         $paginator = $request->user()->lists()
             ->withCount('items')
             ->orderByDesc('updated_at')
@@ -39,6 +44,11 @@ class ListController extends Controller
 
     public function show(Request $request, string $id)
     {
+        $request->validate([
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
+        ]);
+
         if (! Str::isUuid($id)) {
             abort(404);
         }

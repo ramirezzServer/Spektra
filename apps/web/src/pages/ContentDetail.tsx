@@ -16,6 +16,7 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { formatNumber } from '@/lib/formatters';
 import { rememberRecentContent } from '@/lib/recentContent';
+import { safeUrl } from '@/lib/safeUrl';
 import { buildContentPath } from '@/lib/slugs';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
@@ -205,7 +206,7 @@ export function ContentDetail() {
     );
   }
 
-  const currentBackdrop = backdropUrl(item);
+  const currentBackdrop = safeUrl(backdropUrl(item));
   const status = entry.data?.status;
 
   return (
@@ -213,7 +214,7 @@ export function ContentDetail() {
       <SEO
         title={item.title}
         description={detailData.overview ?? `${item.title} on Spektra.`}
-        image={item.posterUrl ?? undefined}
+        image={safeUrl(item.posterUrl) ?? undefined}
         type="article"
         canonicalPath={buildContentPath(item)}
       />

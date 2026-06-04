@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { safeUrl } from '@/lib/safeUrl';
 
 function initials(value: string) {
   return value
@@ -13,6 +14,7 @@ function initials(value: string) {
 
 export function Avatar({ src, alt, size = 'md' }: { src?: string | null; alt: string; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
   const [failed, setFailed] = useState(false);
+  const safeSrc = safeUrl(src);
   const classes = {
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
@@ -22,12 +24,12 @@ export function Avatar({ src, alt, size = 'md' }: { src?: string | null; alt: st
 
   useEffect(() => {
     setFailed(false);
-  }, [src]);
+  }, [safeSrc]);
 
   return (
     <div className={`${classes[size]} flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-accent-light text-sm font-black text-accent shadow-card`}>
-      {src && !failed ? (
-        <img className="h-full w-full object-cover" src={src} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />
+      {safeSrc && !failed ? (
+        <img className="h-full w-full object-cover" src={safeSrc} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />
       ) : (
         <span aria-label={alt}>{initials(alt)}</span>
       )}

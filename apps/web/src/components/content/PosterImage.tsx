@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BookOpen, Gamepad2, Tv, Video } from 'lucide-react';
 import type { ContentType } from '@/types';
+import { safeUrl } from '@/lib/safeUrl';
 
 const iconByType: Record<ContentType, typeof Video> = {
   film: Video,
@@ -25,13 +26,14 @@ interface PosterImageProps {
 
 export function PosterImage({ src, title, type, className = '' }: PosterImageProps) {
   const [failed, setFailed] = useState(false);
+  const safeSrc = safeUrl(src);
   const FallbackIcon = iconByType[type];
 
   useEffect(() => {
     setFailed(false);
-  }, [src]);
+  }, [safeSrc]);
 
-  if (!src || failed) {
+  if (!safeSrc || failed) {
     return (
       <div className={`relative flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-br px-4 text-center ${fallbackByType[type]} ${className}`}>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_8%,rgba(255,255,255,0.22),transparent_9rem),linear-gradient(to_top,rgba(2,6,23,0.92),transparent_55%)]" aria-hidden="true" />
@@ -47,7 +49,7 @@ export function PosterImage({ src, title, type, className = '' }: PosterImagePro
   return (
     <img
       className={className}
-      src={src}
+      src={safeSrc}
       alt={`${title} poster`}
       loading="lazy"
       decoding="async"

@@ -58,7 +58,7 @@ class UserEntryController extends Controller
             'type' => ['nullable', Rule::in(self::TYPES)],
             'sort' => ['nullable', Rule::in(self::SORTS)],
             'page' => ['nullable', 'integer', 'min:1'],
-            'per_page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
         return $this->paginated(

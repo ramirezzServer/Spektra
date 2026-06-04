@@ -86,7 +86,7 @@ class FollowController extends Controller
     {
         $request->validate([
             'page' => ['nullable', 'integer', 'min:1'],
-            'per_page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
         $user = User::where('username', $username)->firstOrFail();
@@ -102,7 +102,7 @@ class FollowController extends Controller
     {
         $request->validate([
             'page' => ['nullable', 'integer', 'min:1'],
-            'per_page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ]);
 
         $user = User::where('username', $username)->firstOrFail();

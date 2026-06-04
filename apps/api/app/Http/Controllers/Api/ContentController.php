@@ -24,7 +24,7 @@ class ContentController extends Controller
         $request->validate([
             'type' => ['nullable', Rule::in(self::TYPES)],
             'page' => ['nullable', 'integer', 'min:1'],
-            'q' => ['nullable', 'string', 'max:200'],
+            'q' => ['nullable', 'string', 'max:100'],
         ]);
 
         $query = trim((string) $request->query('q', ''));
@@ -71,7 +71,7 @@ class ContentController extends Controller
     {
         $request->validate([
             'type' => ['nullable', Rule::in(self::TYPES)],
-            'limit' => ['nullable', 'integer', 'min:1'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:40'],
         ]);
 
         $type = $this->validType($request->query('type'));

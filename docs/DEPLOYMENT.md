@@ -40,6 +40,8 @@ Working directory: `apps/web`
 
 The frontend includes SPA fallback files for Vercel and Netlify-compatible hosts.
 
+Production static headers include a compatible CSP for the SPA, PWA, Google Fonts, HTTPS API calls, provider images, and optional analytics scripts. If analytics or API hosts are restricted further at the edge, add the exact deployed domains to `script-src` and `connect-src` before launch.
+
 ## Canonical Domain and Redirects
 
 Choose one production frontend origin, such as `https://your-domain.example`, and set `VITE_PUBLIC_SITE_URL` to that exact origin. Keep local and preview deployments free of forced redirects.
@@ -92,6 +94,8 @@ Health endpoint: `GET /health`.
 
 If a reverse proxy such as Nginx fronts the API or worker, disable version tokens there (`server_tokens off;`) and enforce HTTPS at the proxy/load balancer. Application code cannot remove every provider-managed `Server` header on static hosts.
 
+API rate limits are defined in Laravel named limiters for login, registration, email verification, search, feed, writes, and health endpoints. Use Redis-backed cache in production so throttling is shared across API instances.
+
 ## Post-Deploy Checklist
 
 - API health: `GET /api/health`.
@@ -111,4 +115,9 @@ If a reverse proxy such as Nginx fronts the API or worker, disable version token
 
 ```bash
 WEB_URL=https://your-domain.example API_URL=https://api.your-domain.example/api/health WORKER_URL=https://worker.your-domain.example/health node scripts/check-headers.mjs
+```
+- Security audit script has no unexpected findings:
+
+```bash
+node scripts/security-audit-check.mjs
 ```

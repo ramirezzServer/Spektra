@@ -34,6 +34,9 @@
 - [ ] Privacy and terms routes available.
 - [ ] External `target="_blank"` links include `rel="noopener noreferrer"`.
 - [ ] API responses do not expose app-controlled `X-Powered-By`.
+- [ ] Login/register/email/search/write route throttles verified.
+- [ ] 429 API responses show a friendly frontend message.
+- [ ] Security audit script reviewed.
 
 ## Smoke Tests
 
@@ -53,6 +56,9 @@
 - [ ] `VITE_PUBLIC_SITE_URL` matches the chosen HTTPS canonical frontend domain.
 - [ ] HTTP to HTTPS and chosen `www`/non-`www` redirect verified at the production edge.
 - [ ] Canonical tags use absolute URLs and match clean slug routes.
+- [ ] CSP allows deployed API, analytics, font, PWA, and provider image domains.
+- [ ] Reviews, list descriptions, provider metadata, and script-like text render as text.
+- [ ] Upload policy reviewed; no upload UI or endpoint is introduced unintentionally.
 - [ ] Favicon and touch icon verified.
 - [ ] Manifest verified.
 - [ ] Install/update prompt tested.
