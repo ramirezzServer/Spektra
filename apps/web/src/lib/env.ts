@@ -5,12 +5,8 @@ function optionalEnv(name: string) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function publicUrl(value: string) {
-  return value.replace(/\/$/, '');
-}
-
 const apiUrl = optionalEnv('VITE_API_URL') || 'http://localhost:8000/api';
-const siteUrl = publicUrl(optionalEnv('VITE_PUBLIC_SITE_URL'));
+const siteUrl = optionalEnv('VITE_PUBLIC_SITE_URL');
 
 if (isProduction) {
   if (!optionalEnv('VITE_API_URL')) {

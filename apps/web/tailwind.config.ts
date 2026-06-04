@@ -98,7 +98,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'Instrument Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Instrument Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         xs: '0 1px 2px rgba(16, 24, 40, 0.04)',

@@ -40,6 +40,20 @@ Working directory: `apps/web`
 
 The frontend includes SPA fallback files for Vercel and Netlify-compatible hosts.
 
+## Canonical Domain and Redirects
+
+Choose one production frontend origin, such as `https://your-domain.example`, and set `VITE_PUBLIC_SITE_URL` to that exact origin. Keep local and preview deployments free of forced redirects.
+
+At the production edge or reverse proxy, redirect HTTP to HTTPS and redirect either `www` to non-`www` or non-`www` to `www`. For Netlify-style rules, keep these domain-specific redirects above the SPA fallback after replacing the placeholder:
+
+```txt
+http://your-domain.example/* https://your-domain.example/:splat 301!
+https://www.your-domain.example/* https://your-domain.example/:splat 301!
+/* /index.html 200
+```
+
+For Vercel, configure the production domain redirect in the dashboard or with real-domain project settings rather than hardcoding placeholder domains in `vercel.json`, so preview URLs continue to work.
+
 ## Backend Deployment
 
 Deploy `apps/api` as a Docker service or Laravel-compatible PHP service.
@@ -76,6 +90,8 @@ It uses the same production database as the API. Set `DATABASE_URL`, `TMDB_API_K
 
 Health endpoint: `GET /health`.
 
+If a reverse proxy such as Nginx fronts the API or worker, disable version tokens there (`server_tokens off;`) and enforce HTTPS at the proxy/load balancer. Application code cannot remove every provider-managed `Server` header on static hosts.
+
 ## Post-Deploy Checklist
 
 - API health: `GET /api/health`.
@@ -91,3 +107,8 @@ Health endpoint: `GET /health`.
 - `robots.txt` and `sitemap.xml` updated to the production domain.
 - Analytics and monitoring consent behavior checked.
 - Smoke test script passes.
+- Header check script passes for deployed targets:
+
+```bash
+WEB_URL=https://your-domain.example API_URL=https://api.your-domain.example/api/health WORKER_URL=https://worker.your-domain.example/health node scripts/check-headers.mjs
+```

@@ -32,6 +32,8 @@
 - [ ] CORS frontend URL correct.
 - [ ] Email verification setting decided.
 - [ ] Privacy and terms routes available.
+- [ ] External `target="_blank"` links include `rel="noopener noreferrer"`.
+- [ ] API responses do not expose app-controlled `X-Powered-By`.
 
 ## Smoke Tests
 
@@ -48,6 +50,9 @@
 ## SEO/PWA
 
 - [ ] Domain in `robots.txt` and `sitemap.xml` updated.
+- [ ] `VITE_PUBLIC_SITE_URL` matches the chosen HTTPS canonical frontend domain.
+- [ ] HTTP to HTTPS and chosen `www`/non-`www` redirect verified at the production edge.
+- [ ] Canonical tags use absolute URLs and match clean slug routes.
 - [ ] Favicon and touch icon verified.
 - [ ] Manifest verified.
 - [ ] Install/update prompt tested.

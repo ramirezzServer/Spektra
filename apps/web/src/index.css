@@ -13,6 +13,10 @@
     min-height: 100%;
   }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     margin: 0;
     overflow-x: hidden;
@@ -21,7 +25,8 @@
       radial-gradient(circle at 88% 2%, rgba(20, 184, 166, 0.12), transparent 28rem),
       linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 48%, #F4F7FB 100%);
     color: #111827;
-    font-family: Inter, 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }

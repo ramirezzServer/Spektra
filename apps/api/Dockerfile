@@ -15,6 +15,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+COPY docker/php/conf.d/security.ini /usr/local/etc/php/conf.d/security.ini
 COPY . .
 RUN composer install --no-dev --optimize-autoloader
 RUN mkdir -p storage bootstrap/cache \

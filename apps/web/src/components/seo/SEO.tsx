@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { env } from '@/lib/env';
+import { buildCanonicalUrl } from '@/lib/canonical';
 
 type SEOProps = {
   title: string;
@@ -29,7 +29,7 @@ function removeMeta(name: string, property = false) {
 export function SEO({ title, description = 'Track films, series, games, and books with Spektra.', image, type = 'website', canonicalPath, noIndex }: SEOProps) {
   useEffect(() => {
     const fullTitle = title.includes('Spektra') ? title : `${title} | Spektra`;
-    const canonical = env.siteUrl && canonicalPath ? `${env.siteUrl}${canonicalPath}` : undefined;
+    const canonical = canonicalPath ? buildCanonicalUrl(canonicalPath) : undefined;
 
     document.title = fullTitle;
     setMeta('description', description);

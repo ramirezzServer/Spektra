@@ -53,7 +53,7 @@ Use `MAIL_MAILER=log` locally.
 ## Frontend
 
 - `VITE_API_URL`: public API base, usually `https://api.example.com/api`.
-- `VITE_PUBLIC_SITE_URL`: canonical frontend URL.
+- `VITE_PUBLIC_SITE_URL`: canonical frontend origin, with one production domain only, for example `https://your-domain.example`. Do not include a path or trailing slash.
 - `VITE_ANALYTICS_PROVIDER`: `none`, `ga`, or `umami`.
 - `VITE_GA_MEASUREMENT_ID`
 - `VITE_UMAMI_SRC`
@@ -61,3 +61,5 @@ Use `MAIL_MAILER=log` locally.
 - `VITE_SENTRY_DSN`
 
 Only `VITE_*` values are exposed to the browser.
+
+Before launch, replace `https://your-domain.example` in `robots.txt` and `sitemap.xml` with the same origin used for `VITE_PUBLIC_SITE_URL`. Set `APP_URL` to the public API/backend URL, not the frontend URL.
