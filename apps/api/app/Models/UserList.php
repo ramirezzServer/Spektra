@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class UserList extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $table = 'lists';
     protected $fillable = ['user_id', 'name', 'description', 'is_public'];

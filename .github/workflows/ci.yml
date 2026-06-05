@@ -23,10 +23,25 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
+      - run: npm test -- --run
 
   backend:
     name: Backend
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: spektra_test
+          POSTGRES_USER: spektra_user
+          POSTGRES_PASSWORD: spektra_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U spektra_user -d spektra_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: apps/api
@@ -43,10 +58,18 @@ jobs:
         env:
           APP_ENV: testing
           APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: spektra_test
+          DB_USERNAME: spektra_user
+          DB_PASSWORD: spektra_pass
           CACHE_STORE: array
           QUEUE_CONNECTION: sync
           SESSION_DRIVER: array
           MAIL_MAILER: array
+          TMDB_API_KEY: ''
+          RAWG_API_KEY: ''
 
   worker:
     name: Worker
@@ -63,3 +86,16 @@ jobs:
           cache-dependency-path: apps/worker/requirements.txt
       - run: pip install -r requirements.txt
       - run: python -m py_compile main.py jobs/sync_trending.py jobs/refresh_ratings.py db/connection.py
+      - run: pytest
+
+  scripts:
+    name: Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --check scripts/check-headers.mjs
+      - run: node --check scripts/security-audit-check.mjs
+      - run: node --check scripts/smoke-test.mjs

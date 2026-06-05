@@ -4,8 +4,11 @@
 
 - [ ] Frontend typecheck passes.
 - [ ] Frontend build passes.
-- [ ] Backend syntax checks or tests pass.
+- [ ] Frontend unit tests pass.
+- [ ] Backend API tests pass against a PostgreSQL test database.
 - [ ] Worker compile checks pass.
+- [ ] Worker unit tests pass.
+- [ ] Script syntax checks pass.
 - [ ] CI is green.
 
 ## Environment
@@ -37,6 +40,7 @@
 - [ ] Login/register/email/search/write route throttles verified.
 - [ ] 429 API responses show a friendly frontend message.
 - [ ] Security audit script reviewed.
+- [ ] No automated test requires real TMDB, RAWG, OpenLibrary, mail, Neon, or production credentials.
 
 ## Smoke Tests
 

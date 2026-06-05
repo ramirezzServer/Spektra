@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Jobs\ActivityFeedJob;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class UserEntry extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $fillable = ['user_id', 'content_id', 'status', 'rating', 'review'];
 

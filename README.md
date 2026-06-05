@@ -118,10 +118,17 @@ The health endpoint is `GET /health`.
 ```bash
 cd apps/web && npm run typecheck
 cd apps/web && npm run build
+cd apps/web && npm test -- --run
 cd apps/api && php artisan route:list --path=api
 cd apps/api && php artisan test
 cd apps/worker && python -m py_compile main.py jobs/sync_trending.py jobs/refresh_ratings.py db/connection.py
+cd apps/worker && pytest
+node --check scripts/check-headers.mjs
+node --check scripts/security-audit-check.mjs
+node --check scripts/smoke-test.mjs
 ```
+
+API tests use PostgreSQL because the migrations rely on PostgreSQL-specific SQL. Web and worker tests are unit/light integration tests and do not require TMDB, RAWG, OpenLibrary, mail, Neon, or production credentials. See [docs/TESTING.md](docs/TESTING.md) for the fuller testing guide.
 
 Smoke test:
 
