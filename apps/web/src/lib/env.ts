@@ -5,7 +5,7 @@ function optionalEnv(name: string) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-const apiUrl = optionalEnv('VITE_API_URL') || 'http://localhost:8000/api';
+const apiUrl = optionalEnv('VITE_API_URL') || 'http://localhost:8000/api/v1';
 const siteUrl = optionalEnv('VITE_PUBLIC_SITE_URL');
 
 if (isProduction) {

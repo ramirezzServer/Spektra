@@ -74,7 +74,7 @@ Use `MAIL_MAILER=log` locally.
 
 ## Frontend
 
-- `VITE_API_URL`: public API base, usually `https://api.example.com/api`.
+- `VITE_API_URL`: public API base, usually `https://api.example.com/api/v1`. Existing `/api` values continue to work while legacy routes are supported.
 - `VITE_PUBLIC_SITE_URL`: canonical frontend origin, with one production domain only, for example `https://your-domain.example`. Do not include a path or trailing slash.
 - `VITE_ANALYTICS_PROVIDER`: `none`, `ga`, or `umami`.
 - `VITE_GA_MEASUREMENT_ID`

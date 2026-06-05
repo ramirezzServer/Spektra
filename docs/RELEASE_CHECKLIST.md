@@ -15,6 +15,7 @@
 
 - [ ] Production API env configured.
 - [ ] Frontend env configured.
+- [ ] Frontend `VITE_API_URL` points to the preferred `/api/v1` base for new deployments.
 - [ ] Worker env configured.
 - [ ] Database URL configured.
 - [ ] Redis configured if required.
@@ -46,6 +47,7 @@
 
 - [ ] Frontend loads.
 - [ ] API health passes.
+- [ ] Legacy `/api` compatibility and preferred `/api/v1` routes both pass smoke checks.
 - [ ] Worker health passes.
 - [ ] Register/login works.
 - [ ] Email verification works.

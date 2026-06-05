@@ -18,7 +18,7 @@ docker compose -f docker-compose.prod.yml exec api php artisan migrate
 4. Run smoke tests:
 
 ```bash
-WEB_URL=http://localhost:8080 API_URL=http://localhost:8000/api WORKER_URL=http://localhost:8001 node scripts/smoke-test.mjs
+WEB_URL=http://localhost:8080 API_URL=http://localhost:8000/api/v1 WORKER_URL=http://localhost:8001 node scripts/smoke-test.mjs
 ```
 
 ## Local Development Compose
@@ -55,6 +55,8 @@ Working directory: `apps/web`
 - Output directory: `dist`
 - Required env: `VITE_API_URL`, `VITE_PUBLIC_SITE_URL`
 - Optional env: analytics and monitoring variables from `docs/ENVIRONMENT.md`
+
+Set `VITE_API_URL` to the preferred versioned API base, for example `https://api.example.com/api/v1`. Existing deployments that still point at `/api` remain compatible while legacy routes are supported.
 
 The frontend includes SPA fallback files for Vercel and Netlify-compatible hosts.
 
@@ -116,7 +118,7 @@ API rate limits are defined in Laravel named limiters for login, registration, e
 
 ## Post-Deploy Checklist
 
-- API health: `GET /api/health`.
+- API health: `GET /api/v1/health` preferred; `GET /api/health` remains supported for legacy clients.
 - Worker health: `GET /health`.
 - Frontend loads and unknown routes fall back to the SPA.
 - Register, login, logout.
@@ -132,7 +134,7 @@ API rate limits are defined in Laravel named limiters for login, registration, e
 - Header check script passes for deployed targets:
 
 ```bash
-WEB_URL=https://your-domain.example API_URL=https://api.your-domain.example/api/health WORKER_URL=https://worker.your-domain.example/health node scripts/check-headers.mjs
+WEB_URL=https://your-domain.example API_URL=https://api.your-domain.example/api/v1/health WORKER_URL=https://worker.your-domain.example/health node scripts/check-headers.mjs
 ```
 - Security audit script has no unexpected findings:
 

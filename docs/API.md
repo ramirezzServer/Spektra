@@ -1,6 +1,10 @@
 # API
 
-Base path: `/api`
+Preferred base path: `/api/v1`
+
+Legacy base path: `/api`
+
+The unversioned `/api` routes remain backward-compatible for existing clients. New clients should use `/api/v1`. Future breaking API changes should be introduced under a new prefix such as `/api/v2` while keeping supported older versions available during migration windows.
 
 Responses generally use `{ "data": ... }` with optional `meta`. Validation errors follow Laravel's `message` plus `errors` object shape. Token auth uses Laravel Sanctum bearer tokens.
 
@@ -23,6 +27,8 @@ Register/login return a user resource and `token`.
 | `POST` | `/email/verification-notification` | Yes | none |
 
 Verification redirects to the frontend email status route.
+
+Laravel email verification URLs still preserve the legacy `verification.verify` route name. A versioned route also exists under `/api/v1/email/verify/{id}/{hash}` for direct v1 compatibility, but generated verification mail keeps using the legacy named URL unless changed intentionally.
 
 ## Content
 

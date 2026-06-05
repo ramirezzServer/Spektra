@@ -78,7 +78,7 @@ Copy each example file before running the matching service:
 - API: `apps/api/.env.example`; use `DB_HOST=postgres` and `REDIS_HOST=redis` in Docker
 - Worker: `apps/worker/.env.example`; use a `DATABASE_URL` with host `postgres` in Docker
 
-Core production variables are `APP_ENV`, `APP_DEBUG`, `APP_URL`, `FRONTEND_URL`, `DATABASE_URL` or `DB_*`, `DB_SSLMODE`, `REDIS_*`, `MAIL_*`, `TMDB_API_KEY`, `RAWG_API_KEY`, `OPENLIBRARY_BASE_URL`, `VITE_API_URL`, and `VITE_PUBLIC_SITE_URL`.
+Core production variables are `APP_ENV`, `APP_DEBUG`, `APP_URL`, `FRONTEND_URL`, `DATABASE_URL` or `DB_*`, `DB_SSLMODE`, `REDIS_*`, `MAIL_*`, `TMDB_API_KEY`, `RAWG_API_KEY`, `OPENLIBRARY_BASE_URL`, `VITE_API_URL`, and `VITE_PUBLIC_SITE_URL`. New frontend deployments should set `VITE_API_URL` to the preferred `/api/v1` prefix.
 
 See [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) for details.
 
@@ -153,7 +153,7 @@ API tests use PostgreSQL because the migrations rely on PostgreSQL-specific SQL.
 Smoke test:
 
 ```bash
-WEB_URL=http://localhost:5173 API_URL=http://localhost:8000/api WORKER_URL=http://localhost:8001 node scripts/smoke-test.mjs
+WEB_URL=http://localhost:5173 API_URL=http://localhost:8000/api/v1 WORKER_URL=http://localhost:8001 node scripts/smoke-test.mjs
 ```
 
 ## Deployment
