@@ -21,6 +21,24 @@ docker compose -f docker-compose.prod.yml exec api php artisan migrate
 WEB_URL=http://localhost:8080 API_URL=http://localhost:8000/api WORKER_URL=http://localhost:8001 node scripts/smoke-test.mjs
 ```
 
+## Local Development Compose
+
+The default dev Compose file publishes only the application services:
+
+- API: `localhost:8000`
+- Worker: `localhost:8001`
+- Web: `localhost:5173`
+
+PostgreSQL and Redis stay on the Docker network by default. Keep `DB_HOST=postgres` in `apps/api/.env`, keep worker `DATABASE_URL` pointed at `postgres`, and keep `REDIS_HOST=redis` for the API container.
+
+If a host database or Redis client needs direct access, use the opt-in override:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.expose.yml up -d
+```
+
+The override publishes `${DB_FORWARD_PORT:-5432}:5432` and `${REDIS_FORWARD_PORT:-6379}:6379`.
+
 ## Neon PostgreSQL
 
 - Create a Neon PostgreSQL database.

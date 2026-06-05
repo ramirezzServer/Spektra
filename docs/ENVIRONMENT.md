@@ -2,6 +2,14 @@
 
 Spektra uses separate environment files for the root compose setup, frontend, API, and worker. Do not commit real secrets.
 
+## File Roles
+
+- Root `.env` is optional for Docker Compose variable substitution. If it is absent, `docker-compose.yml` uses safe local defaults such as `spektra`, `spektra_user`, and `spektra_pass`.
+- `apps/api/.env` is loaded by the API container and Laravel.
+- `apps/worker/.env` is loaded by the worker container.
+- `apps/web/.env` is loaded by Vite, and only `VITE_*` values are exposed to the browser.
+- Default dev Compose does not publish PostgreSQL or Redis to the host. Use `docker-compose.expose.yml` only when a host tool needs direct DB/Redis access.
+
 ## App
 
 - `APP_ENV`: `local`, `staging`, or `production`.
@@ -16,16 +24,30 @@ Spektra uses separate environment files for the root compose setup, frontend, AP
 - `DB_CONNECTION`: `pgsql`.
 - `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`: local or fallback connection fields.
 - `DB_SSLMODE`: use `require` for Neon and most managed PostgreSQL providers.
+- `DB_FORWARD_PORT`: optional host port used only by `docker-compose.expose.yml`, default `5432`.
 
 For Neon, set `DATABASE_URL` in both the API and worker. Include SSL mode in the URL or set `DB_SSLMODE=require` for the API.
+
+For Docker local development, the API database host is `postgres`, not `127.0.0.1`. The worker should use a Docker-network connection string such as `postgresql://spektra_user:spektra_pass@postgres:5432/spektra`.
+
+If you need TablePlus, DBeaver, psql, or another host tool to connect directly, start Compose with the expose override:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.expose.yml up -d
+```
+
+Then connect from the host using `127.0.0.1:${DB_FORWARD_PORT:-5432}`.
 
 ## Redis
 
 - `REDIS_HOST`
 - `REDIS_PORT`
 - `REDIS_PASSWORD` when the provider requires it.
+- `REDIS_FORWARD_PORT`: optional host port used only by `docker-compose.expose.yml`, default `6379`.
 
 Redis is used by Laravel cache, queue, and session configuration.
+
+For Docker local development, the API Redis host is `redis`. Redis remains unauthenticated on the private local Docker network by default.
 
 ## External Providers
 

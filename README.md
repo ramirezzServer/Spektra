@@ -38,11 +38,25 @@ scripts        operational helper scripts
 
 ```bash
 cp .env.example .env
-docker compose up -d postgres redis
+cp apps/api/.env.example apps/api/.env
+cp apps/worker/.env.example apps/worker/.env
+cp apps/web/.env.example apps/web/.env
+docker compose up --build
+```
 
+The default dev Compose file exposes the API, worker, and web ports only. PostgreSQL and Redis are available to containers on the Docker network as `postgres` and `redis`.
+
+For host DB/Redis tools such as TablePlus, DBeaver, psql, or RedisInsight, opt in to port forwarding:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.expose.yml up -d
+```
+
+Manual local service setup without Docker:
+
+```bash
 cd apps/api
 composer install
-cp .env.example .env
 php artisan key:generate
 php artisan migrate
 
@@ -59,10 +73,10 @@ uvicorn main:app --reload --port 8001
 
 Copy each example file before running the matching service:
 
-- Root: `.env.example`
+- Root: `.env.example` for optional Compose defaults and host port override variables
 - Frontend: `apps/web/.env.example`
-- API: `apps/api/.env.example`
-- Worker: `apps/worker/.env.example`
+- API: `apps/api/.env.example`; use `DB_HOST=postgres` and `REDIS_HOST=redis` in Docker
+- Worker: `apps/worker/.env.example`; use a `DATABASE_URL` with host `postgres` in Docker
 
 Core production variables are `APP_ENV`, `APP_DEBUG`, `APP_URL`, `FRONTEND_URL`, `DATABASE_URL` or `DB_*`, `DB_SSLMODE`, `REDIS_*`, `MAIL_*`, `TMDB_API_KEY`, `RAWG_API_KEY`, `OPENLIBRARY_BASE_URL`, `VITE_API_URL`, and `VITE_PUBLIC_SITE_URL`.
 
@@ -74,6 +88,12 @@ Local development:
 
 ```bash
 docker compose up --build
+```
+
+Optional DB/Redis host access:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.expose.yml up -d
 ```
 
 Production-like local run with an included Postgres service:

@@ -2,24 +2,28 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: spektra
-      POSTGRES_USER: spektra_user
-      POSTGRES_PASSWORD: spektra_pass
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${DB_DATABASE:-spektra}
+      POSTGRES_USER: ${DB_USERNAME:-spektra_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-spektra_pass}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
 
   api:
     build: ./apps/api
     ports:
       - "8000:8000"
     env_file: ./apps/api/.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-spektra}
+      DB_USERNAME: ${DB_USERNAME:-spektra_user}
+      DB_PASSWORD: ${DB_PASSWORD:-spektra_pass}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on: [postgres, redis]
     volumes:
       - ./apps/api:/var/www/html
@@ -29,6 +33,8 @@ services:
     ports:
       - "8001:8001"
     env_file: ./apps/worker/.env
+    environment:
+      DATABASE_URL: postgresql://${DB_USERNAME:-spektra_user}:${DB_PASSWORD:-spektra_pass}@postgres:5432/${DB_DATABASE:-spektra}
     depends_on: [postgres]
     command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload --no-server-header
 
