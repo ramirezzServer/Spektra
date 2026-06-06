@@ -84,6 +84,36 @@ class AuthTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_refresh_token_requires_authentication(): void
+    {
+        $this->postJson('/api/auth/refresh-token')
+            ->assertUnauthorized();
+    }
+
+    public function test_refresh_token_returns_new_token_and_revokes_old_token(): void
+    {
+        $user = User::factory()->create();
+        $oldToken = $user->createToken('api-token')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', "Bearer {$oldToken}")
+            ->postJson('/api/v1/auth/refresh-token')
+            ->assertOk()
+            ->assertJsonStructure(['data' => ['id', 'username'], 'token']);
+
+        $newToken = $response->json('token');
+        $this->assertNotSame($oldToken, $newToken);
+        $this->assertSame(1, $user->tokens()->count());
+
+        $this->withHeader('Authorization', "Bearer {$oldToken}")
+            ->getJson('/api/auth/me')
+            ->assertUnauthorized();
+
+        $this->withHeader('Authorization', "Bearer {$newToken}")
+            ->getJson('/api/v1/auth/me')
+            ->assertOk()
+            ->assertJsonPath('data.id', $user->id);
+    }
+
     public function test_email_verification_resend_requires_authentication(): void
     {
         $this->postJson('/api/email/verification-notification')

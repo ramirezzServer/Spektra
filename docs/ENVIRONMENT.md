@@ -18,6 +18,7 @@ Spektra uses separate environment files for the root compose setup, frontend, AP
 - `FRONTEND_URL`: frontend public URL used by CORS and email verification redirects.
 - Password reset emails also use `FRONTEND_URL` to generate `/reset-password?token=...&email=...` links.
 - `REQUIRE_EMAIL_VERIFICATION`: set `true` to require verified email before sensitive mutations.
+- `SANCTUM_TOKEN_EXPIRATION_MINUTES`: API token lifetime in minutes. Defaults to `1440` so bearer tokens expire after 24 hours unless overridden.
 
 ## Database
 

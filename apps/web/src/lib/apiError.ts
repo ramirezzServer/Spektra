@@ -29,7 +29,7 @@ export function getApiErrorMessage(error: unknown, fallback = 'Something went wr
 
   const messageByStatus: Record<number, string> = {
     400: 'We could not process that request. Check the details and try again.',
-    401: 'Your session has ended. Please sign in again.',
+    401: response.data?.message ?? 'Session expired. Please log in again.',
     403: 'You do not have access to do that.',
     404: 'We could not find what you were looking for.',
     409: 'This conflicts with existing data. Refresh and try again.',

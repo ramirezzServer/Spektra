@@ -17,6 +17,7 @@ Responses generally use `{ "data": ... }` with optional `meta`. Validation error
 | `POST` | `/auth/forgot-password` | No | `email` |
 | `POST` | `/auth/reset-password` | No | `token`, `email`, `password`, `password_confirmation` |
 | `POST` | `/auth/logout` | Yes | none |
+| `POST` | `/auth/refresh-token` | Yes | none |
 | `GET` | `/auth/me` | Yes | none |
 
 Register/login return a user resource and `token`.
@@ -25,6 +26,11 @@ Forgot-password responses are generic and do not reveal whether an email belongs
 to an account. Password reset links point to the frontend `/reset-password`
 route using `FRONTEND_URL`. Successful password resets revoke existing API
 tokens for that user.
+
+Refresh-token requires a valid unexpired Sanctum bearer token. It deletes the
+current token, creates a new API token, and returns the same `{ data, token }`
+shape as login. Expired or invalid tokens are rejected by `auth:sanctum` before
+refresh logic runs.
 
 ## Email Verification
 

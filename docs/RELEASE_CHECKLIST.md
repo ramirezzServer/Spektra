@@ -35,6 +35,7 @@
 - [ ] `APP_DEBUG=false`.
 - [ ] No secrets committed.
 - [ ] CORS frontend URL correct.
+- [ ] `SANCTUM_TOKEN_EXPIRATION_MINUTES` set to the intended API token lifetime.
 - [ ] Email verification setting decided.
 - [ ] Privacy and terms routes available.
 - [ ] External `target="_blank"` links include `rel="noopener noreferrer"`.
@@ -51,6 +52,7 @@
 - [ ] Legacy `/api` compatibility and preferred `/api/v1` routes both pass smoke checks.
 - [ ] Worker health passes.
 - [ ] Register/login works.
+- [ ] Auth token refresh returns a new token and rejects the old token.
 - [ ] Forgot-password and reset-password work without revealing account existence.
 - [ ] Email verification works.
 - [ ] Content search works.

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Auth\Events\PasswordReset;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -26,12 +26,8 @@ class AuthController extends Controller
 
         $user = User::create($data);
         $user->sendEmailVerificationNotification();
-        $token = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json([
-            'data' => new UserResource($user),
-            'token' => $token,
-        ], 201);
+        return $this->tokenResponse($user, 201);
     }
 
     public function login(Request $request)
@@ -48,12 +44,8 @@ class AuthController extends Controller
         }
 
         $user->tokens()->delete();
-        $token = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json([
-            'data' => new UserResource($user),
-            'token' => $token,
-        ]);
+        return $this->tokenResponse($user);
     }
 
     public function forgotPassword(Request $request)
@@ -103,8 +95,26 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out']);
     }
 
+    public function refreshToken(Request $request)
+    {
+        $user = $request->user();
+        $user->currentAccessToken()?->delete();
+
+        return $this->tokenResponse($user);
+    }
+
     public function me(Request $request)
     {
         return response()->json(['data' => new UserResource($request->user())]);
+    }
+
+    private function tokenResponse(User $user, int $status = 200)
+    {
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'data' => new UserResource($user),
+            'token' => $token,
+        ], $status);
     }
 }

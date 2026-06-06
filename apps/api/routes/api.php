@@ -21,6 +21,7 @@ $registerApiRoutes = function (): void {
         Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:auth.password_reset');
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout'])->middleware('throttle:api.write');
+            Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->middleware('throttle:api.write');
             Route::get('/me',      [AuthController::class, 'me']);
         });
     });

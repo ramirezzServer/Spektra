@@ -13,7 +13,7 @@ repository.
 | Audit finding | Severity from audit | Current repo status | Evidence file/path | Next segment to handle it |
 | --- | --- | --- | --- | --- |
 | Password reset routes | Medium | Fixed | `apps/api/routes/api.php` registers `/auth/forgot-password` and `/auth/reset-password` under both legacy `/api` and `/api/v1`; `apps/api/app/Http/Controllers/Api/AuthController.php` uses Laravel's password broker; `apps/web/src/pages/Auth/ForgotPassword.tsx` and `ResetPassword.tsx` provide frontend pages | Security & Authentication |
-| Sanctum token expiry | High | Not fixed | `apps/api/config/sanctum.php` has `'expiration' => null` | Security & Authentication |
+| Sanctum token expiry | High | Fixed | `apps/api/config/sanctum.php` reads `SANCTUM_TOKEN_EXPIRATION_MINUTES` with a 1440-minute default; `apps/api/routes/api.php` registers authenticated `/auth/refresh-token` under legacy `/api` and `/api/v1` | Security & Authentication |
 | Health deep endpoint protection | Medium | Partially fixed | `apps/api/routes/api.php` exposes `/health/deep` publicly but applies `throttle:api.health`; `docs/API.md` documents auth as `No` | Security & Authentication |
 | `REQUIRE_EMAIL_VERIFICATION` default and docs | Medium | Partially fixed | `apps/api/config/auth.php` defaults to `false`; `docs/ENVIRONMENT.md`, `docs/API.md`, and `docs/RELEASE_CHECKLIST.md` document the setting and release decision | Security & Authentication |
 | Account deletion endpoint | High | Not fixed | `apps/api/routes/api.php` has no account/profile delete route; no controller method found for deleting the authenticated user | Security & Authentication |
@@ -68,14 +68,14 @@ configuration, PWA configuration, and documentation.
 
 ## Summary
 
-Already fixed areas include password reset, rate limiting, API versioning
-compatibility, test coverage across API/web/worker, CI, Docker DB/Redis
-exposure, changelog, license, project history, TypeScript strict mode,
-per-page hard caps, route code splitting, skeleton/optimistic UI, search
-debounce, and deployment docs.
+Already fixed areas include password reset, Sanctum token expiration and refresh,
+rate limiting, API versioning compatibility, test coverage across API/web/worker,
+CI, Docker DB/Redis exposure, changelog, license, project history, TypeScript
+strict mode, per-page hard caps, route code splitting, skeleton/optimistic UI,
+search debounce, and deployment docs.
 
-Remaining or partially fixed areas include Sanctum token expiration, account
-deletion, public deep health behavior, live smoke testing in CI,
-ESLint/Prettier, Pint wiring, content-detail-specific caching, full dark mode,
-full PWA offline fallback, screenshots/demo link, OpenAPI/Swagger, and GitHub
-repository topics/description.
+Remaining or partially fixed areas include account deletion, public deep health
+behavior, live smoke testing in CI, ESLint/Prettier, Pint wiring,
+content-detail-specific caching, full dark mode, full PWA offline fallback,
+screenshots/demo link, OpenAPI/Swagger, and GitHub repository
+topics/description.
