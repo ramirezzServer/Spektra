@@ -1,4 +1,5 @@
 # Laravel
+.env
 apps/api/.env
 apps/api/vendor/
 apps/api/storage/logs/*.log
