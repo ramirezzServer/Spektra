@@ -58,6 +58,7 @@
 - [ ] Forgot-password and reset-password work without revealing account existence.
 - [ ] Email verification works.
 - [ ] Unverified users cannot create library entries or follow users when `REQUIRE_EMAIL_VERIFICATION=true`.
+- [ ] Account deletion requires password confirmation, deletes user-owned data, and rejects the old token.
 - [ ] Content search works.
 - [ ] Library tracking works.
 - [ ] Follow/feed works.

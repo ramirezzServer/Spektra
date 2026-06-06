@@ -1,4 +1,4 @@
-import { BookMarked, BookOpen, Calendar, CheckCircle2, Clapperboard, Gamepad2, Library, MessageSquare, Search, ShieldAlert, Star, Tv, UserCheck, UserPlus, Users } from 'lucide-react';
+import { BookMarked, BookOpen, Calendar, CheckCircle2, Clapperboard, Gamepad2, Library, MessageSquare, Search, Settings, ShieldAlert, Star, Tv, UserCheck, UserPlus, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ContentGrid } from '@/components/content/ContentGrid';
@@ -164,6 +164,10 @@ export function Profile() {
                     <Link to="/search" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-sm font-black text-content-primary hover:bg-bg-subtle">
                       <Search className="h-4 w-4" />
                       Search
+                    </Link>
+                    <Link to="/account" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-sm font-black text-content-primary hover:bg-bg-subtle">
+                      <Settings className="h-4 w-4" />
+                      Account
                     </Link>
                   </>
                 ) : currentUser ? (

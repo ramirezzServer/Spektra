@@ -16,9 +16,9 @@ repository.
 | Sanctum token expiry | High | Fixed | `apps/api/config/sanctum.php` reads `SANCTUM_TOKEN_EXPIRATION_MINUTES` with a 1440-minute default; `apps/api/routes/api.php` registers authenticated `/auth/refresh-token` under legacy `/api` and `/api/v1` | Security & Authentication |
 | Health deep endpoint protection | Medium | Fixed | `apps/api/routes/api.php` requires `X-Health-Secret` when `HEALTH_CHECK_SECRET` is configured and keeps `/health` public; `docs/API.md` documents the protected deep health behavior | Security & Authentication |
 | `REQUIRE_EMAIL_VERIFICATION` default and docs | Medium | Fixed | `apps/api/config/auth.php` keeps local default `false`; `app/Providers/AppServiceProvider.php` logs a production warning when disabled; env examples and release docs require `true` in production | Security & Authentication |
-| Account deletion endpoint | High | Not fixed | `apps/api/routes/api.php` has no account/profile delete route; no controller method found for deleting the authenticated user | Security & Authentication |
+| Account deletion endpoint | High | Fixed | `apps/api/routes/api.php` registers authenticated `DELETE /account` under legacy `/api` and `/api/v1`; `AuthController::deleteAccount` validates the current password, deletes tokens, and relies on cascades for user-owned data | Security & Authentication |
 | Rate limiting implementation and docs | High | Fixed | `apps/api/app/Providers/AppServiceProvider.php` defines named limiters; `apps/api/routes/api.php` applies throttles; `docs/DEPLOYMENT.md` documents rate limits | Security & Authentication |
-| API versioning with legacy compatibility | High | Fixed | `apps/api/routes/api.php` registers unversioned routes and `Route::prefix('v1')`; `php artisan route:list --path=api` showed 64 routes across `/api` and `/api/v1`; `docs/API.md` prefers `/api/v1` and documents legacy `/api` | API Versioning |
+| API versioning with legacy compatibility | High | Fixed | `apps/api/routes/api.php` registers unversioned routes and `Route::prefix('v1')`; `php artisan route:list --path=api` confirms matching legacy and v1 route families; `docs/API.md` prefers `/api/v1` and documents legacy `/api` | API Versioning |
 | API tests | High | Fixed | `apps/api/tests/Feature/*` includes auth, content, API versioning, library, list, feed/social, and security tests; CI runs `php artisan test` with PostgreSQL and `pdo_pgsql` | Testing & QA |
 | Frontend utility tests | Medium | Fixed | `apps/web/src/lib/*.test.ts`; `apps/web/package.json` has Vitest test script; CI runs `npm test -- --run` | Testing & QA |
 | Worker scheduled job tests | Medium | Fixed | `apps/worker/tests/test_sync_trending.py`, `test_refresh_ratings.py`, and `test_health.py`; CI installs worker requirements and runs `pytest` | Testing & QA |
@@ -74,7 +74,7 @@ CI, Docker DB/Redis exposure, changelog, license, project history, TypeScript
 strict mode, per-page hard caps, route code splitting, skeleton/optimistic UI,
 search debounce, and deployment docs.
 
-Remaining or partially fixed areas include account deletion, live smoke testing
-in CI, ESLint/Prettier, Pint wiring, content-detail-specific caching, full dark
-mode, full PWA offline fallback, screenshots/demo link, OpenAPI/Swagger, and
-GitHub repository topics/description.
+Remaining or partially fixed areas include live smoke testing in CI,
+ESLint/Prettier, Pint wiring, content-detail-specific caching, full dark mode,
+full PWA offline fallback, screenshots/demo link, OpenAPI/Swagger, and GitHub
+repository topics/description.

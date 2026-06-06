@@ -2,7 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\ActivityFeed;
+use App\Models\ContentItem;
+use App\Models\Follow;
+use App\Models\ListItem;
 use App\Models\User;
+use App\Models\UserEntry;
+use App\Models\UserList;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -204,6 +210,89 @@ class AuthTest extends TestCase
             ->assertJson(['message' => 'The reset link is invalid or has expired.']);
 
         $this->assertTrue(Hash::check('old-password', User::where('email', $email)->firstOrFail()->password));
+    }
+
+    public function test_account_delete_requires_authentication(): void
+    {
+        $this->deleteJson('/api/account', ['password' => 'password'])
+            ->assertUnauthorized();
+    }
+
+    public function test_account_delete_rejects_wrong_password(): void
+    {
+        $user = User::factory()->create(['password' => 'correct-password']);
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->deleteJson('/api/v1/account', ['password' => 'wrong-password'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['password'])
+            ->assertJsonMissing(['email' => $user->email]);
+
+        $this->assertDatabaseHas('users', ['id' => $user->id]);
+        $this->assertNotNull(PersonalAccessToken::findToken($token));
+    }
+
+    public function test_account_delete_removes_user_related_data_and_tokens(): void
+    {
+        $user = User::factory()->create(['password' => 'delete-password']);
+        $other = User::factory()->create();
+        $content = ContentItem::factory()->create();
+        $entry = UserEntry::factory()->create([
+            'user_id' => $user->id,
+            'content_id' => $content->id,
+        ]);
+        $list = UserList::factory()->create(['user_id' => $user->id]);
+        ListItem::factory()->create([
+            'list_id' => $list->id,
+            'content_id' => $content->id,
+        ]);
+        Follow::create([
+            'follower_id' => $user->id,
+            'following_id' => $other->id,
+            'created_at' => now(),
+        ]);
+        Follow::create([
+            'follower_id' => $other->id,
+            'following_id' => $user->id,
+            'created_at' => now(),
+        ]);
+        $activity = ActivityFeed::factory()->create([
+            'actor_id' => $user->id,
+            'object_id' => $content->id,
+        ]);
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->deleteJson('/api/v1/account', ['password' => 'delete-password'])
+            ->assertOk()
+            ->assertJson(['message' => 'Account deleted.'])
+            ->assertJsonMissing(['email' => $user->email]);
+
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        $this->assertDatabaseMissing('user_entries', ['id' => $entry->id]);
+        $this->assertDatabaseMissing('lists', ['id' => $list->id]);
+        $this->assertDatabaseMissing('list_items', ['list_id' => $list->id]);
+        $this->assertDatabaseMissing('follows', ['follower_id' => $user->id]);
+        $this->assertDatabaseMissing('follows', ['following_id' => $user->id]);
+        $this->assertDatabaseMissing('activity_feed', ['id' => $activity->id]);
+        $this->assertNull(PersonalAccessToken::findToken($token));
+    }
+
+    public function test_account_delete_revokes_current_token(): void
+    {
+        $user = User::factory()->create(['password' => 'delete-password']);
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->deleteJson('/api/account', ['password' => 'delete-password'])
+            ->assertOk();
+
+        $this->flushHeaders();
+        $this->app['auth']->forgetGuards();
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->getJson('/api/auth/me')
+            ->assertUnauthorized();
     }
 
     private function uniqueTestIp(): string

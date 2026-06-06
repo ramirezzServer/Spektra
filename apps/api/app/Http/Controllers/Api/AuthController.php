@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -106,6 +107,31 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return response()->json(['data' => new UserResource($request->user())]);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $data = $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($data['password'], $user->password)) {
+            return response()->json([
+                'message' => 'The provided password is incorrect.',
+                'errors' => [
+                    'password' => ['The provided password is incorrect.'],
+                ],
+            ], 422);
+        }
+
+        DB::transaction(function () use ($user) {
+            $user->tokens()->delete();
+            $user->delete();
+        });
+
+        return response()->json(['message' => 'Account deleted.']);
     }
 
     private function tokenResponse(User $user, int $status = 200)

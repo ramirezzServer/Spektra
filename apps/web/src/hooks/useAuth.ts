@@ -59,6 +59,13 @@ export function useAuth() {
     },
   });
 
+  const deleteAccountMutation = useMutation({
+    mutationFn: async (data: { password: string }) => {
+      const res = await api.delete<{ message: string }>('/account', { data });
+      return res.data;
+    },
+  });
+
   const logoutMutation = useMutation({
     mutationFn: async () => api.post('/auth/logout'),
     onSettled: () => {
@@ -85,6 +92,7 @@ export function useAuth() {
     login: loginMutation,
     forgotPassword: forgotPasswordMutation,
     resetPassword: resetPasswordMutation,
+    deleteAccount: deleteAccountMutation,
     logout: logoutMutation,
     resendVerification,
   };

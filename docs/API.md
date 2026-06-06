@@ -19,6 +19,7 @@ Responses generally use `{ "data": ... }` with optional `meta`. Validation error
 | `POST` | `/auth/logout` | Yes | none |
 | `POST` | `/auth/refresh-token` | Yes | none |
 | `GET` | `/auth/me` | Yes | none |
+| `DELETE` | `/account` | Yes | `password` |
 
 Register/login return a user resource and `token`.
 
@@ -26,6 +27,12 @@ Forgot-password responses are generic and do not reveal whether an email belongs
 to an account. Password reset links point to the frontend `/reset-password`
 route using `FRONTEND_URL`. Successful password resets revoke existing API
 tokens for that user.
+
+Account deletion requires the current password and is available at both
+`/api/account` and `/api/v1/account`. It deletes the user account, active API
+tokens, library entries, lists, list items, follow relationships, and activity
+feed events owned by that user. The response does not include the deleted email
+address.
 
 Refresh-token requires a valid unexpired Sanctum bearer token. It deletes the
 current token, creates a new API token, and returns the same `{ data, token }`

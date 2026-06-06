@@ -1,4 +1,4 @@
-import { Activity, BookMarked, CircleDot, Command, Compass, Home, Library, LogOut, Plus, Search, ShieldAlert, ShieldCheck, Sparkles, User } from 'lucide-react';
+import { Activity, BookMarked, CircleDot, Command, Compass, Home, Library, LogOut, Plus, Search, Settings, ShieldAlert, ShieldCheck, Sparkles, User } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
@@ -32,7 +32,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
   const { user, isAuthenticated, logout } = useAuth();
   const stats = useUserStats(isAuthenticated ? user?.username : undefined);
   const navItems = isAuthenticated && user?.username
-    ? [...baseNavItems, { to: `/profile/${user.username}`, label: 'Profile', icon: User }]
+    ? [...baseNavItems, { to: `/profile/${user.username}`, label: 'Profile', icon: User }, { to: '/account', label: 'Account', icon: Settings }]
     : baseNavItems;
 
   return (

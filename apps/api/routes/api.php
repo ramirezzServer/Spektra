@@ -80,6 +80,7 @@ $registerApiRoutes = function (): void {
     Route::get('/feed', [FeedController::class, 'index'])->middleware('throttle:api.feed');
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::delete('/account', [AuthController::class, 'deleteAccount'])->middleware('throttle:api.write');
         Route::post('/entries', [UserEntryController::class, 'store'])->middleware('throttle:api.write');
         Route::delete('/entries/{id}', [UserEntryController::class, 'destroy'])->middleware('throttle:api.write');
         Route::get('/entries/by-content/{contentId}', [UserEntryController::class, 'showByContent']);
