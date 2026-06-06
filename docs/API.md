@@ -84,7 +84,8 @@ Profile library endpoints use page pagination.
 | `GET` | `/users/{username}/followers` | No | `page`, `per_page` |
 | `GET` | `/users/{username}/following` | No | `page`, `per_page` |
 
-Follow mutations may require verified email when `REQUIRE_EMAIL_VERIFICATION=true`.
+Library write and follow mutations require verified email when `REQUIRE_EMAIL_VERIFICATION=true`.
+Production deployments should enable that setting; local development may leave it disabled.
 
 ## Feed
 

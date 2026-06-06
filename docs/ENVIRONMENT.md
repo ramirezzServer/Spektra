@@ -17,7 +17,7 @@ Spektra uses separate environment files for the root compose setup, frontend, AP
 - `APP_URL`: API public URL.
 - `FRONTEND_URL`: frontend public URL used by CORS and email verification redirects.
 - Password reset emails also use `FRONTEND_URL` to generate `/reset-password?token=...&email=...` links.
-- `REQUIRE_EMAIL_VERIFICATION`: set `true` to require verified email before sensitive mutations.
+- `REQUIRE_EMAIL_VERIFICATION`: set `true` to require verified email before sensitive mutations. Local development may use `false`; production should use `true`. The API logs a production warning if this is disabled.
 - `SANCTUM_TOKEN_EXPIRATION_MINUTES`: API token lifetime in minutes. Defaults to `1440` so bearer tokens expire after 24 hours unless overridden.
 - `HEALTH_CHECK_SECRET`: shared secret required by `X-Health-Secret` for `/api/health/deep` when set. Leave unset only for local development; production should set a long random value.
 
@@ -78,6 +78,13 @@ Use `MAIL_MAILER=log` locally.
 Password reset and email verification both depend on the configured mailer in
 non-local environments. Confirm `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`, and the
 provider credentials before enabling real user email flows.
+
+Production API envs should include:
+
+```env
+APP_ENV=production
+REQUIRE_EMAIL_VERIFICATION=true
+```
 
 ## Frontend
 

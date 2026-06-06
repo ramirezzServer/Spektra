@@ -39,6 +39,34 @@ class FeedSocialTest extends TestCase
         $this->assertDatabaseMissing('follows', ['follower_id' => $actor->id, 'following_id' => $target->id]);
     }
 
+    public function test_unverified_user_cannot_follow_when_email_verification_required(): void
+    {
+        config(['auth.require_email_verification' => true]);
+
+        $actor = User::factory()->unverified()->create();
+        User::factory()->create(['username' => 'target-user']);
+        Sanctum::actingAs($actor);
+
+        $this->postJson('/api/follows/target-user')
+            ->assertForbidden()
+            ->assertJson(['message' => 'Please verify your email before following users.']);
+
+        $this->assertDatabaseMissing('follows', ['follower_id' => $actor->id]);
+    }
+
+    public function test_unverified_user_can_follow_when_email_verification_not_required(): void
+    {
+        config(['auth.require_email_verification' => false]);
+
+        $actor = User::factory()->unverified()->create();
+        User::factory()->create(['username' => 'target-user']);
+        Sanctum::actingAs($actor);
+
+        $this->postJson('/api/follows/target-user')
+            ->assertOk()
+            ->assertJsonPath('data.following', true);
+    }
+
     public function test_global_feed_returns_cursor_paginated_shape(): void
     {
         $actor = User::factory()->create();

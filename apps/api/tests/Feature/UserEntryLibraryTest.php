@@ -43,6 +43,43 @@ class UserEntryLibraryTest extends TestCase
         ]);
     }
 
+    public function test_unverified_user_cannot_update_library_when_email_verification_required(): void
+    {
+        config(['auth.require_email_verification' => true]);
+
+        $user = User::factory()->unverified()->create();
+        $content = ContentItem::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/entries', [
+            'content_id' => $content->id,
+            'status' => 'want',
+        ])
+            ->assertForbidden()
+            ->assertJson(['message' => 'Please verify your email before updating your library.']);
+
+        $this->assertDatabaseMissing('user_entries', [
+            'user_id' => $user->id,
+            'content_id' => $content->id,
+        ]);
+    }
+
+    public function test_unverified_user_can_update_library_when_email_verification_not_required(): void
+    {
+        config(['auth.require_email_verification' => false]);
+
+        $user = User::factory()->unverified()->create();
+        $content = ContentItem::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/entries', [
+            'content_id' => $content->id,
+            'status' => 'want',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'want');
+    }
+
     public function test_user_cannot_set_trusted_user_id_from_body(): void
     {
         $actor = User::factory()->create();

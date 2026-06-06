@@ -37,7 +37,7 @@
 - [ ] CORS frontend URL correct.
 - [ ] `SANCTUM_TOKEN_EXPIRATION_MINUTES` set to the intended API token lifetime.
 - [ ] `HEALTH_CHECK_SECRET` set to a long random production value.
-- [ ] Email verification setting decided.
+- [ ] `REQUIRE_EMAIL_VERIFICATION=true` in production.
 - [ ] Privacy and terms routes available.
 - [ ] External `target="_blank"` links include `rel="noopener noreferrer"`.
 - [ ] API responses do not expose app-controlled `X-Powered-By`.
@@ -57,6 +57,7 @@
 - [ ] Auth token refresh returns a new token and rejects the old token.
 - [ ] Forgot-password and reset-password work without revealing account existence.
 - [ ] Email verification works.
+- [ ] Unverified users cannot create library entries or follow users when `REQUIRE_EMAIL_VERIFICATION=true`.
 - [ ] Content search works.
 - [ ] Library tracking works.
 - [ ] Follow/feed works.

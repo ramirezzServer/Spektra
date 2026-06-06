@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->environment('production') && ! config('auth.require_email_verification')) {
+            Log::warning('REQUIRE_EMAIL_VERIFICATION is disabled in production; set it to true before launch.');
+        }
+
         $throttleResponse = fn (Request $request, array $headers) => response()->json([
             'message' => 'Too many attempts. Please wait before trying again.',
             'retry_after' => (int) ($headers['Retry-After'] ?? 0),

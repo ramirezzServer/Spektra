@@ -84,8 +84,9 @@ Required steps:
 
 1. Set `APP_ENV=production` and `APP_DEBUG=false`.
 2. Set `APP_KEY`, `APP_URL`, `FRONTEND_URL`, `HEALTH_CHECK_SECRET`, database, Redis, mail, and provider API key env vars.
-3. Run `composer install --no-dev --optimize-autoloader`.
-4. Run:
+3. Set `REQUIRE_EMAIL_VERIFICATION=true` for production. The API logs a warning if production starts with email verification disabled.
+4. Run `composer install --no-dev --optimize-autoloader`.
+5. Run:
 
 ```bash
 php artisan migrate --force
@@ -94,7 +95,7 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-5. Ensure the queue worker is running if queued jobs are used:
+6. Ensure the queue worker is running if queued jobs are used:
 
 ```bash
 php artisan queue:work
