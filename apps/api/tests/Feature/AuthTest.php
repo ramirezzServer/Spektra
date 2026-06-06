@@ -8,6 +8,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\PersonalAccessToken;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -19,7 +21,8 @@ class AuthTest extends TestCase
     {
         Notification::fake();
 
-        $this->postJson('/api/auth/register', [
+        $this->withServerVariables(['REMOTE_ADDR' => $this->uniqueTestIp()])
+            ->postJson('/api/auth/register', [
             'name' => 'Ada Lovelace',
             'username' => 'ada_lovelace',
             'email' => 'ada@example.com',
@@ -37,7 +40,8 @@ class AuthTest extends TestCase
 
     public function test_user_cannot_register_with_invalid_email(): void
     {
-        $this->postJson('/api/auth/register', [
+        $this->withServerVariables(['REMOTE_ADDR' => $this->uniqueTestIp()])
+            ->postJson('/api/auth/register', [
             'name' => 'Ada Lovelace',
             'username' => 'ada_invalid',
             'email' => 'not-an-email',
@@ -50,13 +54,15 @@ class AuthTest extends TestCase
 
     public function test_user_can_login_with_valid_credentials(): void
     {
+        $email = 'grace-'.Str::uuid().'@example.com';
+
         User::factory()->create([
-            'email' => 'grace@example.com',
+            'email' => $email,
             'password' => 'password-secret',
         ]);
 
         $this->postJson('/api/auth/login', [
-            'email' => 'grace@example.com',
+            'email' => $email,
             'password' => 'password-secret',
         ])
             ->assertOk()
@@ -65,13 +71,15 @@ class AuthTest extends TestCase
 
     public function test_login_returns_friendly_unauthorized_response_for_invalid_credentials(): void
     {
+        $email = 'wrong-password-'.Str::uuid().'@example.com';
+
         User::factory()->create([
-            'email' => 'wrong-password@example.com',
+            'email' => $email,
             'password' => 'password-secret',
         ]);
 
         $this->postJson('/api/auth/login', [
-            'email' => 'wrong-password@example.com',
+            'email' => $email,
             'password' => 'incorrect-password',
         ])
             ->assertUnauthorized()
@@ -103,11 +111,17 @@ class AuthTest extends TestCase
         $newToken = $response->json('token');
         $this->assertNotSame($oldToken, $newToken);
         $this->assertSame(1, $user->tokens()->count());
+        $this->assertNull(PersonalAccessToken::findToken($oldToken));
+        $this->assertNotNull(PersonalAccessToken::findToken($newToken));
 
+        $this->flushHeaders();
+        $this->app['auth']->forgetGuards();
         $this->withHeader('Authorization', "Bearer {$oldToken}")
             ->getJson('/api/auth/me')
             ->assertUnauthorized();
 
+        $this->flushHeaders();
+        $this->app['auth']->forgetGuards();
         $this->withHeader('Authorization', "Bearer {$newToken}")
             ->getJson('/api/v1/auth/me')
             ->assertOk()
@@ -133,13 +147,15 @@ class AuthTest extends TestCase
     public function test_forgot_password_returns_generic_success(): void
     {
         Notification::fake();
-        $user = User::factory()->create(['email' => 'reset@example.com']);
+        $email = 'reset-'.Str::uuid().'@example.com';
+        $missingEmail = 'missing-'.Str::uuid().'@example.com';
+        $user = User::factory()->create(['email' => $email]);
 
-        $this->postJson('/api/auth/forgot-password', ['email' => 'missing@example.com'])
+        $this->postJson('/api/auth/forgot-password', ['email' => $missingEmail])
             ->assertOk()
             ->assertJson(['message' => 'If an account exists, a reset link has been sent.']);
 
-        $this->postJson('/api/v1/auth/forgot-password', ['email' => 'reset@example.com'])
+        $this->postJson('/api/v1/auth/forgot-password', ['email' => $email])
             ->assertOk()
             ->assertJson(['message' => 'If an account exists, a reset link has been sent.']);
 
@@ -148,8 +164,9 @@ class AuthTest extends TestCase
 
     public function test_reset_password_with_valid_token_changes_password_and_revokes_tokens(): void
     {
+        $email = 'token-reset-'.Str::uuid().'@example.com';
         $user = User::factory()->create([
-            'email' => 'token-reset@example.com',
+            'email' => $email,
             'password' => 'old-password',
         ]);
         $user->createToken('api-token');
@@ -157,7 +174,7 @@ class AuthTest extends TestCase
 
         $this->postJson('/api/v1/auth/reset-password', [
             'token' => $token,
-            'email' => 'token-reset@example.com',
+            'email' => $email,
             'password' => 'new-password-secret',
             'password_confirmation' => 'new-password-secret',
         ])
@@ -171,20 +188,26 @@ class AuthTest extends TestCase
 
     public function test_reset_password_with_invalid_token_fails_safely(): void
     {
+        $email = 'invalid-token-'.Str::uuid().'@example.com';
         User::factory()->create([
-            'email' => 'invalid-token@example.com',
+            'email' => $email,
             'password' => 'old-password',
         ]);
 
         $this->postJson('/api/auth/reset-password', [
             'token' => 'not-a-valid-token',
-            'email' => 'invalid-token@example.com',
+            'email' => $email,
             'password' => 'new-password-secret',
             'password_confirmation' => 'new-password-secret',
         ])
             ->assertUnprocessable()
             ->assertJson(['message' => 'The reset link is invalid or has expired.']);
 
-        $this->assertTrue(Hash::check('old-password', User::where('email', 'invalid-token@example.com')->firstOrFail()->password));
+        $this->assertTrue(Hash::check('old-password', User::where('email', $email)->firstOrFail()->password));
+    }
+
+    private function uniqueTestIp(): string
+    {
+        return sprintf('10.%d.%d.%d', random_int(1, 254), random_int(1, 254), random_int(1, 254));
     }
 }

@@ -3,21 +3,24 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class SecurityHardeningTest extends TestCase
 {
     public function test_login_route_is_rate_limited(): void
     {
+        $email = 'not-an-email-'.Str::uuid();
+
         for ($attempt = 0; $attempt < 5; $attempt++) {
             $this->postJson('/api/auth/login', [
-                'email' => 'not-an-email',
+                'email' => $email,
                 'password' => 'incorrect-password',
             ])->assertStatus(422);
         }
 
         $this->postJson('/api/auth/login', [
-            'email' => 'not-an-email',
+            'email' => $email,
             'password' => 'incorrect-password',
         ])
             ->assertStatus(429)

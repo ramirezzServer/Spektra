@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\ContentItem;
 use App\Models\UserList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ApiVersioningTest extends TestCase
@@ -46,7 +47,7 @@ class ApiVersioningTest extends TestCase
     {
         foreach (['/api/auth/login', '/api/v1/auth/login'] as $path) {
             $this->postJson($path, [
-                'email' => 'versioning-login-invalid',
+                'email' => 'versioning-login-invalid-'.Str::uuid(),
                 'password' => 'password',
             ])
                 ->assertUnprocessable()
