@@ -83,7 +83,7 @@ Deploy `apps/api` as a Docker service or Laravel-compatible PHP service.
 Required steps:
 
 1. Set `APP_ENV=production` and `APP_DEBUG=false`.
-2. Set `APP_KEY`, `APP_URL`, `FRONTEND_URL`, database, Redis, mail, and provider API key env vars.
+2. Set `APP_KEY`, `APP_URL`, `FRONTEND_URL`, `HEALTH_CHECK_SECRET`, database, Redis, mail, and provider API key env vars.
 3. Run `composer install --no-dev --optimize-autoloader`.
 4. Run:
 
@@ -119,6 +119,7 @@ API rate limits are defined in Laravel named limiters for login, registration, e
 ## Post-Deploy Checklist
 
 - API health: `GET /api/v1/health` preferred; `GET /api/health` remains supported for legacy clients.
+- Deep API health: `GET /api/v1/health/deep` with `X-Health-Secret` matching `HEALTH_CHECK_SECRET`.
 - Worker health: `GET /health`.
 - Frontend loads and unknown routes fall back to the SPA.
 - Register, login, logout.

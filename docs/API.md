@@ -112,9 +112,13 @@ Follow mutations may require verified email when `REQUIRE_EMAIL_VERIFICATION=tru
 | Method | Path | Auth | Params |
 | --- | --- | --- | --- |
 | `GET` | `/health` | No | none |
-| `GET` | `/health/deep` | No | none |
+| `GET` | `/health/deep` | Header secret when configured | `X-Health-Secret` header |
 
-Deep health checks database and Redis without exposing secrets.
+`/health` is public and lightweight. Deep health checks database and Redis
+without exposing connection strings or exception messages. When
+`HEALTH_CHECK_SECRET` is set, `/health/deep` requires a matching
+`X-Health-Secret` header on both `/api/health/deep` and `/api/v1/health/deep`.
+Local development may leave the secret unset.
 
 ## Pagination
 

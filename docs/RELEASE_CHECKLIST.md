@@ -36,6 +36,7 @@
 - [ ] No secrets committed.
 - [ ] CORS frontend URL correct.
 - [ ] `SANCTUM_TOKEN_EXPIRATION_MINUTES` set to the intended API token lifetime.
+- [ ] `HEALTH_CHECK_SECRET` set to a long random production value.
 - [ ] Email verification setting decided.
 - [ ] Privacy and terms routes available.
 - [ ] External `target="_blank"` links include `rel="noopener noreferrer"`.
@@ -49,6 +50,7 @@
 
 - [ ] Frontend loads.
 - [ ] API health passes.
+- [ ] Deep API health returns 403 without `X-Health-Secret` and works with the correct header.
 - [ ] Legacy `/api` compatibility and preferred `/api/v1` routes both pass smoke checks.
 - [ ] Worker health passes.
 - [ ] Register/login works.

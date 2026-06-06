@@ -56,6 +56,8 @@ return [
 
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
 
+    'health_check_secret' => env('HEALTH_CHECK_SECRET'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

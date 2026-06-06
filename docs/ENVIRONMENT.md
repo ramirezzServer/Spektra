@@ -19,6 +19,7 @@ Spektra uses separate environment files for the root compose setup, frontend, AP
 - Password reset emails also use `FRONTEND_URL` to generate `/reset-password?token=...&email=...` links.
 - `REQUIRE_EMAIL_VERIFICATION`: set `true` to require verified email before sensitive mutations.
 - `SANCTUM_TOKEN_EXPIRATION_MINUTES`: API token lifetime in minutes. Defaults to `1440` so bearer tokens expire after 24 hours unless overridden.
+- `HEALTH_CHECK_SECRET`: shared secret required by `X-Health-Secret` for `/api/health/deep` when set. Leave unset only for local development; production should set a long random value.
 
 ## Database
 

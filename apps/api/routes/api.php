@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ListController;
 use App\Http\Controllers\Api\ListItemController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserEntryController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
@@ -37,7 +38,13 @@ $registerApiRoutes = function (): void {
         'timestamp' => now()->toISOString(),
     ]))->middleware('throttle:api.health');
 
-    Route::get('/health/deep', function () {
+    Route::get('/health/deep', function (Request $request) {
+        $secret = (string) config('app.health_check_secret', '');
+
+        if ($secret !== '' && ! hash_equals($secret, (string) $request->header('X-Health-Secret', ''))) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
         $checks = [
             'database' => false,
             'redis' => false,
