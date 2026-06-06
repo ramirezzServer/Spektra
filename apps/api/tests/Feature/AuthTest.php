@@ -98,6 +98,45 @@ class AuthTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_v1_me_without_accept_header_returns_json_unauthenticated(): void
+    {
+        $response = $this->get('/api/v1/auth/me')
+            ->assertUnauthorized()
+            ->assertJson(['message' => 'Unauthenticated.']);
+
+        $this->assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+    }
+
+    public function test_legacy_me_without_accept_header_returns_json_unauthenticated(): void
+    {
+        $response = $this->get('/api/auth/me')
+            ->assertUnauthorized()
+            ->assertJson(['message' => 'Unauthenticated.']);
+
+        $this->assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+    }
+
+    public function test_invalid_bearer_token_without_accept_header_returns_json_unauthenticated(): void
+    {
+        $response = $this->withHeader('Authorization', 'Bearer invalid-token')
+            ->get('/api/v1/auth/me')
+            ->assertUnauthorized()
+            ->assertJson(['message' => 'Unauthenticated.']);
+
+        $this->assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
+    }
+
+    public function test_authenticated_me_without_accept_header_still_returns_success(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->get('/api/v1/auth/me')
+            ->assertOk()
+            ->assertJsonPath('data.id', $user->id);
+    }
+
     public function test_refresh_token_requires_authentication(): void
     {
         $this->postJson('/api/auth/refresh-token')
@@ -216,6 +255,15 @@ class AuthTest extends TestCase
     {
         $this->deleteJson('/api/account', ['password' => 'password'])
             ->assertUnauthorized();
+    }
+
+    public function test_account_delete_without_accept_header_returns_json_unauthenticated(): void
+    {
+        $response = $this->delete('/api/account', ['password' => 'password'])
+            ->assertUnauthorized()
+            ->assertJson(['message' => 'Unauthenticated.']);
+
+        $this->assertStringContainsString('application/json', (string) $response->headers->get('Content-Type'));
     }
 
     public function test_account_delete_rejects_wrong_password(): void
