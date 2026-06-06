@@ -164,6 +164,13 @@ WEB_URL=http://localhost:5173 API_URL=http://localhost:8000/api/v1 WORKER_URL=ht
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/API.md](docs/API.md), and [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
 
+## Documentation
+
+- [Changelog](CHANGELOG.md)
+- [Project History](docs/PROJECT_HISTORY.md)
+- [Testing Guide](docs/TESTING.md)
+- [Environment Guide](docs/ENVIRONMENT.md)
+
 ## Data Providers
 
 Spektra uses TMDB for films/series, RAWG for games, and OpenLibrary for books. API keys must remain server-side.
@@ -174,3 +181,7 @@ Spektra uses TMDB for films/series, RAWG for games, and OpenLibrary for books. A
 - Dynamic content/profile/list sitemap generation is future work.
 - PWA support caches the app shell and static assets only. API responses and offline mutations are intentionally not cached.
 - No production credentials are committed. Use environment variables for secrets.
+
+## License
+
+Spektra is licensed under the [MIT License](LICENSE).
