@@ -11,6 +11,9 @@ use Throwable;
 class ContentAggregatorService
 {
     private const CACHE_TTL_HOURS = 24;
+    private const PROVIDER_TIMEOUT_SECONDS = 5;
+    private const PROVIDER_RETRY_ATTEMPTS = 1;
+    private const PROVIDER_RETRY_DELAY_MS = 100;
 
     public function searchFilms(string $query, int $page = 1): array
     {
@@ -34,7 +37,7 @@ class ContentAggregatorService
         }
 
         try {
-            $response = Http::timeout(10)->get(config('services.rawg.base_url').'/games', [
+            $response = $this->providerHttp()->get(config('services.rawg.base_url').'/games', [
                 'key' => config('services.rawg.key'),
                 'search' => $query,
                 'page' => $page,
@@ -62,7 +65,7 @@ class ContentAggregatorService
         }
 
         try {
-            $response = Http::timeout(10)->get(config('services.openlibrary.base_url').'/search.json', [
+            $response = $this->providerHttp()->get(config('services.openlibrary.base_url').'/search.json', [
                 'q' => $query,
                 'page' => $page,
                 'limit' => 20,
@@ -92,7 +95,7 @@ class ContentAggregatorService
         }
 
         try {
-            $response = Http::timeout(10)->get(config('services.tmdb.base_url').'/trending/all/week', [
+            $response = $this->providerHttp()->get(config('services.tmdb.base_url').'/trending/all/week', [
                 'api_key' => config('services.tmdb.key'),
             ])->throw()->json();
 
@@ -204,7 +207,7 @@ class ContentAggregatorService
         }
 
         try {
-            $response = Http::timeout(10)->get(config('services.tmdb.base_url').$path, [
+            $response = $this->providerHttp()->get(config('services.tmdb.base_url').$path, [
                 'api_key' => config('services.tmdb.key'),
                 'query' => $query,
                 'page' => $page,
@@ -225,7 +228,15 @@ class ContentAggregatorService
 
     private function cacheKey(string $provider, string $type, string $query, int $page): string
     {
-        return sprintf('%s:%s:%s:%d', $provider, $type, md5(mb_strtolower(trim($query))), $page);
+        $normalizedQuery = preg_replace('/\s+/', ' ', mb_strtolower(trim($query))) ?? '';
+
+        return sprintf('provider:%s:%s:search:%s:%d', $provider, $type, md5($normalizedQuery), max(1, $page));
+    }
+
+    private function providerHttp()
+    {
+        return Http::timeout(self::PROVIDER_TIMEOUT_SECONDS)
+            ->retry(self::PROVIDER_RETRY_ATTEMPTS, self::PROVIDER_RETRY_DELAY_MS);
     }
 
     private function yearFromDate(?string $date): ?int

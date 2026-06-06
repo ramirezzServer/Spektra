@@ -60,6 +60,17 @@ Laravel email verification URLs still preserve the legacy `verification.verify` 
 
 Content search uses page pagination and returns content item summaries.
 
+Provider-backed search responses from TMDB, RAWG, and OpenLibrary are
+normalized and cached by provider, content type, normalized query, and page for
+24 hours after a successful provider response. Failed provider responses are
+logged and returned as empty result sets, but they are not cached as successful
+long-lived responses. Provider requests use short timeouts and only a single
+brief retry to protect free API quotas.
+
+Content detail routes (`/content/{type}/{externalId}`) are DB-backed. They read
+content items already stored by search, trending, worker sync, or tests and do
+not call external providers during detail requests.
+
 ## Library And Tracking
 
 | Method | Path | Auth | Params |
