@@ -15,6 +15,8 @@ import { NetworkStatusBanner } from '@/components/network/NetworkStatusBanner';
 import { Home } from '@/pages/Home';
 import { Login } from '@/pages/Auth/Login';
 import { Register } from '@/pages/Auth/Register';
+import { ForgotPassword } from '@/pages/Auth/ForgotPassword';
+import { ResetPassword } from '@/pages/Auth/ResetPassword';
 import { EmailVerificationNotice } from '@/pages/Auth/EmailVerificationNotice';
 import { EmailVerified } from '@/pages/Auth/EmailVerified';
 
@@ -46,6 +48,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/email/verify" element={<RequireAuth><EmailVerificationNotice /></RequireAuth>} />
             <Route path="/email/verified" element={<EmailVerified />} />
 

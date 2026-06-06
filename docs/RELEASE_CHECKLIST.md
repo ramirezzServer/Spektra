@@ -20,6 +20,7 @@
 - [ ] Database URL configured.
 - [ ] Redis configured if required.
 - [ ] Mail configured.
+- [ ] Password reset emails deliver and open the frontend `/reset-password` route.
 - [ ] External API keys configured.
 - [ ] Analytics/monitoring decision documented.
 
@@ -50,6 +51,7 @@
 - [ ] Legacy `/api` compatibility and preferred `/api/v1` routes both pass smoke checks.
 - [ ] Worker health passes.
 - [ ] Register/login works.
+- [ ] Forgot-password and reset-password work without revealing account existence.
 - [ ] Email verification works.
 - [ ] Content search works.
 - [ ] Library tracking works.

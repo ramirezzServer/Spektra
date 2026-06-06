@@ -16,6 +16,7 @@ Spektra uses separate environment files for the root compose setup, frontend, AP
 - `APP_DEBUG`: set `false` in production.
 - `APP_URL`: API public URL.
 - `FRONTEND_URL`: frontend public URL used by CORS and email verification redirects.
+- Password reset emails also use `FRONTEND_URL` to generate `/reset-password?token=...&email=...` links.
 - `REQUIRE_EMAIL_VERIFICATION`: set `true` to require verified email before sensitive mutations.
 
 ## Database
@@ -71,6 +72,10 @@ Frontend code must not receive provider API keys.
 - `MAIL_FROM_NAME`
 
 Use `MAIL_MAILER=log` locally.
+
+Password reset and email verification both depend on the configured mailer in
+non-local environments. Confirm `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME`, and the
+provider credentials before enabling real user email flows.
 
 ## Frontend
 

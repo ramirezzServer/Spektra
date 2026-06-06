@@ -100,6 +100,10 @@ export function Login() {
           </button>
 
           <p className="text-center text-sm text-content-secondary">
+            <Link to="/forgot-password" className="font-medium text-accent hover:text-accent-hover">Forgot your password?</Link>
+          </p>
+
+          <p className="text-center text-sm text-content-secondary">
             Don't have an account?{' '}
             <Link to="/register" className="text-accent hover:text-accent-hover font-medium">Create one</Link>
           </p>

@@ -45,6 +45,20 @@ export function useAuth() {
     },
   });
 
+  const forgotPasswordMutation = useMutation({
+    mutationFn: async (data: { email: string }) => {
+      const res = await api.post<{ message: string }>('/auth/forgot-password', data);
+      return res.data;
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (data: { token: string; email: string; password: string; password_confirmation: string }) => {
+      const res = await api.post<{ message: string }>('/auth/reset-password', data);
+      return res.data;
+    },
+  });
+
   const logoutMutation = useMutation({
     mutationFn: async () => api.post('/auth/logout'),
     onSettled: () => {
@@ -69,6 +83,8 @@ export function useAuth() {
     isAuthenticated,
     register: registerMutation,
     login: loginMutation,
+    forgotPassword: forgotPasswordMutation,
+    resetPassword: resetPasswordMutation,
     logout: logoutMutation,
     resendVerification,
   };

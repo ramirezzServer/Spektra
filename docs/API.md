@@ -14,10 +14,17 @@ Responses generally use `{ "data": ... }` with optional `meta`. Validation error
 | --- | --- | --- | --- |
 | `POST` | `/auth/register` | No | `name`, `username`, `email`, `password`, `password_confirmation` |
 | `POST` | `/auth/login` | No | `email`, `password` |
+| `POST` | `/auth/forgot-password` | No | `email` |
+| `POST` | `/auth/reset-password` | No | `token`, `email`, `password`, `password_confirmation` |
 | `POST` | `/auth/logout` | Yes | none |
 | `GET` | `/auth/me` | Yes | none |
 
 Register/login return a user resource and `token`.
+
+Forgot-password responses are generic and do not reveal whether an email belongs
+to an account. Password reset links point to the frontend `/reset-password`
+route using `FRONTEND_URL`. Successful password resets revoke existing API
+tokens for that user.
 
 ## Email Verification
 
