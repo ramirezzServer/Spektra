@@ -1,38 +1,56 @@
 # Spektra
 
-Spektra is a full-stack tracker for films, series, games, and books. It combines external content discovery with personal library tracking, ratings, reviews, profiles, follows, activity feeds, and custom lists.
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=111827)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?logo=laravel&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-Python%203.11-009688?logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Ready-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-## Feature Overview
+Spektra is a full-stack media tracking platform for films, series, games, and books. It combines external discovery, personal library tracking, ratings, reviews, profiles, follows, activity feeds, custom lists, and PWA installability in one monorepo.
 
-- Email/password auth with optional email verification.
-- Content search and detail views backed by TMDB, RAWG, and OpenLibrary.
-- Personal library tracking with Want, In Progress, and Done statuses.
-- Ratings, reviews, profile stats, and paginated public libraries.
-- Social graph with follow/unfollow, followers, following, and relationship state.
-- Activity feed with Following and Global scopes.
-- Custom lists with public/private visibility and ordered items.
-- Home discovery, SPA SEO metadata, privacy/terms pages, and PWA installability.
-- Consent-gated analytics hooks and frontend error boundary.
+**Demo:** _Add deployed demo URL here._
+
+## Screenshots
+
+Screenshots are not committed yet. See [docs/screenshots/README.md](docs/screenshots/README.md) for the required portfolio capture list before publishing the repo.
+
+## Product Highlights
+
+- Unified discovery across TMDB, RAWG, and OpenLibrary-backed content.
+- Personal library with Want, In Progress, Done, ratings, and reviews.
+- Public profiles, followers/following, and global/following activity feeds.
+- Custom public/private lists with ordered items.
+- React SPA with route splitting, dark mode, PWA install/update flow, and offline messaging.
+- Laravel Sanctum API with versioned `/api/v1` routes and legacy `/api` compatibility.
+- FastAPI worker for scheduled sync and rating refresh jobs.
+
+## Architecture
+
+```txt
+React/Vite PWA (apps/web)
+        |
+        | HTTP /api/v1
+        v
+Laravel API + Sanctum (apps/api)
+        |
+        +--> PostgreSQL: users, content, library, feed, lists
+        +--> Redis: cache, throttling, queues
+        +--> Provider APIs: TMDB, RAWG, OpenLibrary
+
+FastAPI worker (apps/worker)
+        |
+        +--> PostgreSQL + provider APIs for scheduled sync/refresh
+```
 
 ## Tech Stack
 
-| App | Tech | Purpose |
-| --- | --- | --- |
-| `apps/web` | React 18, Vite, TypeScript, TailwindCSS, React Router, TanStack Query, Zustand | SPA frontend |
-| `apps/api` | Laravel 11, Sanctum, PostgreSQL, Redis | API, auth, library, social graph, feed |
-| `apps/worker` | Python 3.11, FastAPI, APScheduler, asyncpg | Scheduled sync and rating refresh jobs |
-| `packages/shared-types` | TypeScript | Shared domain types |
-
-## Monorepo Structure
-
-```txt
-apps/web       React/Vite frontend
-apps/api       Laravel API
-apps/worker    FastAPI scheduled worker
-packages       shared TypeScript packages
-docs           production, API, and release documentation
-scripts        operational helper scripts
-```
+| App                     | Tech                                                                           | Purpose                                       |
+| ----------------------- | ------------------------------------------------------------------------------ | --------------------------------------------- |
+| `apps/web`              | React 18, Vite, TypeScript, TailwindCSS, React Router, TanStack Query, Zustand | SPA/PWA frontend                              |
+| `apps/api`              | Laravel 11, Sanctum, PostgreSQL, Redis                                         | Auth, API, library, social graph, feed, lists |
+| `apps/worker`           | Python 3.11, FastAPI, APScheduler, asyncpg                                     | Scheduled content sync and rating refresh     |
+| `packages/shared-types` | TypeScript                                                                     | Shared domain types                           |
 
 ## Quick Start
 
@@ -44,15 +62,19 @@ cp apps/web/.env.example apps/web/.env
 docker compose up --build
 ```
 
-The default dev Compose file exposes the API, worker, and web ports only. PostgreSQL and Redis are available to containers on the Docker network as `postgres` and `redis`.
+The default Compose file exposes only the app services:
 
-For host DB/Redis tools such as TablePlus, DBeaver, psql, or RedisInsight, opt in to port forwarding:
+- Web: `http://localhost:5173`
+- API: `http://localhost:8000`
+- Worker: `http://localhost:8001`
+
+PostgreSQL and Redis stay inside the Docker network by default. If you need host access for database tools:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.expose.yml up -d
 ```
 
-Manual local service setup without Docker:
+Manual local setup:
 
 ```bash
 cd apps/api
@@ -71,69 +93,11 @@ uvicorn main:app --reload --port 8001
 
 ## Environment
 
-Copy each example file before running the matching service:
+Copy each `.env.example` before running the matching service. Core production variables include `APP_ENV`, `APP_DEBUG`, `APP_URL`, `FRONTEND_URL`, database/Redis settings, mail settings, provider API keys, `VITE_API_URL`, and `VITE_PUBLIC_SITE_URL`.
 
-- Root: `.env.example` for optional Compose defaults and host port override variables
-- Frontend: `apps/web/.env.example`
-- API: `apps/api/.env.example`; use `DB_HOST=postgres` and `REDIS_HOST=redis` in Docker
-- Worker: `apps/worker/.env.example`; use a `DATABASE_URL` with host `postgres` in Docker
+New frontend deployments should set `VITE_API_URL` to the preferred `/api/v1` API base. See [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) for details.
 
-Core production variables are `APP_ENV`, `APP_DEBUG`, `APP_URL`, `FRONTEND_URL`, `DATABASE_URL` or `DB_*`, `DB_SSLMODE`, `REDIS_*`, `MAIL_*`, `TMDB_API_KEY`, `RAWG_API_KEY`, `OPENLIBRARY_BASE_URL`, `VITE_API_URL`, and `VITE_PUBLIC_SITE_URL`. New frontend deployments should set `VITE_API_URL` to the preferred `/api/v1` prefix.
-
-See [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md) for details.
-
-## Docker Usage
-
-Local development:
-
-```bash
-docker compose up --build
-```
-
-Optional DB/Redis host access:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.expose.yml up -d
-```
-
-Production-like local run with an included Postgres service:
-
-```bash
-docker compose -f docker-compose.prod.yml --profile local-db up --build
-```
-
-For managed PostgreSQL such as Neon, set `DATABASE_URL` for the API and worker and omit the `local-db` profile.
-
-## Database Migrations
-
-Run migrations after configuring the API environment:
-
-```bash
-cd apps/api
-php artisan migrate
-```
-
-Production deploys should use:
-
-```bash
-php artisan migrate --force
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-## Worker Usage
-
-The worker runs scheduled content sync and rating refresh jobs:
-
-```bash
-cd apps/worker
-uvicorn main:app --host 0.0.0.0 --port 8001
-```
-
-The health endpoint is `GET /health`.
-
-## Testing And Build
+## Testing
 
 ```bash
 cd apps/web && npm run typecheck
@@ -148,36 +112,29 @@ node --check scripts/security-audit-check.mjs
 node --check scripts/smoke-test.mjs
 ```
 
-API tests use PostgreSQL because the migrations rely on PostgreSQL-specific SQL. Web and worker tests are unit/light integration tests and do not require TMDB, RAWG, OpenLibrary, mail, Neon, or production credentials. See [docs/TESTING.md](docs/TESTING.md) for the fuller testing guide.
-
-Smoke test:
-
-```bash
-WEB_URL=http://localhost:5173 API_URL=http://localhost:8000/api/v1 WORKER_URL=http://localhost:8001 node scripts/smoke-test.mjs
-```
+API tests use PostgreSQL because migrations rely on PostgreSQL-specific SQL. Web and worker tests are unit/light integration tests and do not require real provider, mail, Neon, or production credentials.
 
 ## Deployment
 
-- Frontend: static host from `apps/web`, build with `npm ci && npm run build`, publish `dist`.
-- API: Docker-capable Laravel host with PostgreSQL, Redis, mail, provider API keys, and migrations.
-- Worker: separate service using the same production database and provider API keys.
+- Frontend: build `apps/web` with `npm ci && npm run build`, publish `dist`.
+- API: deploy `apps/api` to a Docker-capable Laravel host with PostgreSQL, Redis, mail, provider API keys, and migrations.
+- Worker: deploy `apps/worker` as a separate service using the same production database and provider API keys.
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/API.md](docs/API.md), and [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) and [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md) before release.
 
 ## Documentation
 
 - [Changelog](CHANGELOG.md)
 - [Project History](docs/PROJECT_HISTORY.md)
-- [Audit Fix Summary](docs/AUDIT_FIX_SUMMARY.md)
 - [Testing Guide](docs/TESTING.md)
+- [API Guide](docs/API.md)
+- [OpenAPI Specification](docs/openapi.yaml)
 - [Environment Guide](docs/ENVIRONMENT.md)
-
-## Data Providers
-
-Spektra uses TMDB for films/series, RAWG for games, and OpenLibrary for books. API keys must remain server-side.
+- [GitHub Repo Setup](docs/GITHUB_REPO_SETUP.md)
 
 ## Known Limitations
 
+- Demo URL and screenshots need to be added before public portfolio/recruiter sharing.
 - `robots.txt` and `sitemap.xml` contain `https://your-domain.example`; update before launch.
 - Dynamic content/profile/list sitemap generation is future work.
 - PWA support caches the app shell, static assets, and a static offline fallback page only. API responses and offline mutations are intentionally not cached or queued.

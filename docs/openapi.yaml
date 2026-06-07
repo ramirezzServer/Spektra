@@ -1,0 +1,1406 @@
+openapi: 3.0.3
+info:
+  title: Spektra API
+  version: 0.1.0
+  description: |
+    OpenAPI foundation for the Spektra Laravel API.
+
+    The preferred base path is `/api/v1`. Legacy `/api` routes remain compatible
+    for existing clients, but new clients should target `/api/v1`.
+servers:
+  - url: /api/v1
+    description: Preferred versioned API base
+  - url: /api
+    description: Legacy compatible API base
+tags:
+  - name: Auth
+  - name: Email Verification
+  - name: Content
+  - name: Library
+  - name: Users
+  - name: Social
+  - name: Feed
+  - name: Lists
+  - name: Health
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registered user and Sanctum token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated user and Sanctum token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Send a password reset link if the account exists
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Reset a password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Delete the current access token
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /auth/refresh-token:
+    post:
+      tags: [Auth]
+      summary: Rotate the current Sanctum token
+      responses:
+        '200':
+          description: Authenticated user and replacement token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get the current user
+      responses:
+        '200':
+          description: Current user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /account:
+    delete:
+      tags: [Auth]
+      summary: Delete the current account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /email/verification-notification:
+    post:
+      tags: [Email Verification]
+      summary: Send or skip an email verification notification
+      responses:
+        '200':
+          description: Verification notification status.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [sent, verified]
+                    properties:
+                      sent:
+                        type: boolean
+                      verified:
+                        type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /email/verify/{id}/{hash}:
+    get:
+      tags: [Email Verification]
+      summary: Verify an email address from a signed URL
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - name: hash
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: expires
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: signature
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirects to the frontend email verification status route.
+  /content:
+    get:
+      tags: [Content]
+      summary: Search or browse content
+      security: []
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 100
+        - $ref: '#/components/parameters/ContentTypeQuery'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Content items with page metadata.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ContentItem'
+  /content/trending:
+    get:
+      tags: [Content]
+      summary: Get trending content
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/ContentTypeQuery'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 40
+            default: 20
+      responses:
+        '200':
+          description: Trending content items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContentItem'
+                  meta:
+                    type: object
+                    properties:
+                      source:
+                        type: string
+                        enum: [db, api]
+  /content/{type}/{externalId}:
+    get:
+      tags: [Content]
+      summary: Get content details by provider id
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/ContentTypePath'
+        - name: externalId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Content item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /entries:
+    post:
+      tags: [Library]
+      summary: Create or update a library entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntryUpsertRequest'
+      responses:
+        '200':
+          description: Updated entry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEntryEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /entries/{id}:
+    delete:
+      tags: [Library]
+      summary: Delete a library entry
+      parameters:
+        - $ref: '#/components/parameters/UuidId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /entries/by-content/{contentId}:
+    get:
+      tags: [Library]
+      summary: Get the current user's entry for a content item
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+      responses:
+        '200':
+          description: Entry or null.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/UserEntry'
+                    nullable: true
+                  meta:
+                    type: object
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /library:
+    get:
+      tags: [Library]
+      summary: Get the current user's library
+      parameters:
+        - $ref: '#/components/parameters/EntryStatusQuery'
+        - $ref: '#/components/parameters/ContentTypeQuery'
+        - $ref: '#/components/parameters/LibrarySort'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Paginated entries.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserEntry'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /users/{username}:
+    get:
+      tags: [Users]
+      summary: Get a public profile
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Username'
+      responses:
+        '200':
+          description: User profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /users/{username}/stats:
+    get:
+      tags: [Users]
+      summary: Get profile library statistics
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Username'
+      responses:
+        '200':
+          description: User library stats.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatsEnvelope'
+  /users/{username}/library:
+    get:
+      tags: [Users]
+      summary: Get a user's public library entries
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Username'
+        - $ref: '#/components/parameters/EntryStatusQuery'
+        - $ref: '#/components/parameters/ContentTypeQuery'
+        - $ref: '#/components/parameters/PublicLibrarySort'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Paginated public entries.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserEntry'
+  /users/{username}/relationship:
+    get:
+      tags: [Social]
+      summary: Get the current user's relationship to a profile
+      parameters:
+        - $ref: '#/components/parameters/Username'
+      responses:
+        '200':
+          description: Relationship state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelationshipEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /users/{username}/followers:
+    get:
+      tags: [Social]
+      summary: Get a user's followers
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Username'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Paginated users.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+  /users/{username}/following:
+    get:
+      tags: [Social]
+      summary: Get users followed by a user
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Username'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Paginated users.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+  /follows/{username}:
+    post:
+      tags: [Social]
+      summary: Follow a user
+      parameters:
+        - $ref: '#/components/parameters/Username'
+      responses:
+        '200':
+          description: Follow state and counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Social]
+      summary: Unfollow a user
+      parameters:
+        - $ref: '#/components/parameters/Username'
+      responses:
+        '200':
+          description: Follow state and counts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /feed:
+    get:
+      tags: [Feed]
+      summary: Get global or following activity feed
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - name: scope
+          in: query
+          schema:
+            type: string
+            enum: [global, following]
+            default: global
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Cursor-paginated activity feed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /lists:
+    get:
+      tags: [Lists]
+      summary: Get the current user's lists
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Paginated lists.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserList'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags: [Lists]
+      summary: Create a list
+      requestBody:
+        $ref: '#/components/requestBodies/ListWrite'
+      responses:
+        '200':
+          description: Created list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /lists/{id}:
+    get:
+      tags: [Lists]
+      summary: Get a public or owned list
+      security:
+        - bearerAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/UuidId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: List detail with paginated items.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDetailEnvelope'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Lists]
+      summary: Update an owned list
+      parameters:
+        - $ref: '#/components/parameters/UuidId'
+      requestBody:
+        $ref: '#/components/requestBodies/ListWrite'
+      responses:
+        '200':
+          description: Updated list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Lists]
+      summary: Delete an owned list
+      parameters:
+        - $ref: '#/components/parameters/UuidId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /lists/{id}/items:
+    post:
+      tags: [Lists]
+      summary: Add content to an owned list
+      parameters:
+        - $ref: '#/components/parameters/UuidId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content_id]
+              properties:
+                content_id:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Added list item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListItemEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /lists/{id}/items/{contentId}:
+    delete:
+      tags: [Lists]
+      summary: Remove content from an owned list
+      parameters:
+        - $ref: '#/components/parameters/UuidId'
+        - $ref: '#/components/parameters/ContentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /lists/{id}/items/reorder:
+    put:
+      tags: [Lists]
+      summary: Reorder owned list items
+      parameters:
+        - $ref: '#/components/parameters/UuidId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [content_id, position]
+                    properties:
+                      content_id:
+                        type: string
+                        format: uuid
+                      position:
+                        type: integer
+                        minimum: 1
+      responses:
+        '200':
+          description: Reordered list items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListItem'
+                  meta:
+                    type: object
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /health:
+    get:
+      tags: [Health]
+      summary: Lightweight API health check
+      security: []
+      responses:
+        '200':
+          description: API health.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /health/deep:
+    get:
+      tags: [Health]
+      summary: Deep health check for database and Redis
+      security: []
+      parameters:
+        - name: X-Health-Secret
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Healthy dependencies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeepHealthResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          description: One or more dependencies are degraded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeepHealthResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum token
+  parameters:
+    UuidId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    ContentId:
+      name: contentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Username:
+      name: username
+      in: path
+      required: true
+      schema:
+        type: string
+    ContentTypePath:
+      name: type
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ContentType'
+    ContentTypeQuery:
+      name: type
+      in: query
+      schema:
+        $ref: '#/components/schemas/ContentType'
+    EntryStatusQuery:
+      name: status
+      in: query
+      schema:
+        $ref: '#/components/schemas/EntryStatus'
+    LibrarySort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        enum: [updated_desc, updated_asc, title_asc, rating_desc, rating_asc]
+    PublicLibrarySort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        enum: [updated_desc, title_asc, rating_desc]
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PerPage:
+      name: per_page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+  requestBodies:
+    ListWrite:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListWriteRequest'
+  responses:
+    Message:
+      description: Message response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageResponse'
+    Deleted:
+      description: Deleted response.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, meta]
+            properties:
+              data:
+                type: object
+                required: [deleted]
+                properties:
+                  deleted:
+                    type: boolean
+              meta:
+                type: object
+    Unauthenticated:
+      description: Missing or invalid Sanctum token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Laravel validation error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ContentType:
+      type: string
+      enum: [film, series, game, book]
+    EntryStatus:
+      type: string
+      enum: [want, in_progress, done]
+    RegisterRequest:
+      type: object
+      required: [name, username, email, password, password_confirmation]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        username:
+          type: string
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        password_confirmation:
+          type: string
+          format: password
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    ResetPasswordRequest:
+      type: object
+      required: [token, email, password, password_confirmation]
+      properties:
+        token:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        password_confirmation:
+          type: string
+          format: password
+    EntryUpsertRequest:
+      type: object
+      required: [content_id, status]
+      properties:
+        content_id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/EntryStatus'
+        rating:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 10
+        review:
+          type: string
+          nullable: true
+          maxLength: 5000
+    ListWriteRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+        is_public:
+          type: boolean
+    User:
+      type: object
+      required: [id, name, username, avatarUrl, bio, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Present only for the authenticated user's own resource.
+        avatarUrl:
+          type: string
+          format: uri
+        bio:
+          type: string
+          nullable: true
+        followersCount:
+          type: integer
+        followingCount:
+          type: integer
+        emailVerified:
+          type: boolean
+          description: Present only for the authenticated user's own resource.
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+    ContentItem:
+      type: object
+      required: [id, externalId, type, title, genres, metadata, avgRating, ratingsCount]
+      properties:
+        id:
+          type: string
+          format: uuid
+        externalId:
+          type: string
+        type:
+          $ref: '#/components/schemas/ContentType'
+        title:
+          type: string
+        posterUrl:
+          type: string
+          format: uri
+          nullable: true
+        releaseYear:
+          type: integer
+          nullable: true
+        genres:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: object
+          additionalProperties: true
+        avgRating:
+          type: number
+          format: float
+          nullable: true
+        ratingsCount:
+          type: integer
+    UserEntry:
+      type: object
+      required: [id, userId, contentId, status, rating, review, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        contentId:
+          type: string
+          format: uuid
+        content:
+          allOf:
+            - $ref: '#/components/schemas/ContentItem'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/EntryStatus'
+        rating:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 10
+        review:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    UserList:
+      type: object
+      required: [id, userId, name, description, isPublic, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        isPublic:
+          type: boolean
+        itemsCount:
+          type: integer
+        previewItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentItem'
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+    ListItem:
+      type: object
+      required: [listId, contentId, position, addedAt]
+      properties:
+        listId:
+          type: string
+          format: uuid
+        contentId:
+          type: string
+          format: uuid
+        position:
+          type: integer
+        content:
+          allOf:
+            - $ref: '#/components/schemas/ContentItem'
+          nullable: true
+        addedAt:
+          type: string
+          format: date-time
+          nullable: true
+    ActivityFeedItem:
+      type: object
+      required: [id, actorId, verb, objectId, objectType, metadata, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        actorId:
+          type: string
+          format: uuid
+        actor:
+          allOf:
+            - $ref: '#/components/schemas/User'
+          nullable: true
+        verb:
+          type: string
+          example: completed
+        objectId:
+          type: string
+        objectType:
+          type: string
+          example: content
+        content:
+          allOf:
+            - $ref: '#/components/schemas/ContentItem'
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+    PageMeta:
+      type: object
+      required: [page, per_page, perPage, total, last_page, lastPage]
+      properties:
+        page:
+          type: integer
+        per_page:
+          type: integer
+        perPage:
+          type: integer
+        total:
+          type: integer
+        last_page:
+          type: integer
+        lastPage:
+          type: integer
+    PaginatedResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items: {}
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+    MessageResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+    AuthTokenResponse:
+      type: object
+      required: [data, token]
+      properties:
+        data:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+    UserEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/User'
+        meta:
+          type: object
+    ContentEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/ContentItem'
+        meta:
+          type: object
+    UserEntryEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/UserEntry'
+        meta:
+          type: object
+    UserListEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/UserList'
+        meta:
+          type: object
+    ListItemEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/ListItem'
+        meta:
+          type: object
+    ListDetail:
+      allOf:
+        - $ref: '#/components/schemas/UserList'
+        - type: object
+          required: [owner, items]
+          properties:
+            owner:
+              $ref: '#/components/schemas/User'
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ListItem'
+    ListDetailEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          $ref: '#/components/schemas/ListDetail'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    UserStatsEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [total, byType, byStatus, ratedCount, reviewedCount]
+          properties:
+            total:
+              type: integer
+            byType:
+              type: object
+              properties:
+                film:
+                  type: integer
+                series:
+                  type: integer
+                game:
+                  type: integer
+                book:
+                  type: integer
+            byStatus:
+              type: object
+              properties:
+                want:
+                  type: integer
+                in_progress:
+                  type: integer
+                done:
+                  type: integer
+            ratedCount:
+              type: integer
+            reviewedCount:
+              type: integer
+        meta:
+          type: object
+    RelationshipEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [isSelf, isFollowing]
+          properties:
+            isSelf:
+              type: boolean
+            isFollowing:
+              type: boolean
+        meta:
+          type: object
+    FollowEnvelope:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [following, followersCount, followingCount]
+          properties:
+            following:
+              type: boolean
+            followersCount:
+              type: integer
+            followingCount:
+              type: integer
+        meta:
+          type: object
+    FeedResponse:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityFeedItem'
+        meta:
+          type: object
+          required: [per_page, next_cursor, has_more]
+          properties:
+            per_page:
+              type: integer
+            next_cursor:
+              type: string
+              nullable: true
+            has_more:
+              type: boolean
+    HealthResponse:
+      type: object
+      required: [status, service, environment, timestamp]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        service:
+          type: string
+        environment:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    DeepHealthResponse:
+      type: object
+      required: [status, service, checks, timestamp]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        service:
+          type: string
+        checks:
+          type: object
+          required: [database, redis]
+          properties:
+            database:
+              type: boolean
+            redis:
+              type: boolean
+        timestamp:
+          type: string
+          format: date-time

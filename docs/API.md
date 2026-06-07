@@ -8,6 +8,8 @@ The unversioned `/api` routes remain backward-compatible for existing clients. N
 
 Responses generally use `{ "data": ... }` with optional `meta`. Validation errors follow Laravel's `message` plus `errors` object shape. Token auth uses Laravel Sanctum bearer tokens.
 
+An OpenAPI 3.0 foundation is available at [docs/openapi.yaml](openapi.yaml) for Postman import, client generation experiments, and contract review. It is maintained manually from the Laravel routes and should be updated with API changes.
+
 ## Auth
 
 | Method | Path | Auth | Params |
