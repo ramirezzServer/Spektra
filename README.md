@@ -180,7 +180,7 @@ Spektra uses TMDB for films/series, RAWG for games, and OpenLibrary for books. A
 
 - `robots.txt` and `sitemap.xml` contain `https://your-domain.example`; update before launch.
 - Dynamic content/profile/list sitemap generation is future work.
-- PWA support caches the app shell and static assets only. API responses and offline mutations are intentionally not cached.
+- PWA support caches the app shell, static assets, and a static offline fallback page only. API responses and offline mutations are intentionally not cached or queued.
 - No production credentials are committed. Use environment variables for secrets.
 
 ## License

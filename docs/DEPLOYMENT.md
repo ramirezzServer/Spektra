@@ -68,6 +68,8 @@ Set `VITE_API_URL` to the preferred versioned API base, for example `https://api
 
 The frontend includes SPA fallback files for Vercel and Netlify-compatible hosts.
 
+The PWA service worker precaches the app shell, static assets, and `/offline.html`. It intentionally does not cache `/api` responses and does not queue offline mutations, so private library, feed, list, and profile data must be fetched again after reconnecting.
+
 Production static headers include a compatible CSP for the SPA, PWA, Google Fonts, HTTPS API calls, provider images, and optional analytics scripts. If analytics or API hosts are restricted further at the edge, add the exact deployed domains to `script-src` and `connect-src` before launch.
 
 ## Canonical Domain and Redirects
@@ -137,7 +139,7 @@ API rate limits are defined in Laravel named limiters for login, registration, e
 - Library tracking, rating, review.
 - Follow/unfollow and feed.
 - Custom lists.
-- PWA manifest and install prompt.
+- PWA manifest, install prompt, offline fallback page, and in-app offline banner.
 - `robots.txt` and `sitemap.xml` updated to the production domain.
 - Analytics and monitoring consent behavior checked.
 - Smoke test script passes.
