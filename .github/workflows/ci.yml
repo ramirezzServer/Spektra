@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  frontend:
-    name: Frontend
+  web:
+    name: Web
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,8 +27,8 @@ jobs:
       - run: npm run build
       - run: npm test -- --run
 
-  backend:
-    name: Backend
+  api:
+    name: API
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -47,6 +47,21 @@ jobs:
     defaults:
       run:
         working-directory: apps/api
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: spektra_test
+      DB_USERNAME: spektra_user
+      DB_PASSWORD: spektra_pass
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      SESSION_DRIVER: array
+      MAIL_MAILER: array
+      TMDB_API_KEY: ''
+      RAWG_API_KEY: ''
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -57,22 +72,8 @@ jobs:
       - run: composer validate --no-check-publish
       - run: composer pint:test
       - run: find app routes config -name '*.php' -print0 | xargs -0 -n1 php -l
+      - run: php artisan migrate --force
       - run: php artisan test
-        env:
-          APP_ENV: testing
-          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
-          DB_CONNECTION: pgsql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 5432
-          DB_DATABASE: spektra_test
-          DB_USERNAME: spektra_user
-          DB_PASSWORD: spektra_pass
-          CACHE_STORE: array
-          QUEUE_CONNECTION: sync
-          SESSION_DRIVER: array
-          MAIL_MAILER: array
-          TMDB_API_KEY: ''
-          RAWG_API_KEY: ''
 
   worker:
     name: Worker
@@ -99,6 +100,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - run: for file in scripts/*.mjs; do node --check "$file"; done
+
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - run: node --check scripts/check-headers.mjs
-      - run: node --check scripts/security-audit-check.mjs
-      - run: node --check scripts/smoke-test.mjs
+      - run: node scripts/security-audit-check.mjs
+
+  docker:
+    name: Docker Compose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare local-only env files for config validation
+        run: |
+          cp apps/api/.env.example apps/api/.env
+          cp apps/worker/.env.example apps/worker/.env
+          cp apps/web/.env.example apps/web/.env
+      - run: docker compose -f docker-compose.yml config --quiet
+      - run: docker compose -f docker-compose.yml -f docker-compose.expose.yml config --quiet
+      - run: docker compose -f docker-compose.prod.yml --profile local-db config --quiet

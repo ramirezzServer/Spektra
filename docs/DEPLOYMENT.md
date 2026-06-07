@@ -1,5 +1,13 @@
 # Deployment
 
+## CI/CD Policy
+
+GitHub Actions CI verifies code quality and security gates for pull requests and pushes to `main`: frontend lint/typecheck/tests/build, API Composer validation/Pint/PHP syntax/tests, worker compile/tests, script syntax, security audit scanning, and Docker Compose config validation.
+
+Deployment is intentionally manual today. No workflow deploys to staging or production because host targets and deployment secrets are not defined in the repository. Add automated deployment only after the hosting target, environment variables, rollback process, and secret names are documented.
+
+For production releases, use the manual checklist in `docs/RELEASE_CHECKLIST.md`. For end-to-end smoke verification in GitHub Actions, run the manual **Smoke** workflow; it starts the production-like Docker Compose stack with local-only CI env values, runs migrations, then executes the smoke and header scripts.
+
 ## Local Production-Like Run
 
 1. Copy env examples and set local-safe values.

@@ -1,0 +1,66 @@
+name: Smoke
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docker-smoke:
+    name: Docker Smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Prepare local-only env files
+        run: |
+          cp apps/api/.env.example apps/api/.env
+          cat >> apps/api/.env <<'EOF'
+          APP_ENV=testing
+          APP_DEBUG=false
+          APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          APP_URL=http://localhost:8000
+          FRONTEND_URL=http://localhost:8080
+          DB_HOST=postgres
+          DB_DATABASE=spektra
+          DB_USERNAME=spektra_user
+          DB_PASSWORD=spektra_pass
+          CACHE_STORE=redis
+          CACHE_DRIVER=redis
+          QUEUE_CONNECTION=sync
+          SESSION_DRIVER=array
+          MAIL_MAILER=array
+          REQUIRE_EMAIL_VERIFICATION=false
+          EOF
+
+          cp apps/worker/.env.example apps/worker/.env
+          cp apps/web/.env.example apps/web/.env
+          cat >> apps/web/.env <<'EOF'
+          VITE_API_URL=http://localhost:8000/api/v1
+          VITE_PUBLIC_SITE_URL=http://localhost:8080
+          EOF
+      - name: Build and start services
+        run: docker compose -f docker-compose.prod.yml --profile local-db up -d --build
+      - name: Wait for services
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:8000/api/v1/health && curl -fsS http://localhost:8001/health && curl -fsS http://localhost:8080 >/dev/null; then
+              exit 0
+            fi
+            sleep 5
+          done
+          docker compose -f docker-compose.prod.yml --profile local-db ps
+          docker compose -f docker-compose.prod.yml --profile local-db logs --tail=120
+          exit 1
+      - name: Run migrations
+        run: docker compose -f docker-compose.prod.yml --profile local-db exec -T api php artisan migrate --force
+      - name: Run smoke checks
+        run: WEB_URL=http://localhost:8080 API_URL=http://localhost:8000/api/v1 WORKER_URL=http://localhost:8001 node scripts/smoke-test.mjs
+      - name: Run header checks
+        run: WEB_URL=http://localhost:8080 API_URL=http://localhost:8000/api/v1/health WORKER_URL=http://localhost:8001/health node scripts/check-headers.mjs
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.prod.yml --profile local-db logs --tail=200
+      - name: Stop services
+        if: always()
+        run: docker compose -f docker-compose.prod.yml --profile local-db down -v

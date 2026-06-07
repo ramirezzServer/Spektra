@@ -2,15 +2,15 @@
 
 ## Code Quality
 
-- [ ] Frontend typecheck passes.
-- [ ] Frontend build passes.
-- [ ] Frontend unit tests pass.
+- [ ] Web CI passes: install, lint, format check, typecheck, unit tests, and build.
 - [ ] Backend Pint style check passes.
-- [ ] Backend API tests pass against a PostgreSQL test database.
-- [ ] Worker compile checks pass.
-- [ ] Worker unit tests pass.
-- [ ] Script syntax checks pass.
-- [ ] CI is green.
+- [ ] API CI passes: Composer install/validate, Pint, PHP syntax, migrations, and tests against PostgreSQL.
+- [ ] Worker CI passes: Python 3.11 dependency install, py_compile, and pytest.
+- [ ] Scripts CI passes: `node --check` for `scripts/*.mjs`.
+- [ ] Security CI passes: security audit script and header-check script syntax.
+- [ ] Docker CI passes: Compose config validation for dev, exposed dev, and production-like files.
+- [ ] Manual Smoke workflow passes for production-like Docker Compose when needed.
+- [ ] CI is green before release.
 
 ## Environment
 

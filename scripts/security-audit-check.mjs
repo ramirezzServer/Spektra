@@ -5,6 +5,7 @@ const root = process.cwd();
 const scanRoots = ['apps/api/app', 'apps/api/routes', 'apps/api/database/migrations', 'apps/web/src', 'apps/web/public', 'apps/worker'];
 const ignoredDirs = new Set(['node_modules', 'dist', 'vendor', '.git', 'storage']);
 const sourceExtensions = new Set(['.php', '.ts', '.tsx', '.js', '.jsx', '.py', '.txt', '.conf']);
+const ignoredFilePatterns = [/\.test\.[cm]?[jt]sx?$/];
 
 const checks = [
   {
@@ -44,7 +45,7 @@ async function collectFiles(dir) {
     const relative = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       files.push(...await collectFiles(relative));
-    } else if (sourceExtensions.has(path.extname(entry.name))) {
+    } else if (sourceExtensions.has(path.extname(entry.name)) && !ignoredFilePatterns.some((pattern) => pattern.test(entry.name))) {
       files.push(relative);
     }
   }
