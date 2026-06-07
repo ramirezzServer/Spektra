@@ -8,6 +8,10 @@ release dates.
 
 ### Added
 
+- Contributor guide covering branch workflow, checks, PR expectations, optional
+  pre-commit routine, and release references.
+- GitHub pull request and issue templates for bug reports and feature requests.
+- Manual release process documentation, including annotated tag guidance.
 - MIT license for legal clarity.
 - Project history documentation for reviewers and maintainers.
 - Changelog documenting the major implementation milestones already reflected
