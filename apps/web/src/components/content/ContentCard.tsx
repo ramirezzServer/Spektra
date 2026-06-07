@@ -78,7 +78,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
           </div>
           {(item.avgRating !== null || userRating) && (
             <div className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-950/90 px-2 py-1 text-xs font-black text-white shadow-sm backdrop-blur">
-              <Star className="h-3 w-3 fill-warning text-warning" />
+              <Star className="h-3 w-3 fill-warning text-warning" aria-hidden="true" />
               {userRating ? `${userRating}/10` : item.avgRating?.toFixed(1)}
             </div>
           )}
@@ -111,7 +111,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
                   } disabled:opacity-60`}
                   aria-label={`Mark ${item.title} as ${action.label}`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
+                  <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                   {action.label}
                 </button>
               );

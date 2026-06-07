@@ -47,6 +47,18 @@
 - [ ] Security audit script reviewed.
 - [ ] No automated test requires real TMDB, RAWG, OpenLibrary, mail, Neon, or production credentials.
 
+## Accessibility
+
+- [ ] Keyboard navigation reaches primary navigation, bottom navigation, command palette, dialogs, forms, cards, ratings, and list actions.
+- [ ] Focus indicators are visible in light and dark themes.
+- [ ] Dialogs and confirm dialogs trap focus, close with Escape, and return focus to the opener.
+- [ ] Forms have labels associated with inputs using `htmlFor`/`id`, and validation errors are announced where practical.
+- [ ] Content images have meaningful alt text; decorative icons and imagery are hidden from assistive technology.
+- [ ] Text, badges, buttons, and focus rings meet WCAG AA contrast as much as practical in light and dark themes.
+- [ ] Icon-only buttons have screen reader names.
+- [ ] Reduced-motion preferences are respected for animations and interaction effects.
+- [ ] Command palette, sidebar, and mobile bottom navigation controls have clear accessible names.
+
 ## Smoke Tests
 
 - [ ] Frontend loads.
