@@ -89,4 +89,7 @@
 - [ ] Favicon and touch icon verified.
 - [ ] Manifest verified.
 - [ ] Install/update prompt tested.
+- [ ] PWA offline fallback page is precached and shown or reachable when the installed app is offline.
+- [ ] Offline banner still appears in the SPA.
+- [ ] Service worker does not cache `/api` responses or queue offline mutations.
 - [ ] Private pages noindex where appropriate.
