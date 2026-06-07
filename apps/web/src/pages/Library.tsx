@@ -42,7 +42,7 @@ export function LibraryPage() {
   const { isOnline } = useOnlineStatus();
   const stats = useUserStats(user?.username);
   const library = useMyLibrary({ status, type, sort, page, perPage: 24 });
-  const entries = library.data?.data ?? [];
+  const entries = useMemo(() => library.data?.data ?? [], [library.data?.data]);
   const items = useMemo(() => entries.map((entry) => entry.content).filter((item): item is ContentItem => Boolean(item)), [entries]);
 
   function resetPage(action: () => void) {

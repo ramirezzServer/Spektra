@@ -22,7 +22,7 @@ export function Lists() {
   const [deleting, setDeleting] = useState<UserList | null>(null);
   const [error, setError] = useState<string | null>(null);
   const user = useAuthStore((state) => state.user);
-  const loadedLists = lists.data?.data ?? [];
+  const loadedLists = useMemo(() => lists.data?.data ?? [], [lists.data?.data]);
   const counts = useMemo(() => ({
     total: lists.data?.meta.total ?? loadedLists.length,
     public: loadedLists.filter((list) => list.isPublic).length,

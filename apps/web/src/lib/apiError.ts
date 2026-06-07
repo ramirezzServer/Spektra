@@ -37,5 +37,5 @@ export function getApiErrorMessage(error: unknown, fallback = 'Something went wr
     500: 'The server had a problem. Try again in a moment.',
   };
 
-  return response.status ? messageByStatus[response.status] ?? response.data?.message ?? fallback : response.data?.message ?? fallback;
+  return response.status ? (messageByStatus[response.status] ?? response.data?.message ?? fallback) : (response.data?.message ?? fallback);
 }

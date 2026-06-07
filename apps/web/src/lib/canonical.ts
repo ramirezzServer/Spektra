@@ -24,10 +24,7 @@ function normalizePath(pathname: string): string {
   return collapsed === '/' ? '/' : collapsed.replace(/\/+$/, '');
 }
 
-export function buildCanonicalUrl(
-  pathname: string,
-  options: { includeSearch?: boolean; search?: string } = {},
-): string | undefined {
+export function buildCanonicalUrl(pathname: string, options: { includeSearch?: boolean; search?: string } = {}): string | undefined {
   const origin = normalizeSiteUrl(env.siteUrl);
   if (!origin) {
     return undefined;

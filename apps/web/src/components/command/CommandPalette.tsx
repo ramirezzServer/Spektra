@@ -21,7 +21,7 @@ interface PaletteItem {
   description: string;
   group: CommandGroup | 'Recent' | 'Content Search shortcut';
   icon?: typeof Search;
-  shortcut?: string;
+  shortcut?: string | undefined;
   poster?: RecentlyViewedItem;
   run: () => void;
 }

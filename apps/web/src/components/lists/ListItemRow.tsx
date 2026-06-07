@@ -8,11 +8,11 @@ import type { ListItem } from '@/types';
 
 interface ListItemRowProps {
   item: ListItem;
-  canMoveUp?: boolean;
-  canMoveDown?: boolean;
-  isOwner?: boolean;
-  isPending?: boolean;
-  view?: 'list' | 'grid';
+  canMoveUp?: boolean | undefined;
+  canMoveDown?: boolean | undefined;
+  isOwner?: boolean | undefined;
+  isPending?: boolean | undefined;
+  view?: 'list' | 'grid' | undefined;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onRemove?: () => void;

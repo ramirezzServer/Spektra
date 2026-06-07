@@ -12,7 +12,7 @@ function initials(value: string) {
     .toUpperCase() || 'SP';
 }
 
-export function Avatar({ src, alt, size = 'md' }: { src?: string | null; alt: string; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
+export function Avatar({ src, alt, size = 'md' }: { src?: string | null | undefined; alt: string; size?: 'sm' | 'md' | 'lg' | 'xl' | undefined }) {
   const [failed, setFailed] = useState(false);
   const safeSrc = safeUrl(src);
   const classes = {

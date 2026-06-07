@@ -13,9 +13,5 @@ export function setConsent(value: ConsentChoice) {
 }
 
 export function optionalTrackingConfigured() {
-  return Boolean(
-    import.meta.env.VITE_SENTRY_DSN ||
-      import.meta.env.VITE_GA_MEASUREMENT_ID ||
-      (import.meta.env.VITE_UMAMI_SRC && import.meta.env.VITE_UMAMI_WEBSITE_ID),
-  );
+  return Boolean(import.meta.env.VITE_SENTRY_DSN || import.meta.env.VITE_GA_MEASUREMENT_ID || (import.meta.env.VITE_UMAMI_SRC && import.meta.env.VITE_UMAMI_WEBSITE_ID));
 }

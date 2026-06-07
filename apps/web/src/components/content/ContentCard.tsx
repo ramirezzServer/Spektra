@@ -18,8 +18,8 @@ const badgeClass: Record<ContentType, string> = {
 
 export interface ContentCardProps {
   item: ContentItem;
-  userStatus?: EntryStatus;
-  userRating?: number | null;
+  userStatus?: EntryStatus | undefined;
+  userRating?: number | null | undefined;
 }
 
 const statusLabel: Record<EntryStatus, string> = {

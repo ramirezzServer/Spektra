@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/Button';
 interface DialogProps {
   open: boolean;
   title: string;
-  description?: string;
+  description?: string | undefined;
   children: ReactNode;
   onClose: () => void;
-  role?: 'dialog' | 'alertdialog';
-  closeOnEscape?: boolean;
-  closeOnBackdrop?: boolean;
-  initialFocusRef?: RefObject<HTMLElement>;
+  role?: 'dialog' | 'alertdialog' | undefined;
+  closeOnEscape?: boolean | undefined;
+  closeOnBackdrop?: boolean | undefined;
+  initialFocusRef?: RefObject<HTMLElement> | undefined;
 }
 
 const focusableSelector = [
@@ -99,6 +99,7 @@ export function Dialog({
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       const active = document.activeElement as HTMLElement | null;
+      if (!first || !last) return;
 
       if (event.shiftKey && (!active || active === first || !panel.contains(active))) {
         event.preventDefault();

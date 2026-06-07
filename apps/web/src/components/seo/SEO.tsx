@@ -4,11 +4,11 @@ import { safeUrl } from '@/lib/safeUrl';
 
 type SEOProps = {
   title: string;
-  description?: string;
-  image?: string;
-  type?: 'website' | 'article' | 'profile';
-  canonicalPath?: string;
-  noIndex?: boolean;
+  description?: string | undefined;
+  image?: string | undefined;
+  type?: 'website' | 'article' | 'profile' | undefined;
+  canonicalPath?: string | undefined;
+  noIndex?: boolean | undefined;
 };
 
 function setMeta(name: string, content: string, property = false) {

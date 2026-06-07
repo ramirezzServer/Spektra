@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 interface PaginationProps {
   page: number;
   lastPage: number;
-  isFetching?: boolean;
+  isFetching?: boolean | undefined;
   onPageChange: (page: number) => void;
 }
 

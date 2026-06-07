@@ -21,9 +21,7 @@ describe('recent content helpers', () => {
 
     rememberRecentContent(item);
 
-    expect(getRecentContent()).toMatchObject([
-      { id: 'book:old-id-42', externalId: 'old-id-42', type: 'book', viewedAt: '2026-06-05T12:00:00.000Z' },
-    ]);
+    expect(getRecentContent()).toMatchObject([{ id: 'book:old-id-42', externalId: 'old-id-42', type: 'book', viewedAt: '2026-06-05T12:00:00.000Z' }]);
   });
 
   it('ignores malformed storage safely', () => {

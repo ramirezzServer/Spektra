@@ -1,4 +1,4 @@
-import { BookOpen, Calendar, Check, Clock, Gamepad2, Layers, ListPlus, Plus, RefreshCw, Sparkles, Star, Trash2, UserRound, Users } from 'lucide-react';
+import { BookOpen, Calendar, Check, Clock, Gamepad2, Layers, ListPlus, Plus, Sparkles, Star, Trash2, UserRound, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AddToListModal } from '@/components/lists/AddToListModal';
@@ -75,7 +75,6 @@ export function ContentDetail() {
   const location = useLocation();
   const content = useContentItem(type, id);
   const item = content.data;
-  const metadata = item?.metadata ?? {};
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const entry = useEntryByContent(item?.id);
@@ -156,6 +155,7 @@ export function ContentDetail() {
 
   const detailData = useMemo(() => {
     if (!item) return null;
+    const metadata = item.metadata as Record<string, unknown>;
     const platforms = asStringArray(metadata.platforms);
     const authors = asStringArray(metadata.authors);
     const subjects = asStringArray(metadata.subjects);
@@ -176,7 +176,7 @@ export function ContentDetail() {
     ].filter(Boolean) as Array<{ label: string; value: string | null; icon: typeof Layers }>;
 
     return { platforms, authors, subjects, overview, cards };
-  }, [item, metadata]);
+  }, [item]);
 
   if (content.isLoading) {
     return (

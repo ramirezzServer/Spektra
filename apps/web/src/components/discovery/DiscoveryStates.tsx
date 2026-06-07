@@ -4,17 +4,17 @@ import { Button } from '@/components/ui/Button';
 
 interface StateAction {
   label: string;
-  to?: string;
-  onClick?: () => void;
+  to?: string | undefined;
+  onClick?: (() => void) | undefined;
 }
 
 interface DiscoveryStateProps {
   title: string;
   description: string;
-  icon?: LucideIcon;
-  primaryAction?: StateAction;
-  secondaryAction?: StateAction;
-  tone?: 'neutral' | 'warning' | 'danger';
+  icon?: LucideIcon | undefined;
+  primaryAction?: StateAction | undefined;
+  secondaryAction?: StateAction | undefined;
+  tone?: 'neutral' | 'warning' | 'danger' | undefined;
 }
 
 const toneClass = {

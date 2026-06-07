@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+coverage
+.vite
+.cache
+vendor
+storage
+bootstrap/cache
+apps/api/storage
+apps/api/bootstrap/cache
+apps/web/public

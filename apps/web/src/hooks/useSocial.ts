@@ -1,6 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/axios';
-import { getApiErrorMessage } from '@/lib/apiError';
 import { libraryKeys } from '@/hooks/useLibrary';
 import { useAuthStore } from '@/stores/authStore';
 import type { FollowRelationship, PaginatedResponse, User } from '@/types';

@@ -7,12 +7,14 @@ describe('api errors', () => {
   });
 
   it('maps validation errors to the first friendly validation message', () => {
-    expect(getApiErrorMessage({
-      response: {
-        status: 422,
-        data: { errors: { email: ['Use a valid email address.'] } },
-      },
-    })).toBe('Use a valid email address.');
+    expect(
+      getApiErrorMessage({
+        response: {
+          status: 422,
+          data: { errors: { email: ['Use a valid email address.'] } },
+        },
+      }),
+    ).toBe('Use a valid email address.');
   });
 
   it('maps 429 into a friendly retry message', () => {

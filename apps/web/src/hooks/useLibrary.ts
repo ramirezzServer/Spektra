@@ -8,11 +8,11 @@ type LibrarySort = 'updated_desc' | 'updated_asc' | 'title_asc' | 'rating_desc' 
 type PublicLibrarySort = 'updated_desc' | 'title_asc' | 'rating_desc';
 
 export interface LibraryParams {
-  status?: EntryStatus;
-  type?: ContentType;
-  page?: number;
-  perPage?: number;
-  sort?: LibrarySort;
+  status?: EntryStatus | undefined;
+  type?: ContentType | undefined;
+  page?: number | undefined;
+  perPage?: number | undefined;
+  sort?: LibrarySort | undefined;
 }
 
 export interface UpsertEntryInput {
@@ -139,7 +139,7 @@ export function useUpsertEntry() {
         id: previousEntry?.id ?? 'optimistic',
         userId: previousEntry?.userId ?? user?.id ?? '',
         contentId: input.content_id,
-        content: previousEntry?.content,
+        ...(previousEntry?.content ? { content: previousEntry.content } : {}),
         status: input.status,
         rating: input.rating ?? previousEntry?.rating ?? null,
         review: input.review ?? previousEntry?.review ?? null,

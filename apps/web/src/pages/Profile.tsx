@@ -45,7 +45,7 @@ export function Profile() {
   const [followError, setFollowError] = useState<string | null>(null);
   const { isOnline } = useOnlineStatus();
   const library = useUserLibrary(username, { status, type, page, perPage: 20, sort: 'updated_desc' });
-  const entries = library.data?.data ?? [];
+  const entries = useMemo(() => library.data?.data ?? [], [library.data?.data]);
   const items = useMemo(() => entries.map((entry) => entry.content).filter((item): item is ContentItem => Boolean(item)), [entries]);
   const isOwnProfile = currentUser?.username === username;
 

@@ -110,7 +110,9 @@ export function ListDetail() {
     const toIndex = fromIndex + direction;
     if (toIndex < 0 || toIndex >= items.length) return;
     const moved = items[fromIndex];
-    items[fromIndex] = items[toIndex];
+    const target = items[toIndex];
+    if (!moved || !target) return;
+    items[fromIndex] = target;
     items[toIndex] = moved;
     const ordered = items.map((item, index) => ({ contentId: item.contentId, position: (page - 1) * 20 + index + 1 }));
     try {

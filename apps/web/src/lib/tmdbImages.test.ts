@@ -6,9 +6,7 @@ describe('getResponsivePosterImage', () => {
     const image = getResponsivePosterImage('https://image.tmdb.org/t/p/original/poster.jpg');
 
     expect(image.src).toBe('https://image.tmdb.org/t/p/w342/poster.jpg');
-    expect(image.srcSet).toBe(
-      'https://image.tmdb.org/t/p/w185/poster.jpg 185w, https://image.tmdb.org/t/p/w342/poster.jpg 342w, https://image.tmdb.org/t/p/w500/poster.jpg 500w',
-    );
+    expect(image.srcSet).toBe('https://image.tmdb.org/t/p/w185/poster.jpg 185w, https://image.tmdb.org/t/p/w342/poster.jpg 342w, https://image.tmdb.org/t/p/w500/poster.jpg 500w');
   });
 
   it('resizes an existing TMDB width safely', () => {

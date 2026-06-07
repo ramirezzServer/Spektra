@@ -4,7 +4,7 @@ const TMDB_DEFAULT_POSTER_WIDTH = 342;
 
 export interface ResponsiveImageAttrs {
   src: string;
-  srcSet?: string;
+  srcSet?: string | undefined;
 }
 
 function tmdbPosterUrl(url: URL, width: number) {
@@ -39,11 +39,10 @@ export function getResponsivePosterImage(src: string): ResponsiveImageAttrs {
     return { src };
   }
 
-  const srcSet = TMDB_POSTER_WIDTHS
-    .map((width) => {
-      const resized = tmdbPosterUrl(url, width);
-      return resized ? `${resized} ${width}w` : null;
-    })
+  const srcSet = TMDB_POSTER_WIDTHS.map((width) => {
+    const resized = tmdbPosterUrl(url, width);
+    return resized ? `${resized} ${width}w` : null;
+  })
     .filter((entry): entry is string => Boolean(entry))
     .join(', ');
 

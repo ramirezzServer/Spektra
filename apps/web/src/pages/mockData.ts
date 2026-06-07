@@ -10,7 +10,7 @@ export const sampleContent: ContentItem[] = [
 ];
 
 export const sampleFeed: ActivityFeedItem[] = [
-  { id: 1, actorId: 'u1', actor: { id: 'u1', username: 'maya', email: 'maya@spektra.test', avatarUrl: null, bio: null, createdAt: new Date().toISOString() }, verb: 'reviewed', objectId: '1', objectType: 'content', metadata: { title: 'Past Lives', thumbnail: sampleContent[0].posterUrl }, createdAt: '12m ago' },
-  { id: 2, actorId: 'u2', actor: { id: 'u2', username: 'rio', email: 'rio@spektra.test', avatarUrl: null, bio: null, createdAt: new Date().toISOString() }, verb: 'rated', objectId: '5', objectType: 'content', metadata: { title: 'Dune: Part Two', rating: 9, thumbnail: sampleContent[4].posterUrl }, createdAt: '1h ago' },
-  { id: 3, actorId: 'u3', actor: { id: 'u3', username: 'nara', email: 'nara@spektra.test', avatarUrl: null, bio: null, createdAt: new Date().toISOString() }, verb: 'status_changed', objectId: '3', objectType: 'content', metadata: { title: 'Hades II', status: 'in_progress', thumbnail: sampleContent[2].posterUrl }, createdAt: '3h ago' },
+  { id: 1, actorId: 'u1', actor: { id: 'u1', username: 'maya', email: 'maya@spektra.test', avatarUrl: null, bio: null, createdAt: new Date().toISOString() }, verb: 'reviewed', objectId: '1', objectType: 'content', metadata: { title: 'Past Lives', thumbnail: sampleContent[0]!.posterUrl }, createdAt: '12m ago' },
+  { id: 2, actorId: 'u2', actor: { id: 'u2', username: 'rio', email: 'rio@spektra.test', avatarUrl: null, bio: null, createdAt: new Date().toISOString() }, verb: 'rated', objectId: '5', objectType: 'content', metadata: { title: 'Dune: Part Two', rating: 9, thumbnail: sampleContent[4]!.posterUrl }, createdAt: '1h ago' },
+  { id: 3, actorId: 'u3', actor: { id: 'u3', username: 'nara', email: 'nara@spektra.test', avatarUrl: null, bio: null, createdAt: new Date().toISOString() }, verb: 'status_changed', objectId: '3', objectType: 'content', metadata: { title: 'Hades II', status: 'in_progress', thumbnail: sampleContent[2]!.posterUrl }, createdAt: '3h ago' },
 ];

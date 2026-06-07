@@ -17,7 +17,7 @@ const sizes = {
   icon: 'min-h-11 min-w-11 rounded-xl p-2',
 };
 
-export const Button = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & { variant?: keyof typeof variants; size?: keyof typeof sizes; isLoading?: boolean; children: ReactNode }>(function Button(
+export const Button = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButtonElement> & { variant?: keyof typeof variants; size?: keyof typeof sizes; isLoading?: boolean | undefined; children: ReactNode }>(function Button(
   { className = '', variant = 'primary', size = variant === 'icon' ? 'icon' : 'md', isLoading = false, disabled, children, ...props },
   ref,
 ) {
