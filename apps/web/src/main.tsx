@@ -12,16 +12,15 @@ import { UpdatePrompt } from '@/components/pwa/UpdatePrompt';
 import { ScrollRestoration } from '@/components/navigation/ScrollRestoration';
 import { NetworkStatusBanner } from '@/components/network/NetworkStatusBanner';
 
-import { Home } from '@/pages/Home';
-import { Login } from '@/pages/Auth/Login';
-import { Register } from '@/pages/Auth/Register';
-import { ForgotPassword } from '@/pages/Auth/ForgotPassword';
-import { ResetPassword } from '@/pages/Auth/ResetPassword';
-import { EmailVerificationNotice } from '@/pages/Auth/EmailVerificationNotice';
-import { EmailVerified } from '@/pages/Auth/EmailVerified';
-
 import './index.css';
 
+const Home = React.lazy(() => import('@/pages/Home').then((module) => ({ default: module.Home })));
+const Login = React.lazy(() => import('@/pages/Auth/Login').then((module) => ({ default: module.Login })));
+const Register = React.lazy(() => import('@/pages/Auth/Register').then((module) => ({ default: module.Register })));
+const ForgotPassword = React.lazy(() => import('@/pages/Auth/ForgotPassword').then((module) => ({ default: module.ForgotPassword })));
+const ResetPassword = React.lazy(() => import('@/pages/Auth/ResetPassword').then((module) => ({ default: module.ResetPassword })));
+const EmailVerificationNotice = React.lazy(() => import('@/pages/Auth/EmailVerificationNotice').then((module) => ({ default: module.EmailVerificationNotice })));
+const EmailVerified = React.lazy(() => import('@/pages/Auth/EmailVerified').then((module) => ({ default: module.EmailVerified })));
 const Profile = React.lazy(() => import('@/pages/Profile').then((module) => ({ default: module.Profile })));
 const ContentDetail = React.lazy(() => import('@/pages/ContentDetail').then((module) => ({ default: module.ContentDetail })));
 const LibraryPage = React.lazy(() => import('@/pages/Library').then((module) => ({ default: module.LibraryPage })));
@@ -47,15 +46,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <RouteAnalytics />
           <ScrollRestoration />
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/email/verify" element={<RequireAuth><EmailVerificationNotice /></RequireAuth>} />
-            <Route path="/email/verified" element={<EmailVerified />} />
+            <Route path="/login" element={lazyPage(<Login />)} />
+            <Route path="/register" element={lazyPage(<Register />)} />
+            <Route path="/forgot-password" element={lazyPage(<ForgotPassword />)} />
+            <Route path="/reset-password" element={lazyPage(<ResetPassword />)} />
+            <Route path="/email/verify" element={<RequireAuth>{lazyPage(<EmailVerificationNotice />)}</RequireAuth>} />
+            <Route path="/email/verified" element={lazyPage(<EmailVerified />)} />
 
             <Route element={<AppShell />}>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={lazyPage(<Home />)} />
               <Route path="/search" element={lazyPage(<Search />)} />
               <Route path="/profile/:username" element={lazyPage(<Profile />)} />
               <Route path="/profile/:username/followers" element={lazyPage(<UserConnections kind="followers" />)} />

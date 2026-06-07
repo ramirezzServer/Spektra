@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BookOpen, Gamepad2, Tv, Video } from 'lucide-react';
 import type { ContentType } from '@/types';
 import { safeUrl } from '@/lib/safeUrl';
+import { getResponsivePosterImage } from '@/lib/tmdbImages';
 
 const iconByType: Record<ContentType, typeof Video> = {
   film: Video,
@@ -22,12 +23,16 @@ interface PosterImageProps {
   title: string;
   type: ContentType;
   className?: string;
+  sizes?: string;
 }
 
-export function PosterImage({ src, title, type, className = '' }: PosterImageProps) {
+const defaultPosterSizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 18vw';
+
+export function PosterImage({ src, title, type, className = '', sizes = defaultPosterSizes }: PosterImageProps) {
   const [failed, setFailed] = useState(false);
   const safeSrc = safeUrl(src);
   const FallbackIcon = iconByType[type];
+  const responsiveImage = safeSrc ? getResponsivePosterImage(safeSrc) : null;
 
   useEffect(() => {
     setFailed(false);
@@ -49,10 +54,14 @@ export function PosterImage({ src, title, type, className = '' }: PosterImagePro
   return (
     <img
       className={className}
-      src={safeSrc}
+      src={responsiveImage?.src ?? safeSrc}
+      srcSet={responsiveImage?.srcSet}
+      sizes={responsiveImage?.srcSet ? sizes : undefined}
       alt={`${title} poster`}
       loading="lazy"
       decoding="async"
+      width={342}
+      height={513}
       onError={() => setFailed(true)}
     />
   );
