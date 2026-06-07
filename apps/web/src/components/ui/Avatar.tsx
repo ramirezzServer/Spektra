@@ -27,7 +27,7 @@ export function Avatar({ src, alt, size = 'md' }: { src?: string | null | undefi
   }, [safeSrc]);
 
   return (
-    <div className={`${classes[size]} flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-accent-light text-sm font-black text-accent shadow-card`}>
+    <div className={`${classes[size]} flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-subtle bg-accent-light text-sm font-black text-accent shadow-card`}>
       {safeSrc && !failed ? (
         <img className="h-full w-full object-cover" src={safeSrc} alt={alt} loading="lazy" decoding="async" onError={() => setFailed(true)} />
       ) : (

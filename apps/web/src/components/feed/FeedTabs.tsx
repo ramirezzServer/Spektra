@@ -16,7 +16,7 @@ export function FeedTabs({ active, isAuthenticated, onChange }: FeedTabsProps) {
         disabled={!isAuthenticated}
         onClick={() => onChange('following')}
         className={`min-h-11 rounded-xl px-4 py-2 text-sm font-black transition focus:outline-none focus:ring-4 focus:ring-white/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 motion-reduce:transition-none motion-reduce:active:scale-100 ${
-          active === 'following' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-200 hover:bg-white/10 hover:text-white'
+          active === 'following' ? 'bg-surface text-content-primary shadow-sm' : 'text-slate-200 hover:bg-white/10 hover:text-white'
         }`}
       >
         Following
@@ -27,7 +27,7 @@ export function FeedTabs({ active, isAuthenticated, onChange }: FeedTabsProps) {
         aria-selected={active === 'global'}
         onClick={() => onChange('global')}
         className={`min-h-11 rounded-xl px-4 py-2 text-sm font-black transition focus:outline-none focus:ring-4 focus:ring-white/20 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 ${
-          active === 'global' ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-200 hover:bg-white/10 hover:text-white'
+          active === 'global' ? 'bg-surface text-content-primary shadow-sm' : 'text-slate-200 hover:bg-white/10 hover:text-white'
         }`}
       >
         Global

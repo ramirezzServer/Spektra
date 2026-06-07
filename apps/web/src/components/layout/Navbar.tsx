@@ -1,6 +1,7 @@
 import { Command, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useAuthStore } from '@/stores/authStore';
 
 interface NavbarProps {
@@ -18,6 +19,7 @@ export function Navbar({ onOpenCommandPalette }: NavbarProps) {
         </Link>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle compact className="min-w-12 px-0" />
           <button
             type="button"
             onClick={onOpenCommandPalette}

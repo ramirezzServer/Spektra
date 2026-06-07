@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Dialog } from '@/components/ui/Dialog';
 import { PosterImage } from '@/components/content/PosterImage';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { commandItemDefinitions, type CommandGroup } from '@/lib/commandItems';
 import { slugify } from '@/lib/slugs';
 import { useAuthStore } from '@/stores/authStore';
@@ -225,6 +226,7 @@ export function CommandPalette({ open, recentItems, onClose, onCreateList }: Com
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 px-4 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-500">
           <span>Arrow keys to move</span>
+          <ThemeToggle className="min-h-9 rounded-xl border-white/10 bg-white/5 px-2 text-[10px] text-slate-300 hover:bg-white/10 hover:text-white" />
           <span>Enter to open</span>
         </div>
       </div>
