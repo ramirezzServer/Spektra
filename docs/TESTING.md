@@ -7,10 +7,11 @@ Spektra uses focused automated tests for the API, worker, and frontend utility l
 Run from `apps/api`:
 
 ```bash
+./vendor/bin/pint --test
 php artisan test
 ```
 
-The Laravel tests cover auth, content discovery fallbacks, library entries, lists, social follow/feed behavior, and API throttling. They require PostgreSQL because the migrations use PostgreSQL-specific features such as `gen_random_uuid`, `jsonb`, array casts, and raw DDL.
+Pint enforces the Laravel PHP style preset. The Laravel tests cover auth, content discovery fallbacks, library entries, lists, social follow/feed behavior, and API throttling. They require PostgreSQL because the migrations use PostgreSQL-specific features such as `gen_random_uuid`, `jsonb`, array casts, and raw DDL.
 
 For local runs, point the API test environment at a disposable database:
 

@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE content_items ALTER COLUMN genres DROP DEFAULT");
+        DB::statement('ALTER TABLE content_items ALTER COLUMN genres DROP DEFAULT');
         DB::statement("
             ALTER TABLE content_items
             ALTER COLUMN genres TYPE jsonb
@@ -31,7 +31,7 @@ return new class extends Migration
         DB::statement('DROP INDEX IF EXISTS content_items_ratings_count_index');
         DB::statement('DROP INDEX IF EXISTS content_items_type_release_year_index');
 
-        DB::statement("ALTER TABLE content_items ALTER COLUMN genres DROP DEFAULT");
+        DB::statement('ALTER TABLE content_items ALTER COLUMN genres DROP DEFAULT');
         DB::statement("
             ALTER TABLE content_items
             ALTER COLUMN genres TYPE text[]

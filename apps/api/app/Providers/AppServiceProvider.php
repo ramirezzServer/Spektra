@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\ContentAggregatorService;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -18,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(\App\Services\ContentAggregatorService::class);
+        $this->app->singleton(ContentAggregatorService::class);
     }
 
     /**

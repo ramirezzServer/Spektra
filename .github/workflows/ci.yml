@@ -55,6 +55,7 @@ jobs:
           extensions: pdo_pgsql, mbstring, bcmath, redis
       - run: composer install --no-interaction --prefer-dist
       - run: composer validate --no-check-publish
+      - run: composer pint:test
       - run: find app routes config -name '*.php' -print0 | xargs -0 -n1 php -l
       - run: php artisan test
         env:

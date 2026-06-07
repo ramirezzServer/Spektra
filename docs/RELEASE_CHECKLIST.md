@@ -5,6 +5,7 @@
 - [ ] Frontend typecheck passes.
 - [ ] Frontend build passes.
 - [ ] Frontend unit tests pass.
+- [ ] Backend Pint style check passes.
 - [ ] Backend API tests pass against a PostgreSQL test database.
 - [ ] Worker compile checks pass.
 - [ ] Worker unit tests pass.

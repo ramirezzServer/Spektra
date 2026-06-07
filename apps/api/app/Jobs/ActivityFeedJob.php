@@ -15,9 +15,7 @@ class ActivityFeedJob implements ShouldQueue
         private string $contentId,
         private string $verb,
         private array $metadata
-    )
-    {
-    }
+    ) {}
 
     public function handle(): void
     {

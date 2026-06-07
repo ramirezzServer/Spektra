@@ -16,7 +16,9 @@ class UserController extends Controller
     use JsonEnvelope;
 
     private const STATUSES = ['want', 'in_progress', 'done'];
+
     private const TYPES = ['film', 'series', 'game', 'book'];
+
     private const SORTS = ['updated_desc', 'title_asc', 'rating_desc'];
 
     public function show(Request $request, string $username)

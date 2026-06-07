@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class ActivityFeed extends Model
 {
     use HasFactory;
 
     protected $table = 'activity_feed';
+
     public $timestamps = false;
 
     protected $fillable = ['actor_id', 'verb', 'object_id', 'object_type', 'metadata', 'created_at'];

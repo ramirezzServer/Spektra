@@ -11,8 +11,11 @@ use Throwable;
 class ContentAggregatorService
 {
     private const CACHE_TTL_HOURS = 24;
+
     private const PROVIDER_TIMEOUT_SECONDS = 5;
+
     private const PROVIDER_RETRY_ATTEMPTS = 1;
+
     private const PROVIDER_RETRY_DELAY_MS = 100;
 
     public function searchFilms(string $query, int $page = 1): array
@@ -49,6 +52,7 @@ class ContentAggregatorService
                 'total' => (int) ($response['count'] ?? 0),
             ];
             Cache::put($cacheKey, $result, now()->addHours(self::CACHE_TTL_HOURS));
+
             return $result;
         } catch (Throwable $exception) {
             Log::warning('RAWG search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
@@ -76,6 +80,7 @@ class ContentAggregatorService
                 'total' => (int) ($response['numFound'] ?? 0),
             ];
             Cache::put($cacheKey, $result, now()->addHours(self::CACHE_TTL_HOURS));
+
             return $result;
         } catch (Throwable $exception) {
             Log::warning('OpenLibrary search failed', ['query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);
@@ -105,6 +110,7 @@ class ContentAggregatorService
                 ->values()
                 ->all();
             Cache::put('tmdb:trending:week', $result, now()->addHours(self::CACHE_TTL_HOURS));
+
             return $result;
         } catch (Throwable $exception) {
             Log::warning('TMDB trending failed', ['error' => $exception->getMessage()]);
@@ -218,6 +224,7 @@ class ContentAggregatorService
                 'total' => (int) ($response['total_results'] ?? 0),
             ];
             Cache::put($cacheKey, $result, now()->addHours(self::CACHE_TTL_HOURS));
+
             return $result;
         } catch (Throwable $exception) {
             Log::warning('TMDB search failed', ['type' => $type, 'query' => $query, 'page' => $page, 'error' => $exception->getMessage()]);

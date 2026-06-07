@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Jobs\ActivityFeedJob;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class UserEntry extends Model
@@ -31,11 +31,13 @@ class UserEntry extends Model
 
             if ($entry->wasChanged('review') && $entry->review) {
                 self::dispatchActivity($entry, 'reviewed');
+
                 return;
             }
 
             if ($entry->wasChanged('rating') && $entry->rating) {
                 self::dispatchActivity($entry, 'rated');
+
                 return;
             }
 

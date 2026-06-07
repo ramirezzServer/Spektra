@@ -29,12 +29,12 @@ class AuthTest extends TestCase
 
         $this->withServerVariables(['REMOTE_ADDR' => $this->uniqueTestIp()])
             ->postJson('/api/auth/register', [
-            'name' => 'Ada Lovelace',
-            'username' => 'ada_lovelace',
-            'email' => 'ada@example.com',
-            'password' => 'password-secret',
-            'password_confirmation' => 'password-secret',
-        ])
+                'name' => 'Ada Lovelace',
+                'username' => 'ada_lovelace',
+                'email' => 'ada@example.com',
+                'password' => 'password-secret',
+                'password_confirmation' => 'password-secret',
+            ])
             ->assertCreated()
             ->assertJsonStructure(['data' => ['id', 'username'], 'token']);
 
@@ -48,12 +48,12 @@ class AuthTest extends TestCase
     {
         $this->withServerVariables(['REMOTE_ADDR' => $this->uniqueTestIp()])
             ->postJson('/api/auth/register', [
-            'name' => 'Ada Lovelace',
-            'username' => 'ada_invalid',
-            'email' => 'not-an-email',
-            'password' => 'password-secret',
-            'password_confirmation' => 'password-secret',
-        ])
+                'name' => 'Ada Lovelace',
+                'username' => 'ada_invalid',
+                'email' => 'not-an-email',
+                'password' => 'password-secret',
+                'password_confirmation' => 'password-secret',
+            ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['email']);
     }

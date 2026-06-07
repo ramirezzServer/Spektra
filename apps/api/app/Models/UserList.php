@@ -11,6 +11,7 @@ class UserList extends Model
     use HasFactory, HasUuids;
 
     protected $table = 'lists';
+
     protected $fillable = ['user_id', 'name', 'description', 'is_public'];
 
     protected $casts = [

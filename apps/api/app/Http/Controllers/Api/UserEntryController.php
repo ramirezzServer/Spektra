@@ -16,7 +16,9 @@ class UserEntryController extends Controller
     use JsonEnvelope;
 
     private const STATUSES = ['want', 'in_progress', 'done'];
+
     private const TYPES = ['film', 'series', 'game', 'book'];
+
     private const SORTS = ['updated_desc', 'updated_asc', 'title_asc', 'rating_desc', 'rating_asc'];
 
     public function store(Request $request)

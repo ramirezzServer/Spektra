@@ -100,6 +100,7 @@ class ListController extends Controller
     public function destroy(Request $request, string $id)
     {
         UserList::where('user_id', $request->user()->id)->findOrFail($id)->delete();
+
         return $this->ok(['deleted' => true]);
     }
 
@@ -113,7 +114,7 @@ class ListController extends Controller
         $items = ListItem::query()
             ->with('content')
             ->whereIn('list_id', $ids)
-            ->whereIn('content_id', function ($query) use ($ids) {
+            ->whereIn('content_id', function ($query) {
                 $query->select('content_id')
                     ->from('list_items as ranked')
                     ->whereColumn('ranked.list_id', 'list_items.list_id')
