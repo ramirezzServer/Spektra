@@ -169,6 +169,7 @@ See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/API.md](docs/API.md), and [d
 - [Changelog](CHANGELOG.md)
 - [Project History](docs/PROJECT_HISTORY.md)
 - [Audit Fix Summary](docs/AUDIT_FIX_SUMMARY.md)
+- [OpenAPI Specification](docs/openapi.yaml)
 - [Testing Guide](docs/TESTING.md)
 - [Environment Guide](docs/ENVIRONMENT.md)
 
