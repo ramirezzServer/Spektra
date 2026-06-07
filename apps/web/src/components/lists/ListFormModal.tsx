@@ -142,7 +142,7 @@ export function ListFormModal({ open, list, isPending = false, error, onClose, o
         <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-bg-subtle px-3 text-sm font-bold text-content-secondary">
           <input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} className="h-4 w-4 rounded border-border text-accent focus:ring-accent" />
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface text-accent">
-            {isPublic ? <Eye className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+            {isPublic ? <Eye className="h-4 w-4" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
           </span>
           <span>
             <span className="block text-content-primary">{isPublic ? 'Public list' : 'Private list'}</span>

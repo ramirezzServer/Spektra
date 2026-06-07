@@ -97,7 +97,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
 
         <section className="rounded-3xl border border-border-subtle bg-surface/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Quick actions">
           <div className="mb-2 flex items-center gap-2 px-1 text-[10px] font-black uppercase tracking-[0.18em] text-content-tertiary">
-            <Sparkles className="h-3.5 w-3.5 text-accent" />
+            <Sparkles className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
             Quick Actions
           </div>
           <div className="grid gap-1.5">
@@ -160,7 +160,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
 
         <section className="rounded-3xl border border-border-subtle bg-surface/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Recently viewed">
           <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-content-tertiary">
-            <CircleDot className="h-3.5 w-3.5 text-accent-secondary" />
+            <CircleDot className="h-3.5 w-3.5 text-accent-secondary" aria-hidden="true" />
             Recent
           </div>
           {recentItems.length > 0 ? (
@@ -197,7 +197,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
                   @{user?.username}
                 </Link>
                 <Badge variant={user?.emailVerified ? 'success' : 'warning'} className="mt-1">
-                  {user?.emailVerified ? <ShieldCheck className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
+                  {user?.emailVerified ? <ShieldCheck className="h-3 w-3" aria-hidden="true" /> : <ShieldAlert className="h-3 w-3" aria-hidden="true" />}
                   {user?.emailVerified ? 'Verified' : 'Verify email'}
                 </Badge>
               </div>

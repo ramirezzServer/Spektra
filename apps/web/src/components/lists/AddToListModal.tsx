@@ -90,8 +90,11 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
         {lists.data?.data.length ? (
           <>
           <div className="relative">
+            <label htmlFor="list-filter" className="sr-only">
+              Filter lists
+            </label>
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-content-tertiary" aria-hidden="true" />
-            <Input value={listQuery} name="list-filter" autoComplete="off" onChange={(event) => setListQuery(event.target.value)} placeholder="Filter lists..." className="pl-9" />
+            <Input id="list-filter" value={listQuery} name="list-filter" autoComplete="off" onChange={(event) => setListQuery(event.target.value)} placeholder="Filter lists..." className="pl-9" />
           </div>
           <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
             {filteredLists.map((list) => (
@@ -100,6 +103,7 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
                 type="button"
                 disabled={addItem.isPending || !isOnline}
                 onClick={() => addToList(list.id)}
+                aria-label={`Add ${content?.title ?? 'item'} to ${list.name}`}
                 className="flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl border border-border bg-bg-subtle px-3 py-3 text-left text-sm shadow-xs transition hover:border-accent/50 hover:bg-surface active:scale-[0.99] disabled:opacity-60 motion-reduce:transition-none motion-reduce:active:scale-100"
               >
                 <span className="flex min-w-0 items-center gap-3">
@@ -115,13 +119,13 @@ export function AddToListModal({ open, content, onClose }: AddToListModalProps) 
                   <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-content-tertiary">
                     <span>{formatNumber(list.itemsCount ?? 0)} items</span>
                     <Badge className={list.isPublic ? 'bg-accent-light text-accent' : 'bg-bg-tertiary text-content-tertiary'}>
-                      {list.isPublic ? <Eye className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                      {list.isPublic ? <Eye className="h-3 w-3" aria-hidden="true" /> : <Lock className="h-3 w-3" aria-hidden="true" />}
                       {list.isPublic ? 'Public' : 'Private'}
                     </Badge>
                   </span>
                   </span>
                 </span>
-                <Plus className="h-4 w-4 shrink-0 text-accent" />
+                <Plus className="h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
               </button>
             ))}
             {!filteredLists.length ? <p className="rounded-2xl border border-dashed border-border bg-bg-subtle p-4 text-sm font-semibold text-content-tertiary">No lists match that filter.</p> : null}

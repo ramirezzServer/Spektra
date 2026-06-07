@@ -18,21 +18,21 @@ export function BottomNav({ onOpenCommandPalette }: BottomNavProps) {
 
   return (
     <nav
+      aria-label="Primary navigation"
       className="fixed bottom-0 left-0 right-0 z-30 px-3 md:hidden"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 10px)' }}
     >
       <div className="mx-auto flex max-w-md rounded-2xl border border-border-subtle bg-surface/90 p-1.5 shadow-panel backdrop-blur-xl">
-        <button type="button" onClick={onOpenCommandPalette} className="flex-1 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20 motion-reduce:transition-none motion-reduce:active:scale-100">
+        <button type="button" onClick={onOpenCommandPalette} aria-label="Open command palette" aria-haspopup="dialog" className="flex-1 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/20 motion-reduce:transition-none motion-reduce:active:scale-100">
           <div className="flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-content-tertiary">
             <Command size={20} aria-hidden="true" />
             <span className="text-[10px] font-bold leading-none">Jump</span>
           </div>
         </button>
         {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} end={item.to === '/'} className="flex-1 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
+          <NavLink key={item.to} to={item.to} end={item.to === '/'} aria-label={item.label} className="flex-1 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
             {({ isActive }) => (
               <div
-                aria-current={isActive ? 'page' : undefined}
                 className={`flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 ${
                   isActive ? 'bg-accent text-white shadow-sm' : 'text-content-tertiary'
                 }`}
