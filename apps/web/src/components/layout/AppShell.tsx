@@ -40,7 +40,7 @@ export function AppShell() {
 
   return (
     <div className="app-shell-bg min-h-screen">
-      <aside className="fixed left-0 top-0 z-30 hidden h-full w-72 flex-col overflow-y-auto border-r border-white/70 bg-surface/80 shadow-floating backdrop-blur-2xl md:flex">
+      <aside className="fixed left-0 top-0 z-30 hidden h-full w-72 flex-col overflow-y-auto border-r border-border-subtle bg-surface/80 shadow-floating backdrop-blur-2xl md:flex">
         <Sidebar onOpenCommandPalette={commandPalette.openPalette} onCreateList={openCreateList} shortcutLabel={commandPalette.shortcutLabel} recentItems={recentlyViewed.items} />
       </aside>
 

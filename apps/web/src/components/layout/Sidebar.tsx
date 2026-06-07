@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { PosterImage } from '@/components/content/PosterImage';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStats } from '@/hooks/useLibrary';
 import { formatNumber } from '@/lib/formatters';
@@ -38,7 +39,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
   return (
     <div className="flex min-h-full flex-col">
       <div className="px-4 py-5">
-        <div className="rounded-3xl bg-slate-950 p-4 text-white shadow-floating">
+        <div className="rounded-3xl bg-slate-950 p-4 text-white shadow-floating dark:bg-[radial-gradient(circle_at_20%_0%,rgba(129,140,248,0.28),transparent_12rem),linear-gradient(135deg,#020617,#111827)]">
           <div className="flex items-center justify-between gap-3">
             <span className="text-2xl font-black tracking-tight">
               spek<span className="text-cyan-300">.</span>tra
@@ -54,7 +55,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
           <button
             type="button"
             onClick={onOpenCommandPalette}
-            className="flex min-h-12 w-full items-center gap-3 rounded-2xl border border-border-subtle bg-white/80 px-3 text-left text-sm font-black text-content-primary shadow-card transition hover:border-border-strong hover:bg-white focus-ring"
+            className="flex min-h-12 w-full items-center gap-3 rounded-2xl border border-border-subtle bg-surface/80 px-3 text-left text-sm font-black text-content-primary shadow-card transition hover:border-border-strong hover:bg-bg-subtle focus-ring"
           >
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent text-white shadow-sm">
               <Command className="h-4 w-4" aria-hidden="true" />
@@ -65,6 +66,10 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
             </span>
             <kbd className="rounded-lg border border-border bg-bg-subtle px-2 py-1 text-[10px] font-black text-content-tertiary">{shortcutLabel}</kbd>
           </button>
+        </section>
+
+        <section aria-label="Theme">
+          <ThemeToggle className="w-full justify-start" />
         </section>
 
         <section aria-label="Primary navigation">
@@ -78,7 +83,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
                     className={`flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2 text-sm font-bold transition active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 ${
                       isActive
                         ? 'bg-accent text-white shadow-glow'
-                        : 'text-content-secondary hover:bg-white/75 hover:text-content-primary'
+                        : 'text-content-secondary hover:bg-bg-subtle hover:text-content-primary'
                     }`}
                   >
                     <item.icon size={17} aria-hidden="true" />
@@ -90,7 +95,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
           </nav>
         </section>
 
-        <section className="rounded-3xl border border-border-subtle bg-white/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Quick actions">
+        <section className="rounded-3xl border border-border-subtle bg-surface/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Quick actions">
           <div className="mb-2 flex items-center gap-2 px-1 text-[10px] font-black uppercase tracking-[0.18em] text-content-tertiary">
             <Sparkles className="h-3.5 w-3.5 text-accent" />
             Quick Actions
@@ -126,7 +131,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
           </div>
         </section>
 
-        <section className="rounded-3xl border border-border-subtle bg-white/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Library snapshot">
+        <section className="rounded-3xl border border-border-subtle bg-surface/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Library snapshot">
           <div className="mb-3 flex items-center justify-between gap-2">
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-content-tertiary">Library Snapshot</p>
             {stats.isFetching ? <span className="text-[10px] font-bold text-content-tertiary">Syncing</span> : null}
@@ -153,7 +158,7 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
           )}
         </section>
 
-        <section className="rounded-3xl border border-border-subtle bg-white/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Recently viewed">
+        <section className="rounded-3xl border border-border-subtle bg-surface/70 p-3 shadow-innerSubtle backdrop-blur" aria-label="Recently viewed">
           <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-content-tertiary">
             <CircleDot className="h-3.5 w-3.5 text-accent-secondary" />
             Recent
@@ -180,9 +185,9 @@ export function Sidebar({ recentItems, shortcutLabel, onOpenCommandPalette, onCr
         </section>
       </div>
 
-      <div className="border-t border-white/70 p-3">
+      <div className="border-t border-border-subtle p-3">
         {isAuthenticated ? (
-          <div className="rounded-3xl border border-border-subtle bg-white/80 p-3 shadow-card backdrop-blur">
+          <div className="rounded-3xl border border-border-subtle bg-surface/80 p-3 shadow-card backdrop-blur">
             <div className="flex items-center gap-2.5">
               <Link to={`/profile/${user?.username}`} className="shrink-0 rounded-full focus-ring">
                 <Avatar src={user?.avatarUrl} alt={user?.username ?? 'User'} size="sm" />

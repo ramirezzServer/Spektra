@@ -4,6 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#4F46E5" />
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem('spektra-theme') || 'system';
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var dark = mode === 'dark' || (mode === 'system' && prefersDark);
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.dataset.theme = mode;
+          document.documentElement.dataset.resolvedTheme = dark ? 'dark' : 'light';
+          document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#070A12' : '#4F46E5');
+        } catch {
+          document.documentElement.dataset.theme = 'system';
+        }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
@@ -19,6 +34,11 @@
         background: #f8f9fb;
         font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
         line-height: 1.5;
+      }
+
+      html.dark,
+      html.dark body {
+        background: #070a12;
       }
     </style>
     <div id="root"></div>

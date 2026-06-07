@@ -107,7 +107,7 @@ export function ContentCard({ item, userStatus, userRating }: ContentCardProps) 
                   disabled={upsertEntry.isPending || !isOnline}
                   onClick={(event) => setStatus(action.value, event)}
                   className={`inline-flex min-h-9 items-center justify-center gap-1 rounded-lg px-2 text-xs font-bold transition ${
-                    active ? 'bg-white text-content-primary' : 'text-white hover:bg-white/20'
+                    active ? 'bg-surface text-content-primary' : 'text-white hover:bg-white/20'
                   } disabled:opacity-60`}
                   aria-label={`Mark ${item.title} as ${action.label}`}
                 >

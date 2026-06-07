@@ -47,8 +47,8 @@ function StateButton({ action, variant = 'primary' }: { action: StateAction; var
 export function DiscoveryEmptyState({ title, description, icon: Icon = Compass, primaryAction, secondaryAction, tone = 'neutral' }: DiscoveryStateProps) {
   return (
     <div className={`relative overflow-hidden rounded-3xl border border-dashed px-5 py-8 text-center shadow-card ${toneClass[tone]}`}>
-      <div className="pointer-events-none absolute inset-x-8 top-0 h-24 rounded-full bg-white/60 blur-2xl" aria-hidden="true" />
-      <div className="relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-accent shadow-xs" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-x-8 top-0 h-24 rounded-full bg-white/60 blur-2xl dark:bg-accent/20" aria-hidden="true" />
+      <div className="relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-surface/80 text-accent shadow-xs" aria-hidden="true">
         <Icon className="h-6 w-6" />
       </div>
       <h2 className="relative mt-4 text-lg font-black text-content-primary">{title}</h2>

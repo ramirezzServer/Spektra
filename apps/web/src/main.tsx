@@ -11,6 +11,7 @@ import { RouteAnalytics } from '@/components/monitoring/RouteAnalytics';
 import { UpdatePrompt } from '@/components/pwa/UpdatePrompt';
 import { ScrollRestoration } from '@/components/navigation/ScrollRestoration';
 import { NetworkStatusBanner } from '@/components/network/NetworkStatusBanner';
+import { ThemeController } from '@/components/theme/ThemeController';
 
 import './index.css';
 
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <ThemeController />
           <RouteAnalytics />
           <ScrollRestoration />
           <Routes>
